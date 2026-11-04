@@ -25,6 +25,7 @@ import { Monitor, Moon, Plus, Sun } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { browser } from "wxt/browser";
 
+import { ConfirmDialog } from "../../components/ConfirmDialog";
 import { SessionCard, type UrlDisplayMode } from "../../components/SessionCard";
 import { SearchBar } from "../../components/SearchBar";
 import { useI18n } from "../../hooks/useI18n";
@@ -77,18 +78,26 @@ function errorMessage(error: unknown): string {
 }
 
 function isUiResponse(value: unknown): value is UiResponse {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    typeof (value as { ok?: unknown }).ok === "boolean"
-  );
+  if (typeof value !== "object" || value === null) return false;
+  const record = value as { ok?: unknown; code?: unknown; data?: unknown };
+  if (record.ok === true) return record.data !== undefined;
+  if (record.ok === false) return typeof record.code === "string";
+  return false;
+}
+
+/** Thrown when the background reply does not match the message contract. */
+class UnexpectedResponseError extends Error {
+  constructor() {
+    super("unexpected background response");
+    this.name = "UnexpectedResponseError";
+  }
 }
 
 /** Send one typed message and reject an unexpected background reply. */
 async function sendUiMessage(message: UiMessage): Promise<UiResponse> {
   const response: unknown = await browser.runtime.sendMessage(message);
   if (isUiResponse(response)) return response;
-  throw new Error("The extension background returned an invalid response");
+  throw new UnexpectedResponseError();
 }
 
 export function App() {
@@ -99,6 +108,7 @@ export function App() {
   const [status, setStatus] = useState<Status | null>(null);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [saving, setSaving] = useState(false);
+  const [saveConfirmCount, setSaveConfirmCount] = useState<number | null>(null);
   const mounted = useRef(true);
 
   const themePreference = normalizeThemePreference(settings?.["general.theme"]);
@@ -165,11 +175,14 @@ export function App() {
   function reportException(error: unknown): void {
     setStatus({
       kind: "error",
-      message: t("sessions.actionFailed", { message: errorMessage(error) }),
+      message:
+        error instanceof UnexpectedResponseError
+          ? t("sessions.invalidResponse")
+          : t("sessions.actionFailed", { message: errorMessage(error) }),
     });
   }
 
-  async function saveWindow(): Promise<void> {
+  async function saveWindow(confirmed = false): Promise<void> {
     if (saving) return;
     setSaving(true);
     setStatus(null);
@@ -177,8 +190,13 @@ export function App() {
       const response = await sendUiMessage({
         type: "SAVE_TABS",
         source: "window",
+        ...(confirmed ? { confirmed: true } : {}),
       });
       if (!response.ok) {
+        if (response.code === "confirmation_required") {
+          setSaveConfirmCount(response.data?.count ?? 0);
+          return;
+        }
         reportFailure(response);
         return;
       }
@@ -200,6 +218,15 @@ export function App() {
       setSaving(false);
       await refresh();
     }
+  }
+
+  function confirmSaveWindow(): void {
+    setSaveConfirmCount(null);
+    void saveWindow(true);
+  }
+
+  function cancelSaveWindow(): void {
+    setSaveConfirmCount(null);
   }
 
   async function restoreSession(sessionId: string): Promise<void> {
@@ -371,6 +398,20 @@ export function App() {
           </div>
         )}
       </main>
+
+      {saveConfirmCount !== null && (
+        <ConfirmDialog
+          title={t("sessions.saveConfirmTitle")}
+          message={t("sessions.saveConfirmMessage", {
+            count: saveConfirmCount,
+          })}
+          confirmLabel={t("sessions.saveConfirm")}
+          cancelLabel={t("common.cancel")}
+          destructive
+          onConfirm={confirmSaveWindow}
+          onCancel={cancelSaveWindow}
+        />
+      )}
     </div>
   );
 }

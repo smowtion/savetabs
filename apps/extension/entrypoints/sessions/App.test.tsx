@@ -77,13 +77,16 @@ function restoreClipboard(): void {
 
 /**
  * fakeBrowser types `runtime.sendMessage` as returning void because the
- * default fake has no background listener; the tests answer with a typed
- * UiResponse instead, so the stub casts the reply.
+ * default fake has no background listener; the tests answer with typed
+ * UiResponses instead, so the stub casts each reply. Multiple replies are
+ * consumed in order for the two-phase save confirmation.
  */
-function stubSendMessage(response: unknown) {
-  return vi
-    .spyOn(fakeBrowser.runtime, "sendMessage")
-    .mockResolvedValue(response as never);
+function stubSendMessage(...responses: unknown[]) {
+  const sendMessage = vi.spyOn(fakeBrowser.runtime, "sendMessage");
+  for (const response of responses) {
+    sendMessage.mockResolvedValueOnce(response as never);
+  }
+  return sendMessage;
 }
 
 beforeEach(async () => {
@@ -193,6 +196,92 @@ describe("sessions page", () => {
       }),
     );
     expect(await screen.findByText("Saved 1 tabs.")).toBeInTheDocument();
+  });
+
+  it("asks for confirmation and resends the save with confirmed true", async () => {
+    const sendMessage = stubSendMessage(
+      { ok: false, code: "confirmation_required", data: { count: 21 } },
+      {
+        ok: true,
+        data: {
+          session: makeSession({
+            tabs: [{ url: "https://a.example", title: "A" }],
+          }),
+          skipped: 0,
+          closed: 21,
+          overflow: 0,
+        },
+      },
+    );
+    await addSession(makeSession({ title: "A session" }));
+
+    render(<App />);
+
+    await screen.findByRole("region", { name: "A session" });
+    await userEvent.click(screen.getByRole("button", { name: "Save window" }));
+
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveTextContent("Saving will close 21 tabs. Continue?");
+    expect(sendMessage).toHaveBeenNthCalledWith(1, {
+      type: "SAVE_TABS",
+      source: "window",
+    });
+
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "Save and close" }),
+    );
+
+    await waitFor(() =>
+      expect(sendMessage).toHaveBeenNthCalledWith(2, {
+        type: "SAVE_TABS",
+        source: "window",
+        confirmed: true,
+      }),
+    );
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(await screen.findByText("Saved 1 tabs.")).toBeInTheDocument();
+  });
+
+  it("does not resend the save when the confirmation is cancelled", async () => {
+    const sendMessage = stubSendMessage({
+      ok: false,
+      code: "confirmation_required",
+      data: { count: 21 },
+    });
+    await addSession(makeSession({ title: "A session" }));
+
+    render(<App />);
+
+    await screen.findByRole("region", { name: "A session" });
+    await userEvent.click(screen.getByRole("button", { name: "Save window" }));
+
+    const dialog = await screen.findByRole("dialog");
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "Cancel" }),
+    );
+
+    await waitFor(() =>
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
+    );
+    expect(sendMessage).toHaveBeenCalledTimes(1);
+    expect(sendMessage).toHaveBeenCalledWith({
+      type: "SAVE_TABS",
+      source: "window",
+    });
+  });
+
+  it("shows a localized error when the background reply is invalid", async () => {
+    stubSendMessage({ ok: true });
+    await addSession(makeSession({ id: "restore-me", title: "Restore me" }));
+
+    render(<App />);
+
+    const card = await screen.findByRole("region", { name: "Restore me" });
+    await userEvent.click(within(card).getByRole("button", { name: "Restore" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "The extension returned an unexpected response.",
+    );
   });
 
   it("sends RESTORE_SESSION for the card restore action", async () => {

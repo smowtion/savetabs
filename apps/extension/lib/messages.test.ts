@@ -26,7 +26,7 @@ async function seedSettings(overrides: Settings = {}): Promise<void> {
   });
 }
 
-async function seedWindowWithTab(url: string): Promise<void> {
+async function seedWindowWithTabs(urls: readonly string[]): Promise<number[]> {
   const window = await fakeBrowser.windows.create({
     type: "normal",
     focused: true,
@@ -34,7 +34,20 @@ async function seedWindowWithTab(url: string): Promise<void> {
   if (window?.id === undefined) {
     throw new Error("fakeBrowser.windows.create returned no window id");
   }
-  await fakeBrowser.tabs.create({ url, windowId: window.id, active: true });
+  const ids: number[] = [];
+  for (const url of urls) {
+    const tab = await fakeBrowser.tabs.create({
+      url,
+      windowId: window.id,
+      active: false,
+    });
+    if (tab?.id !== undefined) ids.push(tab.id);
+  }
+  return ids;
+}
+
+async function seedWindowWithTab(url: string): Promise<void> {
+  await seedWindowWithTabs([url]);
 }
 
 function deleteDatabase(): Promise<void> {
@@ -94,6 +107,75 @@ describe("handleUiMessage", () => {
     });
 
     expect(response).toEqual({ ok: false, code: "invalid_message" });
+  });
+
+  it("rejects SAVE_TABS with a non-boolean confirmation flag", async () => {
+    const response = await handleUiMessage({
+      type: "SAVE_TABS",
+      source: "window",
+      confirmed: "yes",
+    });
+
+    expect(response).toEqual({ ok: false, code: "invalid_message" });
+  });
+
+  it("requires confirmation above the close threshold without saving or closing", async () => {
+    await seedSettings({
+      "general.confirmThreshold": 2,
+      "open.openSessionsAfterSave": false,
+    });
+    const tabIds = await seedWindowWithTabs([
+      "https://example.com/one",
+      "https://example.com/two",
+      "https://example.com/three",
+    ]);
+    const remove = vi.spyOn(fakeBrowser.tabs, "remove");
+
+    const response = await handleUiMessage({
+      type: "SAVE_TABS",
+      source: "window",
+    });
+
+    expect(response).toEqual({
+      ok: false,
+      code: "confirmation_required",
+      data: { count: 3 },
+    });
+    await expect(listSessions()).resolves.toEqual([]);
+    expect(remove).not.toHaveBeenCalled();
+    const openTabs = await fakeBrowser.tabs.query({});
+    expect(openTabs.map((tab) => tab.id)).toEqual(
+      expect.arrayContaining(tabIds),
+    );
+  });
+
+  it("saves and closes when the save is confirmed", async () => {
+    await seedSettings({
+      "general.confirmThreshold": 2,
+      "open.openSessionsAfterSave": false,
+    });
+    const tabIds = await seedWindowWithTabs([
+      "https://example.com/one",
+      "https://example.com/two",
+      "https://example.com/three",
+    ]);
+    const remove = vi
+      .spyOn(fakeBrowser.tabs, "remove")
+      .mockResolvedValue(undefined as never);
+
+    const response = await handleUiMessage({
+      type: "SAVE_TABS",
+      source: "window",
+      confirmed: true,
+    });
+
+    const data = expectOk(response) as SaveTabsResult;
+    expect(data.session?.tabs).toHaveLength(3);
+    expect(data.closed).toBe(3);
+    await expect(listSessions()).resolves.toHaveLength(1);
+    expect(remove).toHaveBeenCalledTimes(1);
+    const removed = remove.mock.calls[0]?.[0] as number[];
+    expect([...removed].sort()).toEqual([...tabIds].sort());
   });
 
   it("restores a stored session for RESTORE_SESSION", async () => {
