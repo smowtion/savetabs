@@ -35,6 +35,12 @@ interface NewSession {
   updatedAt: number;
 }
 
+/** The stored timestamps that decide whether an incoming PUT may land. */
+interface WriteState {
+  sessionUpdatedAt?: number;
+  deletedAt?: number;
+}
+
 type ExistingKeyAuth = { authId: string } | { response: Response };
 
 /** Tombstones are kept for 30 days so other devices can observe deletes. */
@@ -121,6 +127,14 @@ sessionsRoutes.put("/keys/:authId/sessions/:sessionId", async (c) => {
       sizeRejection.code,
       sizeRejection.message,
     );
+  }
+
+  // A tombstone or a newer stored copy wins over this write. Answering 200
+  // lets the client clear its pending flag; the next sync reconciles it with
+  // the winning state instead of resurrecting deleted data.
+  const current = await loadWriteState(c.env.DB, authId, sessionId);
+  if (isStaleWrite(current, session.updatedAt)) {
+    return c.json({ ok: true });
   }
 
   const quotaRejection = await checkSessionQuota(
@@ -322,6 +336,48 @@ function loadKey(db: D1Database, authId: string): Promise<KeyRow | null> {
     .prepare("SELECT key_hash FROM keys WHERE auth_id = ?")
     .bind(authId)
     .first<KeyRow>();
+}
+
+/**
+ * Read the timestamps a PUT has to beat: the stored session's `updated_at`
+ * and any tombstone for the same id. Either may be absent.
+ */
+async function loadWriteState(
+  db: D1Database,
+  authId: string,
+  sessionId: string,
+): Promise<WriteState> {
+  const session = await db
+    .prepare(
+      "SELECT updated_at AS updatedAt FROM sessions WHERE auth_id = ? AND session_id = ?",
+    )
+    .bind(authId, sessionId)
+    .first<{ updatedAt: number }>();
+  const deletion = await db
+    .prepare(
+      "SELECT deleted_at AS deletedAt FROM deletions WHERE auth_id = ? AND session_id = ?",
+    )
+    .bind(authId, sessionId)
+    .first<{ deletedAt: number }>();
+
+  const state: WriteState = {};
+  if (session !== null) state.sessionUpdatedAt = session.updatedAt;
+  if (deletion !== null) state.deletedAt = deletion.deletedAt;
+  return state;
+}
+
+/**
+ * A write is stale when a tombstone is at least as new as the incoming
+ * `updatedAt`, or when the stored copy is strictly newer. Last-write-wins
+ * still allows a session updated after its deletion to exist again.
+ */
+function isStaleWrite(state: WriteState, updatedAt: number): boolean {
+  if (state.deletedAt !== undefined && state.deletedAt >= updatedAt) {
+    return true;
+  }
+  return (
+    state.sessionUpdatedAt !== undefined && state.sessionUpdatedAt > updatedAt
+  );
 }
 
 /** Parse `Authorization: Bearer <token>`; anything else is malformed. */

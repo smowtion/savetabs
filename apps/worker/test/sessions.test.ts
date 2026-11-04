@@ -347,6 +347,122 @@ describe("GET /v1/keys/:authId/blobs", () => {
   });
 });
 
+describe("PUT last-write-wins", () => {
+  it("rejects a stale write without changing the stored blob", async () => {
+    const authId = "stale-write";
+    const original = toBase64Url(new Uint8Array([1, 2, 3]));
+    const competing = toBase64Url(new Uint8Array([9, 9, 9, 9, 9]));
+
+    expect(
+      (
+        await putSession(authId, "s1", {
+          ciphertext: original,
+          updatedAt: 2_000,
+        })
+      ).status,
+    ).toBe(201);
+
+    const response = await putSession(authId, "s1", {
+      ciphertext: competing,
+      updatedAt: 1_000,
+    });
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true });
+    expect(await readSession(authId, "s1")).toEqual({
+      size: 3,
+      updated_at: 2_000,
+    });
+  });
+
+  it("accepts an equal timestamp so the client can repair its own copy", async () => {
+    const authId = "equal-write";
+    expect((await putSession(authId, "s1")).status).toBe(201);
+
+    const response = await putSession(authId, "s1", {
+      ciphertext: toBase64Url(new Uint8Array([4, 5, 6, 7])),
+      updatedAt: 1_000,
+    });
+
+    expect(response.status).toBe(200);
+    expect(await readSession(authId, "s1")).toEqual({
+      size: 4,
+      updated_at: 1_000,
+    });
+  });
+
+  it("rejects writes at or before a tombstone and accepts a newer resurrection", async () => {
+    const authId = "tombstone-write";
+    await seedKey(authId);
+    await env.DB.prepare(
+      `INSERT INTO deletions (auth_id, session_id, deleted_at) VALUES (?, ?, ?)`,
+    )
+      .bind(authId, "s1", 5_000)
+      .run();
+
+    for (const updatedAt of [4_000, 5_000]) {
+      const response = await putSession(authId, "s1", {
+        ciphertext: SMALL_CIPHERTEXT,
+        updatedAt,
+      });
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual({ ok: true });
+      expect(await readSession(authId, "s1")).toBeNull();
+    }
+
+    const resurrected = await putSession(authId, "s1", {
+      ciphertext: SMALL_CIPHERTEXT,
+      updatedAt: 6_000,
+    });
+    expect(resurrected.status).toBe(200);
+    expect(await readSession(authId, "s1")).toEqual({
+      size: 6,
+      updated_at: 6_000,
+    });
+    // The tombstone is left for other devices; a later sync reconciles it.
+    expect(await countRows("deletions", authId)).toBe(1);
+  });
+
+  it("does not change quota accounting for a rejected write", async () => {
+    const authId = "stale-quota";
+    await seedSessions(
+      authId,
+      Array.from({ length: LIMITS.maxSessionsPerKey }, (_, index) => ({
+        id: `s${index}`,
+        size: 1,
+      })),
+    );
+    await env.DB.prepare(
+      "DELETE FROM sessions WHERE auth_id = ? AND session_id = ?",
+    )
+      .bind(authId, "s0")
+      .run();
+    await env.DB.prepare(
+      `INSERT INTO deletions (auth_id, session_id, deleted_at) VALUES (?, ?, ?)`,
+    )
+      .bind(authId, "s0", 5_000)
+      .run();
+
+    const rejected = await putSession(authId, "s0", {
+      ciphertext: SMALL_CIPHERTEXT,
+      updatedAt: 4_000,
+    });
+
+    expect(rejected.status).toBe(200);
+    expect(await countRows("sessions", authId)).toBe(
+      LIMITS.maxSessionsPerKey - 1,
+    );
+    expect(await readSession(authId, "s0")).toBeNull();
+
+    const accepted = await putSession(authId, "s0", {
+      ciphertext: SMALL_CIPHERTEXT,
+      updatedAt: 6_000,
+    });
+    expect(accepted.status).toBe(200);
+    expect(await countRows("sessions", authId)).toBe(LIMITS.maxSessionsPerKey);
+  });
+});
+
 describe("PUT quotas", () => {
   it("rejects payloads over maxSessionBytes with 413", async () => {
     const authId = "oversized";
