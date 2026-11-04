@@ -1,3 +1,4 @@
+export * from "./api/sync-client";
 export * from "./base64url";
 export * from "./clipboard";
 export * from "./constants";
