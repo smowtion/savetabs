@@ -358,5 +358,41 @@
     "saveTab": "Lưu tab này",
     "saveWindow": "Lưu tất cả tab trong cửa sổ",
     "saveSelection": "Lưu các tab đã chọn"
+  },
+  "sessions": {
+    "title": "Phiên đã lưu",
+    "searchLabel": "Tìm kiếm phiên",
+    "searchPlaceholder": "Tìm kiếm phiên…",
+    "saveWindow": "Lưu cửa sổ",
+    "empty": "Chưa có phiên nào. Hãy lưu các tab đang mở bằng nút Lưu cửa sổ.",
+    "noResults": "Không có phiên nào khớp với tìm kiếm.",
+    "private": "Riêng tư",
+    "moreActions": "Thêm hành động",
+    "rename": "Đổi tên",
+    "exportSession": "Xuất phiên JSON",
+    "renameLabel": "Tên phiên",
+    "renameSuccess": "Đã đổi tên phiên.",
+    "restoreSuccess": "Đã khôi phục {count} tab.",
+    "saveSuccess": "Đã lưu {count} tab.",
+    "saveEmpty": "Không có tab nào để lưu.",
+    "copySuccess": "Đã sao chép {count} tab vào bộ nhớ tạm.",
+    "copyFailed": "Không thể sao chép các tab.",
+    "exportSuccess": "Đã xuất {filename}.",
+    "deleteTitle": "Xóa phiên này?",
+    "deleteMessage": "Phiên này sẽ bị xóa vĩnh viễn. Không thể hoàn tác.",
+    "deleteConfirm": "Xóa phiên",
+    "deleteSuccess": "Đã xóa phiên.",
+    "sessionMissing": "Phiên đó không còn tồn tại.",
+    "actionFailed": "Thao tác thất bại: {message}",
+    "loadFailed": "Không thể tải các phiên đã lưu.",
+    "noTabs": "Phiên này không có tab nào.",
+    "expand": "Hiện tab",
+    "collapse": "Ẩn tab",
+    "time": {
+      "justNow": "Vừa xong",
+      "minutesAgo": "{count} phút trước",
+      "hoursAgo": "{count} giờ trước",
+      "daysAgo": "{count} ngày trước"
+    }
   }
 }

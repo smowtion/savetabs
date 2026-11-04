@@ -132,6 +132,46 @@ describe("i18n", () => {
     expect(missingKeys("vi", syncKeys)).toEqual([]);
   });
 
+  it("covers the sessions page strings in both languages", () => {
+    const sessionKeys = [
+      "sessions.title",
+      "sessions.searchLabel",
+      "sessions.searchPlaceholder",
+      "sessions.saveWindow",
+      "sessions.empty",
+      "sessions.noResults",
+      "sessions.private",
+      "sessions.moreActions",
+      "sessions.rename",
+      "sessions.exportSession",
+      "sessions.renameLabel",
+      "sessions.renameSuccess",
+      "sessions.restoreSuccess",
+      "sessions.saveSuccess",
+      "sessions.saveEmpty",
+      "sessions.copySuccess",
+      "sessions.copyFailed",
+      "sessions.exportSuccess",
+      "sessions.deleteTitle",
+      "sessions.deleteMessage",
+      "sessions.deleteConfirm",
+      "sessions.deleteSuccess",
+      "sessions.sessionMissing",
+      "sessions.actionFailed",
+      "sessions.loadFailed",
+      "sessions.noTabs",
+      "sessions.expand",
+      "sessions.collapse",
+      "sessions.time.justNow",
+      "sessions.time.minutesAgo",
+      "sessions.time.hoursAgo",
+      "sessions.time.daysAgo",
+    ];
+
+    expect(missingKeys("en", sessionKeys)).toEqual([]);
+    expect(missingKeys("vi", sessionKeys)).toEqual([]);
+  });
+
   it("covers the setting control strings in both languages", () => {
     const controlKeys = [
       "options.tooltip",

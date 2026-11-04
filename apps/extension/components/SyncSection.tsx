@@ -14,6 +14,7 @@
 import { formatKey, parseKey, type Translator } from "@savetabs/shared";
 import { useEffect, useId, useState, type FormEvent } from "react";
 
+import { copyText } from "../lib/clipboard-write";
 import {
   getOrCreateKey,
   rotateKey,
@@ -46,40 +47,6 @@ export function maskKey(key: string): string {
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
-}
-
-/**
- * Copy through the async clipboard API, falling back to a temporary textarea
- * for insecure contexts or denied permissions. No extension permission is
- * needed for either path.
- */
-async function copyToClipboard(text: string): Promise<void> {
-  const clipboard = navigator.clipboard;
-  if (clipboard !== undefined && typeof clipboard.writeText === "function") {
-    try {
-      await clipboard.writeText(text);
-      return;
-    } catch {
-      // Fall through to the legacy path.
-    }
-  }
-
-  const textarea = document.createElement("textarea");
-  textarea.value = text;
-  textarea.setAttribute("readonly", "");
-  textarea.style.position = "fixed";
-  textarea.style.opacity = "0";
-  textarea.style.pointerEvents = "none";
-  document.body.appendChild(textarea);
-  try {
-    textarea.select();
-    const copied =
-      typeof document.execCommand === "function" &&
-      document.execCommand("copy");
-    if (!copied) throw new Error("clipboard copy failed");
-  } finally {
-    textarea.remove();
-  }
 }
 
 export function SyncSection({ t }: SyncSectionProps) {
@@ -153,7 +120,7 @@ export function SyncSection({ t }: SyncSectionProps) {
   async function copyKey(): Promise<void> {
     if (key === null) return;
     try {
-      await copyToClipboard(key);
+      await copyText(key);
       setStatus({ kind: "success", message: t("settings.sync.copied") });
     } catch {
       setStatus({ kind: "error", message: t("settings.sync.copyFailed") });

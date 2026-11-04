@@ -358,5 +358,41 @@
     "saveTab": "Save this tab",
     "saveWindow": "Save all tabs in this window",
     "saveSelection": "Save selected tabs"
+  },
+  "sessions": {
+    "title": "Saved sessions",
+    "searchLabel": "Search sessions",
+    "searchPlaceholder": "Search sessions…",
+    "saveWindow": "Save window",
+    "empty": "No sessions yet. Save your open tabs with the Save window button.",
+    "noResults": "No sessions match your search.",
+    "private": "Private",
+    "moreActions": "More actions",
+    "rename": "Rename",
+    "exportSession": "Export session JSON",
+    "renameLabel": "Session name",
+    "renameSuccess": "Session renamed.",
+    "restoreSuccess": "Restored {count} tabs.",
+    "saveSuccess": "Saved {count} tabs.",
+    "saveEmpty": "No tabs to save.",
+    "copySuccess": "Copied {count} tabs to the clipboard.",
+    "copyFailed": "Could not copy the tabs.",
+    "exportSuccess": "Exported {filename}.",
+    "deleteTitle": "Delete this session?",
+    "deleteMessage": "This session will be deleted permanently. This cannot be undone.",
+    "deleteConfirm": "Delete session",
+    "deleteSuccess": "Session deleted.",
+    "sessionMissing": "That session no longer exists.",
+    "actionFailed": "The action failed: {message}",
+    "loadFailed": "Could not load the saved sessions.",
+    "noTabs": "This session has no tabs.",
+    "expand": "Show tabs",
+    "collapse": "Hide tabs",
+    "time": {
+      "justNow": "Just now",
+      "minutesAgo": "{count} minutes ago",
+      "hoursAgo": "{count} hours ago",
+      "daysAgo": "{count} days ago"
+    }
   }
 }
