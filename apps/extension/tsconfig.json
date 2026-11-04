@@ -1,6 +1,8 @@
 {
   "extends": "./.wxt/tsconfig.json",
   "compilerOptions": {
+    // WXT enables noUncheckedIndexedAccess; workspace TS sources such as @savetabs/shared are not written for it.
+    "noUncheckedIndexedAccess": false,
     "strict": true,
     "jsx": "react-jsx"
   }
