@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Typecheck, test, and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # packageManager in package.json pins pnpm 10.33.0.
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # WXT generates .wxt/tsconfig.json and types used by `tsc --noEmit`.
+      - name: Prepare WXT types
+        run: pnpm --filter @savetabs/extension exec wxt prepare
+
+      - name: Check release versions are in sync
+        run: node scripts/update-versions.mjs --check
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      # Runs the unit suites (shared, extension, web) and the worker tests.
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Package extension
+        run: pnpm zip:chrome && pnpm zip:firefox
+
+      - name: Verify extension build
+        run: pnpm verify:build
+
+      - name: Upload extension artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: savetabs-extension
+          path: |
+            apps/extension/.output/savetabs-*-chrome.zip
+            apps/extension/.output/savetabs-*-firefox.zip
+            apps/extension/.output/savetabs-*-sources.zip
+          if-no-files-found: error

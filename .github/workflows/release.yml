@@ -1,0 +1,190 @@
+name: Release
+
+# Runs only when dispatched manually or when a version tag is pushed. Ordinary
+# pushes never deploy or publish anything.
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  # Repository variables (Settings -> Variables), not secrets.
+  WXT_SAVETABS_API_BASE: ${{ vars.WXT_SAVETABS_API_BASE }}
+  VITE_API_BASE: ${{ vars.VITE_API_BASE }}
+  SAVETABS_NOTES_URL: ${{ vars.SAVETABS_NOTES_URL }}
+
+jobs:
+  release:
+    name: Build, deploy, and publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # packageManager in package.json pins pnpm 10.33.0.
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Prepare WXT types
+        run: pnpm --filter @savetabs/extension exec wxt prepare
+
+      # A release built with the *.example placeholders would ship a broken
+      # manifest (wrong host permission) and web app. Require real origins.
+      - name: Check release configuration
+        run: |
+          for name in WXT_SAVETABS_API_BASE VITE_API_BASE; do
+            value="${!name}"
+            case "$value" in
+              https://*) ;;
+              *)
+                echo "::error::Set the repository variable $name to the deployed https origin."
+                exit 1
+                ;;
+            esac
+            case "$value" in
+              *.example*)
+                echo "::error::Repository variable $name still points at a placeholder."
+                exit 1
+                ;;
+            esac
+          done
+
+      - name: Read extension version
+        id: version
+        run: |
+          version="$(node -p "require('./apps/extension/package.json').version")"
+          echo "SAVETABS_VERSION=${version}" >> "$GITHUB_ENV"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Verify tag matches package version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          if [ "v${SAVETABS_VERSION}" != "${GITHUB_REF_NAME}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match package version v${SAVETABS_VERSION}."
+            exit 1
+          fi
+
+      - name: Generate versions.json
+        run: node scripts/update-versions.mjs
+
+      - name: Check versions are in sync
+        run: node scripts/update-versions.mjs --check
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Package extension
+        run: pnpm zip:chrome && pnpm zip:firefox
+
+      - name: Verify extension build
+        run: pnpm verify:build
+
+      # Upload the ZIPs first so versions.json never points at missing objects.
+      - name: Upload extension ZIPs to R2
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          pnpm --filter @savetabs/worker exec wrangler r2 object put \
+            "savetabs-releases/chrome/savetabs-${SAVETABS_VERSION}.zip" \
+            --file "$GITHUB_WORKSPACE/apps/extension/.output/savetabs-${SAVETABS_VERSION}-chrome.zip" \
+            --content-type application/zip \
+            --remote
+          pnpm --filter @savetabs/worker exec wrangler r2 object put \
+            "savetabs-releases/firefox/savetabs-${SAVETABS_VERSION}.zip" \
+            --file "$GITHUB_WORKSPACE/apps/extension/.output/savetabs-${SAVETABS_VERSION}-firefox.zip" \
+            --content-type application/zip \
+            --remote
+
+      - name: Publish versions.json to R2
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          pnpm --filter @savetabs/worker exec wrangler r2 object put \
+            "savetabs-releases/versions.json" \
+            --file "$GITHUB_WORKSPACE/versions.json" \
+            --content-type application/json \
+            --cache-control "public, max-age=300" \
+            --remote
+
+      - name: Deploy worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: pnpm --filter @savetabs/worker exec wrangler deploy
+
+      - name: Deploy web app to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: >-
+          pnpm --filter @savetabs/worker exec wrangler pages deploy
+          "$GITHUB_WORKSPACE/apps/web/dist"
+          --project-name savetabs
+          --branch main
+          --commit-dirty=true
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: savetabs-${{ steps.version.outputs.version }}
+          path: |
+            apps/extension/.output/savetabs-*.zip
+            versions.json
+          if-no-files-found: error
+
+      # Store submission is optional. Each step skips itself when its
+      # credentials are absent, so the workflow stays usable for Cloudflare-
+      # only releases. Secrets are scoped to the step that needs them.
+      - name: Submit to Chrome Web Store
+        env:
+          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+        run: |
+          if [ -z "${CHROME_CLIENT_ID}" ]; then
+            echo "CHROME_CLIENT_ID is not configured; skipping Chrome Web Store submission."
+            exit 0
+          fi
+          pnpm --filter @savetabs/extension exec wxt submit \
+            --chrome-api-version v1.1 \
+            --chrome-zip "$GITHUB_WORKSPACE/apps/extension/.output/savetabs-${SAVETABS_VERSION}-chrome.zip"
+
+      - name: Submit to Firefox Add-ons
+        env:
+          FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
+          FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
+        run: |
+          if [ -z "${FIREFOX_JWT_ISSUER}" ]; then
+            echo "FIREFOX_JWT_ISSUER is not configured; skipping Firefox Add-ons submission."
+            exit 0
+          fi
+          pnpm --filter @savetabs/extension exec wxt submit \
+            --firefox-zip "$GITHUB_WORKSPACE/apps/extension/.output/savetabs-${SAVETABS_VERSION}-firefox.zip" \
+            --firefox-sources-zip "$GITHUB_WORKSPACE/apps/extension/.output/savetabs-${SAVETABS_VERSION}-sources.zip"
