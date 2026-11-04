@@ -359,6 +359,18 @@
     "saveWindow": "Save all tabs in this window",
     "saveSelection": "Save selected tabs"
   },
+  "popup": {
+    "saveTabs": "Save {count} tabs",
+    "openSessions": "Open sessions page",
+    "syncOn": "Sync on",
+    "syncOff": "Sync off",
+    "discardOff": "Auto-discard: Off",
+    "discardStatus": "Auto-discard: {minutes} min · {count} discarded today",
+    "recentTitle": "Recent sessions",
+    "empty": "No saved sessions yet.",
+    "restoreSession": "Restore {time}",
+    "loadFailed": "Could not load the popup data."
+  },
   "sessions": {
     "title": "Saved sessions",
     "searchLabel": "Search sessions",

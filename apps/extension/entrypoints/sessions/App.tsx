@@ -23,7 +23,6 @@ import {
 } from "@savetabs/shared";
 import { Monitor, Moon, Plus, Sun } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { browser } from "wxt/browser";
 
 import { ConfirmDialog } from "../../components/ConfirmDialog";
 import { SessionCard, type UrlDisplayMode } from "../../components/SessionCard";
@@ -31,11 +30,15 @@ import { SearchBar } from "../../components/SearchBar";
 import { useI18n } from "../../hooks/useI18n";
 import { useSettings } from "../../hooks/useSettings";
 import { useTheme } from "../../hooks/useTheme";
-import type { UiMessage, UiResponse } from "../../lib/messages";
+import type { UiResponse } from "../../lib/messages";
 import type { RestoreResult } from "../../lib/restore";
 import type { SaveTabsResult } from "../../lib/save-flow";
 import { listSessions, onSessionsChanged } from "../../lib/sessions-repo";
 import { nextThemePreference, normalizeThemePreference } from "../../lib/theme";
+import {
+  sendUiMessage,
+  UnexpectedResponseError,
+} from "../../lib/ui-message-client";
 
 type Status = { kind: "success" | "error"; message: string };
 type ErrorResponse = Extract<UiResponse, { ok: false }>;
@@ -75,29 +78,6 @@ function matchesSessionQuery(session: Session, query: string): boolean {
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
-}
-
-function isUiResponse(value: unknown): value is UiResponse {
-  if (typeof value !== "object" || value === null) return false;
-  const record = value as { ok?: unknown; code?: unknown; data?: unknown };
-  if (record.ok === true) return record.data !== undefined;
-  if (record.ok === false) return typeof record.code === "string";
-  return false;
-}
-
-/** Thrown when the background reply does not match the message contract. */
-class UnexpectedResponseError extends Error {
-  constructor() {
-    super("unexpected background response");
-    this.name = "UnexpectedResponseError";
-  }
-}
-
-/** Send one typed message and reject an unexpected background reply. */
-async function sendUiMessage(message: UiMessage): Promise<UiResponse> {
-  const response: unknown = await browser.runtime.sendMessage(message);
-  if (isUiResponse(response)) return response;
-  throw new UnexpectedResponseError();
 }
 
 export function App() {

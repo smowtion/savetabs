@@ -359,6 +359,18 @@
     "saveWindow": "Lưu tất cả tab trong cửa sổ",
     "saveSelection": "Lưu các tab đã chọn"
   },
+  "popup": {
+    "saveTabs": "Lưu {count} tab",
+    "openSessions": "Mở trang phiên",
+    "syncOn": "Đang đồng bộ",
+    "syncOff": "Đồng bộ tắt",
+    "discardOff": "Tự động giải phóng: Tắt",
+    "discardStatus": "Tự động giải phóng: {minutes} phút · {count} tab đã giải phóng hôm nay",
+    "recentTitle": "Phiên gần đây",
+    "empty": "Chưa có phiên nào được lưu.",
+    "restoreSession": "Khôi phục {time}",
+    "loadFailed": "Không thể tải dữ liệu cửa sổ bật lên."
+  },
   "sessions": {
     "title": "Phiên đã lưu",
     "searchLabel": "Tìm kiếm phiên",

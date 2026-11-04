@@ -132,6 +132,24 @@ describe("i18n", () => {
     expect(missingKeys("vi", syncKeys)).toEqual([]);
   });
 
+  it("covers the popup strings in both languages", () => {
+    const popupKeys = [
+      "popup.saveTabs",
+      "popup.openSessions",
+      "popup.syncOn",
+      "popup.syncOff",
+      "popup.discardOff",
+      "popup.discardStatus",
+      "popup.recentTitle",
+      "popup.empty",
+      "popup.restoreSession",
+      "popup.loadFailed",
+    ];
+
+    expect(missingKeys("en", popupKeys)).toEqual([]);
+    expect(missingKeys("vi", popupKeys)).toEqual([]);
+  });
+
   it("covers the sessions page strings in both languages", () => {
     const sessionKeys = [
       "sessions.title",
