@@ -474,13 +474,13 @@
       "sections": {
         "data": {
           "title": "Máy chủ đồng bộ lưu gì",
-          "lead": "Máy chủ đồng bộ chỉ lưu những gì cần thiết để đồng bộ các phiên đã mã hóa:",
+          "lead": "Máy chủ đồng bộ lưu dữ liệu sau cho khóa của bạn:",
           "authId": "Mã tài khoản công khai được tạo từ khóa đồng bộ của bạn. Mã này xuất hiện trong URL API và không thể chuyển ngược lại thành khóa.",
           "authKeyHash": "Mã băm SHA-256 của thông tin xác thực bearer được tạo từ khóa đồng bộ. Mã băm dùng để xác minh yêu cầu và không thể đảo ngược thành thông tin xác thực.",
           "blobs": "Các khối phiên đã mã hóa: bản mã AES-GCM 256 dạng base64url, kèm mã phiên, thời điểm cập nhật và kích thước.",
           "tombstones": "Đánh dấu xóa: mã phiên đã xóa và thời điểm xóa. Đánh dấu xóa giúp đồng bộ việc xóa sang các thiết bị khác và được dọn trong các lần xóa sau khi đã quá 30 ngày.",
-          "timestamps": "Thời điểm khóa đồng bộ được thấy lần đầu và dùng lần cuối.",
-          "footer": "URL, tiêu đề trang, biểu tượng trang và mọi dữ liệu phiên khác chỉ nằm trong các khối đã mã hóa. Máy chủ không thể đọc chúng, và chúng tôi không bao giờ nhận được khóa đồng bộ của bạn."
+          "timestamps": "Thời điểm khóa đồng bộ được thấy lần đầu và được tải lên lần cuối.",
+          "footer": "URL, tiêu đề trang, biểu tượng trang và mọi dữ liệu phiên khác chỉ nằm trong các khối đã mã hóa. Máy chủ không thể đọc chúng, và chúng tôi không bao giờ nhận được khóa đồng bộ của bạn. Máy chủ cũng giữ các bản ghi giới hạn tốc độ ngắn hạn để chống lạm dụng, được khóa theo địa chỉ IP của client và authId, cùng bộ đếm tổng hợp theo ngày về số yêu cầu và số khóa đăng ký; không bản ghi nào chứa URL hay tiêu đề trang."
         },
         "e2ee": {
           "title": "Mã hóa đầu cuối",
@@ -514,6 +514,8 @@
       "searchPlaceholder": "Tìm kiếm phiên…",
       "noResults": "Không có phiên nào khớp với tìm kiếm.",
       "empty": "Chưa có phiên nào. Hãy lưu tab bằng tiện ích SaveTabs rồi mở lại trang này.",
+      "unknownKeyTitle": "Không có dữ liệu đồng bộ cho khóa này",
+      "unknownKey": "Khóa đồng bộ này chưa có phiên nào được đồng bộ. Hãy kiểm tra lại khóa bạn đã nhập hoặc đổi sang khóa khác.",
       "restore": "Khôi phục",
       "restoreHint": "Khôi phục mở từng tab trong tab mới. Hãy cho phép cửa sổ bật lên nếu trình duyệt hỏi.",
       "restoreSuccess": "Đã mở {count} tab.",

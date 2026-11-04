@@ -17,10 +17,22 @@ import type { Session } from "@savetabs/shared/types";
  * never need a Worker or D1 instance. Fixtures are encrypted with the same
  * shared crypto the app uses, which proves the page decrypts real base64url
  * blobs rather than a hand-written stand-in.
+ *
+ * The mock follows the Worker's real failure semantics:
+ * - an authenticated read for an authId with no key row returns 404;
+ * - a registered key presented with a different bearer returns 401.
+ * Because the authId is derived from the key, a mistyped key is always a
+ * different vault, so 404 is the normal wrong-key outcome, never 401.
  */
 
 const SESSION_TITLE = "Morning reading";
 const TAB_TITLES = ["Example A", "Docs B"] as const;
+
+const FULL_CSP =
+  "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
+  "img-src 'self' data:; font-src 'self'; " +
+  "connect-src 'self' https://api.savetabs.example; " +
+  "frame-ancestors 'none'; base-uri 'self'; form-action 'self';";
 
 /** Headers required by Chromium for a cross-origin fetch with a bearer token. */
 const CORS_HEADERS = {
@@ -32,13 +44,22 @@ const CORS_HEADERS = {
 type Fixture = {
   syncKey: string;
   authId: string;
+  authKey: string;
   blob: { id: string; ciphertext: string; updatedAt: number };
+};
+
+/** What the mocked server should do for the fixture key's list request. */
+type ApiMode = "serve" | "auth-mismatch";
+
+/** Values observed by the mock, asserted by the tests. */
+type ApiObservation = {
+  authorization: string | null;
 };
 
 /** Build one session and encrypt it exactly as the extension would. */
 async function createFixture(): Promise<Fixture> {
   const syncKey = generateKey();
-  const { authId, encKey } = await deriveKeys(parseKey(syncKey));
+  const { authId, authKey, encKey } = await deriveKeys(parseKey(syncKey));
   const session: Session = {
     id: crypto.randomUUID(),
     createdAt: 1_700_000_000_000,
@@ -54,6 +75,7 @@ async function createFixture(): Promise<Fixture> {
   return {
     syncKey,
     authId,
+    authKey,
     blob: {
       id: session.id,
       ciphertext: await encryptSession(encKey, authId, session),
@@ -63,11 +85,17 @@ async function createFixture(): Promise<Fixture> {
 }
 
 /**
- * Serve the list endpoint for the fixture key and reject every other key with
- * 401, mirroring the Worker's bearer check. Requests are answered with CORS
- * headers because the app talks to `https://api.savetabs.example`.
+ * Serve the list endpoint for the fixture key and mirror the Worker for every
+ * other request: unknown authIds get 404, while `auth-mismatch` makes the
+ * registered fixture key answer 401 for a bearer that does not match.
  */
-async function mockSyncApi(page: Page, fixture: Fixture): Promise<void> {
+async function mockSyncApi(
+  page: Page,
+  fixture: Fixture,
+  mode: ApiMode = "serve",
+): Promise<ApiObservation> {
+  const observed: ApiObservation = { authorization: null };
+
   await page.route("**/v1/keys/**", async (route) => {
     const request = route.request();
 
@@ -77,10 +105,27 @@ async function mockSyncApi(page: Page, fixture: Fixture): Promise<void> {
     }
 
     const { pathname } = new URL(request.url());
-    if (
-      request.method() === "GET" &&
-      pathname === `/v1/keys/${fixture.authId}/blobs`
-    ) {
+    const listPath = `/v1/keys/${fixture.authId}/blobs`;
+
+    if (request.method() === "GET" && pathname === listPath) {
+      observed.authorization =
+        request.headers()["authorization"] ?? null;
+
+      if (mode === "auth-mismatch") {
+        await route.fulfill({
+          status: 401,
+          headers: CORS_HEADERS,
+          contentType: "application/json",
+          body: JSON.stringify({
+            error: {
+              code: "unauthorized",
+              message: "A valid bearer token is required.",
+            },
+          }),
+        });
+        return;
+      }
+
       await route.fulfill({
         status: 200,
         headers: CORS_HEADERS,
@@ -90,18 +135,18 @@ async function mockSyncApi(page: Page, fixture: Fixture): Promise<void> {
       return;
     }
 
+    // Authenticated reads for an authId with no key row are 404 in the Worker.
     await route.fulfill({
-      status: 401,
+      status: 404,
       headers: CORS_HEADERS,
       contentType: "application/json",
       body: JSON.stringify({
-        error: {
-          code: "unauthorized",
-          message: "A valid bearer token is required.",
-        },
+        error: { code: "not_found", message: "Sync key not found." },
       }),
     });
   });
+
+  return observed;
 }
 
 async function enterKey(page: Page, syncKey: string): Promise<void> {
@@ -114,7 +159,7 @@ test("opens a session with the sync key and decrypts its tab titles", async ({
   page,
 }) => {
   const fixture = await createFixture();
-  await mockSyncApi(page, fixture);
+  const api = await mockSyncApi(page, fixture);
 
   await enterKey(page, fixture.syncKey);
 
@@ -126,9 +171,10 @@ test("opens a session with the sync key and decrypts its tab titles", async ({
     await expect(page.getByRole("link", { name: new RegExp(title) })).toBeVisible();
   }
   await expect(page.getByText("2 tabs")).toBeVisible();
+  expect(api.authorization).toBe(`Bearer ${fixture.authKey}`);
 });
 
-test("shows an auth error instead of the empty state when the key is rejected", async ({
+test("shows the no-data state for an unknown key instead of an auth error", async ({
   page,
 }) => {
   const fixture = await createFixture();
@@ -136,9 +182,34 @@ test("shows an auth error instead of the empty state when the key is rejected", 
 
   await enterKey(page, generateKey());
 
+  await expect(
+    page.getByRole("heading", { name: "No synced data for this key" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/Check that you entered it correctly/i),
+  ).toBeVisible();
+  await expect(page.getByText("No sessions yet")).toHaveCount(0);
+  await expect(page.getByText("Your sync key was rejected")).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Change key" }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(
+    page.getByRole("heading", { name: "Open your saved tabs" }),
+  ).toBeVisible();
+});
+
+test("shows an auth error when a registered key receives the wrong bearer", async ({
+  page,
+}) => {
+  const fixture = await createFixture();
+  await mockSyncApi(page, fixture, "auth-mismatch");
+
+  await enterKey(page, fixture.syncKey);
+
   await expect(page.getByRole("alert")).toContainText(
     "Your sync key was rejected",
   );
+  await expect(page.getByText("No synced data for this key")).toHaveCount(0);
   await expect(page.getByText("No sessions yet")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Change key" })).toBeVisible();
 });
@@ -154,6 +225,12 @@ test("serves the privacy policy with its data-handling details", async ({
   await expect(
     page.getByRole("heading", { name: "What the sync server stores" }),
   ).toBeVisible();
+  await expect(
+    page.getByText("The sync server stores the following data for your key:"),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/rate-limit records keyed by client IP address and authId/i),
+  ).toBeVisible();
   await expect(page.getByText("contact@savetabs.example")).toBeVisible();
 });
 
@@ -161,10 +238,10 @@ test("ships the Cloudflare Pages security headers", async () => {
   const headersPath = fileURLToPath(new URL("../dist/_headers", import.meta.url));
   const headers = await readFile(headersPath, "utf8");
 
-  expect(headers).toContain("default-src 'self'");
-  expect(headers).toContain("script-src 'self'");
-  expect(headers).toContain("connect-src 'self' https://api.savetabs.example");
-  expect(headers).toContain("frame-ancestors 'none'");
+  expect(headers).toContain(`Content-Security-Policy: ${FULL_CSP}`);
   expect(headers).toContain("X-Content-Type-Options: nosniff");
   expect(headers).toContain("Referrer-Policy: strict-origin-when-cross-origin");
+  expect(headers).toContain(
+    "Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()",
+  );
 });

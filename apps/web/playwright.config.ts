@@ -23,7 +23,7 @@ export default defineConfig({
   use: {
     baseURL: BASE_URL,
     trace: "on-first-retry",
-    channel: process.env.PW_CHANNEL,
+    channel: process.env.PW_CHANNEL || undefined,
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {

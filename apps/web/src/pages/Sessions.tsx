@@ -7,10 +7,13 @@
  * receives incognito sessions, so none can appear here.
  *
  * Failure rules:
- * - 401 means the key was rejected: show an auth banner with a "change key"
- *   action and never fall through to an empty-success state.
- * - 404 from the list endpoint means the key is fresh and unknown to the
- *   server, which is the empty state rather than an error.
+ * - 401 means a registered key received the wrong bearer: show an auth banner
+ *   with a "change key" action and never fall through to an empty-success state.
+ * - 404 from the list endpoint means no key row exists for this authId. Because
+ *   the authId is derived from the key, a mistyped key is a different (empty)
+ *   vault; show a dedicated "no synced data for this key" state that asks the
+ *   user to check the key. The generic empty state is reserved for a successful
+ *   response with zero sessions.
  * - A blob that fails to decrypt is counted and skipped; the other sessions
  *   still render.
  */
@@ -66,6 +69,7 @@ export default function Sessions() {
   const [sessions, setSessions] = useState<Session[] | null>(null);
   const [decryptFailures, setDecryptFailures] = useState(0);
   const [authError, setAuthError] = useState(false);
+  const [keyUnknown, setKeyUnknown] = useState(false);
   const [loadFailed, setLoadFailed] = useState(false);
   const [status, setStatus] = useState<Status | null>(null);
   const [query, setQuery] = useState("");
@@ -127,8 +131,8 @@ export default function Sessions() {
           return;
         }
         if (error instanceof SyncHttpError && error.status === 404) {
-          // A fresh key has no server row yet: no sessions, not an error.
-          setSessions([]);
+          // No key row for this authId: a mistyped key is a different vault.
+          setKeyUnknown(true);
           return;
         }
         setLoadFailed(true);
@@ -235,6 +239,27 @@ export default function Sessions() {
           </div>
         ) : null}
 
+        {keyUnknown ? (
+          <section
+            aria-labelledby="unknown-key-title"
+            className="mb-4 rounded-lg border border-amber-300/70 bg-amber-50 p-4 text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200"
+          >
+            <h2 id="unknown-key-title" className="text-sm font-semibold">
+              {t("web.sessions.unknownKeyTitle")}
+            </h2>
+            <p className="mt-1 text-sm text-amber-900/80 dark:text-amber-200/80">
+              {t("web.sessions.unknownKey")}
+            </p>
+            <button
+              type="button"
+              onClick={changeKey}
+              className="mt-3 rounded-md bg-amber-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-amber-700"
+            >
+              {t("web.sessions.changeKey")}
+            </button>
+          </section>
+        ) : null}
+
         {decryptFailures > 0 ? (
           <div
             role="alert"
@@ -267,7 +292,7 @@ export default function Sessions() {
         ) : null}
 
         {sessions === null ? (
-          authError || loadFailed ? null : (
+          authError || loadFailed || keyUnknown ? null : (
             <p className="text-sm text-neutral-500 dark:text-neutral-400">
               {t("common.loading")}
             </p>

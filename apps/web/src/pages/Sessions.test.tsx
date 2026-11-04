@@ -24,6 +24,8 @@ const WEB_SESSION_KEYS = [
   "web.sessions.searchPlaceholder",
   "web.sessions.noResults",
   "web.sessions.empty",
+  "web.sessions.unknownKeyTitle",
+  "web.sessions.unknownKey",
   "web.sessions.restore",
   "web.sessions.restoreHint",
   "web.sessions.restoreSuccess",
@@ -197,15 +199,43 @@ describe("Sessions page", () => {
     expect(urls.some((url) => url.includes("page=1&pageSize=50"))).toBe(true);
   });
 
-  it("renders the empty state when a fresh key is unknown to the server", async () => {
+  it("shows the unknown-key state when the server has no data for the key", async () => {
+    const user = userEvent.setup();
     mockFetch(() =>
-      jsonResponse({ error: { code: "not_found", message: "Sync key not found." } }, 404),
+      jsonResponse(
+        { error: { code: "not_found", message: "Sync key not found." } },
+        404,
+      ),
     );
 
     renderSessions();
 
+    expect(
+      await screen.findByRole("heading", {
+        name: "No synced data for this key",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Check that you entered it correctly/i),
+    ).toBeInTheDocument();
+    // The 404 path is not the empty-success state.
+    expect(screen.queryByText(/No sessions yet/i)).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Change key" }));
+
+    expect(await screen.findByTestId("landing-page")).toBeInTheDocument();
+    expect(loadKey()).toBeNull();
+  });
+
+  it("uses the generic empty state only after a successful empty response", async () => {
+    mockFetch(() => jsonResponse({ blobs: [] }));
+
+    renderSessions();
+
     expect(await screen.findByText(/No sessions yet/i)).toBeInTheDocument();
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "No synced data for this key" }),
+    ).not.toBeInTheDocument();
   });
 
   it("shows an auth error instead of the empty state on a rejected key", async () => {
@@ -223,6 +253,9 @@ describe("Sessions page", () => {
       /sync key was rejected/i,
     );
     expect(screen.queryByText(/No sessions yet/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "No synced data for this key" }),
+    ).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Change key" }));
 
