@@ -7,7 +7,12 @@
  * entries can never linger.
  */
 
-import type { Settings } from "@savetabs/shared";
+import {
+  createTranslator,
+  resolveLang,
+  type Settings,
+  type Translator,
+} from "@savetabs/shared";
 import { browser } from "wxt/browser";
 
 import { saveTabs } from "./save-flow";
@@ -33,14 +38,29 @@ export type ContextMenuDefinition = {
 };
 
 /**
- * Menu titles follow the design spec. Context menus are platform UI created by
- * the background, so they cannot use the React i18n layer.
+ * Dictionary keys for the menu titles. Titles are resolved at rebuild time so
+ * a language change in settings re-renders the platform menus.
  */
-const CONTEXT_MENU_TITLES: Record<ContextMenuId, string> = {
-  [CONTEXT_MENU_IDS.SAVE_TAB]: "Save this tab",
-  [CONTEXT_MENU_IDS.SAVE_WINDOW]: "Save all tabs in this window",
-  [CONTEXT_MENU_IDS.SAVE_SELECTION]: "Save selected tabs",
+const CONTEXT_MENU_TITLE_KEYS: Record<ContextMenuId, string> = {
+  [CONTEXT_MENU_IDS.SAVE_TAB]: "contextMenu.saveTab",
+  [CONTEXT_MENU_IDS.SAVE_WINDOW]: "contextMenu.saveWindow",
+  [CONTEXT_MENU_IDS.SAVE_SELECTION]: "contextMenu.saveSelection",
 };
+
+/** Browser UI language; falls back to English outside a browser context. */
+function getBrowserLanguage(): string {
+  return typeof navigator !== "undefined" && navigator.language
+    ? navigator.language
+    : "en";
+}
+
+/** Translator bound to `general.language`; "auto" follows the browser. */
+function createMenuTranslator(settings: Settings): Translator {
+  const preference = settings["general.language"];
+  const language =
+    preference === "en" || preference === "vi" ? preference : "auto";
+  return createTranslator(resolveLang(language, getBrowserLanguage()));
+}
 
 /** Menu entries enabled by the current settings, in stable display order. */
 export function getContextMenuDefinitions(
@@ -48,25 +68,28 @@ export function getContextMenuDefinitions(
 ): ContextMenuDefinition[] {
   if (settings["contextMenu.enabled"] !== true) return [];
 
+  const translate = createMenuTranslator(settings);
   const definitions: ContextMenuDefinition[] = [];
   if (settings["contextMenu.saveTab"] === true) {
     definitions.push({
       id: CONTEXT_MENU_IDS.SAVE_TAB,
-      title: CONTEXT_MENU_TITLES[CONTEXT_MENU_IDS.SAVE_TAB],
+      title: translate(CONTEXT_MENU_TITLE_KEYS[CONTEXT_MENU_IDS.SAVE_TAB]),
       contexts: ["page", "tab"],
     });
   }
   if (settings["contextMenu.saveWindow"] === true) {
     definitions.push({
       id: CONTEXT_MENU_IDS.SAVE_WINDOW,
-      title: CONTEXT_MENU_TITLES[CONTEXT_MENU_IDS.SAVE_WINDOW],
+      title: translate(CONTEXT_MENU_TITLE_KEYS[CONTEXT_MENU_IDS.SAVE_WINDOW]),
       contexts: ["page", "tab"],
     });
   }
   if (settings["contextMenu.saveSelection"] === true) {
     definitions.push({
       id: CONTEXT_MENU_IDS.SAVE_SELECTION,
-      title: CONTEXT_MENU_TITLES[CONTEXT_MENU_IDS.SAVE_SELECTION],
+      title: translate(
+        CONTEXT_MENU_TITLE_KEYS[CONTEXT_MENU_IDS.SAVE_SELECTION],
+      ),
       contexts: ["tab"],
     });
   }

@@ -202,5 +202,10 @@
     "advanced": {
       "label": "Nâng cao"
     }
+  },
+  "contextMenu": {
+    "saveTab": "Lưu tab này",
+    "saveWindow": "Lưu tất cả tab trong cửa sổ",
+    "saveSelection": "Lưu các tab đã chọn"
   }
 }

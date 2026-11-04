@@ -43,7 +43,7 @@ describe("rebuildContextMenus", () => {
     const removeAllSpy = vi.spyOn(fakeBrowser.contextMenus, "removeAll");
     const createSpy = vi.spyOn(fakeBrowser.contextMenus, "create");
 
-    await rebuildContextMenus(settingsWith());
+    await rebuildContextMenus(settingsWith({ "general.language": "en" }));
 
     expect(removeAllSpy).toHaveBeenCalledTimes(1);
     expect(createSpy.mock.calls.map(([props]) => props)).toEqual([
@@ -66,6 +66,18 @@ describe("rebuildContextMenus", () => {
     expect(removeAllSpy.mock.invocationCallOrder[0]).toBeLessThan(
       createSpy.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY,
     );
+  });
+
+  it("localizes menu titles to the configured language", async () => {
+    const createSpy = vi.spyOn(fakeBrowser.contextMenus, "create");
+
+    await rebuildContextMenus(settingsWith({ "general.language": "vi" }));
+
+    expect(createSpy.mock.calls.map(([props]) => props.title)).toEqual([
+      "Lưu tab này",
+      "Lưu tất cả tab trong cửa sổ",
+      "Lưu các tab đã chọn",
+    ]);
   });
 
   it("removes every menu item when the context menu is disabled", async () => {

@@ -202,5 +202,10 @@
     "advanced": {
       "label": "Advanced"
     }
+  },
+  "contextMenu": {
+    "saveTab": "Save this tab",
+    "saveWindow": "Save all tabs in this window",
+    "saveSelection": "Save selected tabs"
   }
 }

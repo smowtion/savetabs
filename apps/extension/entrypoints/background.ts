@@ -58,7 +58,12 @@ export default defineBackground(() => {
     run(applyCurrentSettings());
   });
 
-  browser.runtime.onMessage.addListener((message) => handleUiMessage(message));
+  // `sendResponse` + `return true` keeps the response channel open on every
+  // supported browser, independent of promise-return support in onMessage.
+  browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+    void handleUiMessage(message).then(sendResponse);
+    return true;
+  });
 
   browser.action.onClicked.addListener(() => {
     run(handleToolbarClick());

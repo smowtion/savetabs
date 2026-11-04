@@ -13,6 +13,10 @@ export default defineConfig({
     name: "SaveTabs",
     description: "Save and restore browser tab sessions.",
     permissions: ["tabs", "storage", "alarms", "contextMenus"],
+    // The background configures the toolbar action at runtime (popup vs click
+    // handler), so the manifest must declare it even before a popup entrypoint
+    // exists. The popup entrypoint later merges `default_popup` into this key.
+    action: {},
     host_permissions: [`${apiBase}/*`],
     commands: {
       "save-tabs": {
