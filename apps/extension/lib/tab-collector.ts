@@ -70,14 +70,15 @@ function readMatchMode(settings: Settings): MatchMode {
 }
 
 /**
- * Domain entries are user input: trim blanks, lowercase, drop leading and
- * trailing dots, and ignore empty strings. A bare domain matches both the
- * exact host and every subdomain of it.
+ * Normalize user-entered excluded domain entries: trim blanks, lowercase,
+ * drop leading and trailing dots, and ignore empty strings. A bare domain
+ * matches both the exact host and every subdomain of it.
+ *
+ * Shared with the auto-discard policy so both features agree on what an
+ * excluded host is.
  */
-function readExcludedDomains(value: Settings[string]): string[] {
-  if (!Array.isArray(value)) return [];
-  return value
-    .filter((entry): entry is string => typeof entry === "string")
+export function normalizeExcludedDomains(list: string[]): string[] {
+  return list
     .map((entry) =>
       entry
         .trim()
@@ -86,6 +87,13 @@ function readExcludedDomains(value: Settings[string]): string[] {
         .replace(/\.+$/, ""),
     )
     .filter((entry) => entry.length > 0);
+}
+
+function readExcludedDomains(value: Settings[string]): string[] {
+  if (!Array.isArray(value)) return [];
+  return normalizeExcludedDomains(
+    value.filter((entry): entry is string => typeof entry === "string"),
+  );
 }
 
 function isExcludedHost(url: string, domains: readonly string[]): boolean {

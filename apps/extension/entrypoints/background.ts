@@ -2,11 +2,10 @@
  * Background service worker.
  *
  * Wires browser lifecycle events to the small background behaviors:
- * toolbar action mode, context menus, badge count, keyboard commands and the
- * typed runtime message router.
+ * toolbar action mode, context menus, badge count, keyboard commands,
+ * auto-discard and the typed runtime message router.
  *
- * Sync key generation (Task 18) and the auto-discard alarm (Task 14) are
- * intentionally not wired here.
+ * Sync key generation is intentionally not wired here.
  */
 
 import type { Settings } from "@savetabs/shared";
@@ -22,6 +21,15 @@ import {
   handleContextMenuClick,
   rebuildContextMenus,
 } from "../lib/context-menus";
+import {
+  DISCARD_ALARM_NAME,
+  applyDiscardAlarm,
+  evaluateAndDiscard,
+  forgetTabActivity,
+  pruneActivity,
+  recordActivity,
+  recordWindowActivity,
+} from "../lib/discard";
 import { handleUiMessage } from "../lib/messages";
 import { loadSettings, onSettingsChanged } from "../lib/settings";
 import { onSessionsChanged } from "../lib/sessions-repo";
@@ -43,6 +51,7 @@ async function applySettings(settings: Settings): Promise<void> {
     applyToolbarAction(settings),
     rebuildContextMenus(settings),
     updateBadge(settings),
+    applyDiscardAlarm(settings),
   ]);
 }
 
@@ -50,12 +59,18 @@ async function applyCurrentSettings(): Promise<void> {
   await applySettings(await loadSettings());
 }
 
+/** Install and startup both restore settings and drop stale tab activity. */
+async function initialize(): Promise<void> {
+  await applyCurrentSettings();
+  await pruneActivity();
+}
+
 export default defineBackground(() => {
   browser.runtime.onInstalled.addListener(() => {
-    run(applyCurrentSettings());
+    run(initialize());
   });
   browser.runtime.onStartup.addListener(() => {
-    run(applyCurrentSettings());
+    run(initialize());
   });
 
   // `sendResponse` + `return true` keeps the response channel open on every
@@ -75,6 +90,28 @@ export default defineBackground(() => {
 
   browser.commands.onCommand.addListener((command) => {
     run(handleCommand(command));
+  });
+
+  browser.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name === DISCARD_ALARM_NAME) run(evaluateAndDiscard());
+  });
+
+  // Activity tracking feeds the idle threshold. URL changes cover in-page
+  // navigations that never report a `complete` status.
+  browser.tabs.onActivated.addListener(({ tabId }) => {
+    run(recordActivity(tabId));
+  });
+  browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
+    if (changeInfo.status === "complete" || changeInfo.url !== undefined) {
+      run(recordActivity(tabId));
+    }
+  });
+  browser.windows.onFocusChanged.addListener((windowId) => {
+    if (windowId === browser.windows.WINDOW_ID_NONE) return;
+    run(recordWindowActivity(windowId));
+  });
+  browser.tabs.onRemoved.addListener((tabId) => {
+    run(forgetTabActivity(tabId));
   });
 
   onSettingsChanged((settings) => {

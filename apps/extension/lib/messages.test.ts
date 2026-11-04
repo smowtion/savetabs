@@ -157,14 +157,17 @@ describe("handleUiMessage", () => {
     expect(expectOk(response)).toEqual({ deleted: "already-gone" });
   });
 
-  it.each(["SYNC_NOW", "DISCARD_NOW"] as const)(
-    "reports %s as not implemented",
-    async (type) => {
-      const response = await handleUiMessage({ type });
+  it("runs the discard sweep for DISCARD_NOW", async () => {
+    const response = await handleUiMessage({ type: "DISCARD_NOW" });
 
-      expect(response).toEqual({ ok: false, code: "not_implemented" });
-    },
-  );
+    expect(expectOk(response)).toEqual({ discarded: 0 });
+  });
+
+  it("reports SYNC_NOW as not implemented", async () => {
+    const response = await handleUiMessage({ type: "SYNC_NOW" });
+
+    expect(response).toEqual({ ok: false, code: "not_implemented" });
+  });
 
   it("reports unknown message types as not implemented", async () => {
     const response = await handleUiMessage({ type: "NOT_A_REAL_MESSAGE" });

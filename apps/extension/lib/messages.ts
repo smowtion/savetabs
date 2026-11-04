@@ -10,6 +10,7 @@
 
 import type { SessionSource } from "@savetabs/shared";
 
+import { discardNow, type DiscardResult } from "./discard";
 import { executeRestore, type RestoreResult } from "./restore";
 import { saveTabs, type SaveTabsResult } from "./save-flow";
 import { deleteSession, getSession } from "./sessions-repo";
@@ -36,7 +37,10 @@ export type UiErrorCode =
  * human-readable `message` when one is available (for example a quota error).
  */
 export type UiResponse =
-  | { ok: true; data: SaveTabsResult | RestoreResult | { deleted: string } }
+  | {
+      ok: true;
+      data: SaveTabsResult | RestoreResult | DiscardResult | { deleted: string };
+    }
   | { ok: false; code: UiErrorCode; message?: string };
 
 const SESSION_SOURCES: ReadonlySet<string> = new Set([
@@ -117,9 +121,16 @@ export async function handleUiMessage(message: unknown): Promise<UiResponse> {
       }
     }
 
-    // Handlers are added with the auto-discard service and the sync service.
+    case "DISCARD_NOW": {
+      try {
+        return { ok: true, data: await discardNow() };
+      } catch (error) {
+        return failed(error);
+      }
+    }
+
+    // The handler is added with the sync service.
     case "SYNC_NOW":
-    case "DISCARD_NOW":
       return notImplemented();
 
     default:
