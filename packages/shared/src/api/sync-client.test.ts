@@ -141,6 +141,26 @@ describe("SyncClient", () => {
     expect(requestInit(fetchMock, 0).method).toBe("DELETE");
   });
 
+  it("invokes fetch with the global receiver", async () => {
+    // Browsers reject native fetch when called as an object method, so the
+    // client must never hand itself to the fetch implementation as `this`.
+    let receiver: unknown;
+    const fetchMock = vi.fn(function (this: unknown) {
+      receiver = this;
+      return Promise.resolve(jsonResponse({ blobs: [] }));
+    });
+    const client = new SyncClient(
+      ORIGIN,
+      AUTH_ID,
+      AUTH_KEY,
+      fetchMock as unknown as typeof fetch,
+    );
+
+    await client.listBlobs();
+
+    expect(receiver).toBe(globalThis);
+  });
+
   it("throws SyncAuthError on HTTP 401", async () => {
     const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(
       jsonResponse(

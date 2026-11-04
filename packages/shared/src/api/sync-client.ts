@@ -136,7 +136,13 @@ export class SyncClient {
     }
 
     const url = `${this.baseUrl}/v1/keys/${encodeURIComponent(this.authId)}${path}`;
-    const response = await this.fetchImpl(url, { ...init, headers });
+    // Native fetch is a Window/Worker method and rejects other receivers with
+    // "Illegal invocation"; calling it as `this.fetchImpl(...)` would pass the
+    // client instance. Pin the receiver to the global scope instead.
+    const response = await this.fetchImpl.call(globalThis, url, {
+      ...init,
+      headers,
+    });
 
     if (!response.ok) throw await this.toError(response);
     if (response.status === 204) return undefined as T;
