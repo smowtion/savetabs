@@ -223,9 +223,14 @@ type IncognitoSectionProps = Pick<
 type CopyStatus = "success" | "error";
 
 /**
- * Incognito status plus the schema rows. Access is checked once on mount; the
- * setting is disabled when the browser reports no access, because the control
- * could never take effect in that state.
+ * Incognito status plus the schema rows.
+ *
+ * Access is checked on mount and re-checked whenever the options page becomes
+ * visible or focused again: the user grants the permission on the browser's
+ * extensions page, then comes back to this still-mounted panel, which must not
+ * keep showing the stale answer. The setting is disabled when the browser
+ * reports no access, because the control could never take effect in that
+ * state.
  */
 function IncognitoSection({
   settings,
@@ -238,11 +243,25 @@ function IncognitoSection({
 
   useEffect(() => {
     let active = true;
-    void isIncognitoAllowed().then((value) => {
-      if (active) setAllowed(value);
-    });
+
+    function refresh(): void {
+      void isIncognitoAllowed().then((value) => {
+        if (active) setAllowed(value);
+      });
+    }
+
+    function handleVisibilityChange(): void {
+      if (document.visibilityState === "visible") refresh();
+    }
+
+    refresh();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", refresh);
+
     return () => {
       active = false;
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", refresh);
     };
   }, []);
 

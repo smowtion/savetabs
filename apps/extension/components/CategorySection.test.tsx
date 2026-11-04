@@ -96,6 +96,7 @@ afterEach(async () => {
   vi.restoreAllMocks();
   await resetSettings();
   fakeBrowser.reset();
+  Reflect.deleteProperty(document, "visibilityState");
   if (originalClipboard === undefined) {
     Reflect.deleteProperty(navigator, "clipboard");
   } else {
@@ -441,6 +442,62 @@ describe("CategorySection", () => {
     expect(
       screen.getByText("Path copied to the clipboard."),
     ).toBeInTheDocument();
+  });
+
+  it("refreshes incognito access when the page becomes visible or focused", async () => {
+    const check = vi
+      .spyOn(fakeBrowser.extension, "isAllowedIncognitoAccess")
+      .mockImplementationOnce(async () => false)
+      .mockImplementationOnce(async () => true)
+      .mockImplementation(async () => false);
+
+    render(<Harness categoryId="incognito" />);
+    expect(await screen.findByText("Not allowed")).toBeInTheDocument();
+
+    // Hidden pages do not refresh; the user is still changing settings
+    // elsewhere.
+    Object.defineProperty(document, "visibilityState", {
+      configurable: true,
+      value: "hidden",
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+    expect(check).toHaveBeenCalledTimes(1);
+
+    Object.defineProperty(document, "visibilityState", {
+      configurable: true,
+      value: "visible",
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+    expect(await screen.findByText("Allowed")).toBeInTheDocument();
+    expect(check).toHaveBeenCalledTimes(2);
+    expect(
+      screen.getByRole("switch", { name: "Include incognito windows" }),
+    ).toBeEnabled();
+
+    window.dispatchEvent(new Event("focus"));
+    expect(await screen.findByText("Not allowed")).toBeInTheDocument();
+    expect(check).toHaveBeenCalledTimes(3);
+    expect(
+      screen.getByRole("switch", { name: "Include incognito windows" }),
+    ).toBeDisabled();
+  });
+
+  it("removes incognito refresh listeners on unmount", () => {
+    vi.spyOn(
+      fakeBrowser.extension,
+      "isAllowedIncognitoAccess",
+    ).mockImplementation(async () => true);
+    const documentRemove = vi.spyOn(document, "removeEventListener");
+    const windowRemove = vi.spyOn(window, "removeEventListener");
+
+    const { unmount } = render(<Harness categoryId="incognito" />);
+    unmount();
+
+    expect(documentRemove).toHaveBeenCalledWith(
+      "visibilitychange",
+      expect.any(Function),
+    );
+    expect(windowRemove).toHaveBeenCalledWith("focus", expect.any(Function));
   });
 
   it("renders real command bindings in the shortcuts category", async () => {

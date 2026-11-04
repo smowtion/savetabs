@@ -8,6 +8,10 @@
  * - `listShortcuts` reads the bindings the browser currently has for this
  *   extension through `commands.getAll()`.
  *
+ * The user changes both states outside the options page, so the reads refresh
+ * when this page regains visibility or focus (and on `commands.onChanged`
+ * where the browser provides it) instead of freezing the mount-time answer.
+ *
  * Browsers block opening privileged pages such as `chrome://extensions` from
  * extension code, so the UI shows the path as text with a Copy button instead
  * of rendering a link that could not be opened.
@@ -46,6 +50,26 @@ const BUTTON_CLASS =
   "rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800";
 
 type CopyStatus = "success" | "error";
+
+type CommandsChangedEvent = {
+  addListener(listener: () => void): void;
+  removeListener(listener: () => void): void;
+};
+
+/**
+ * `commands.onChanged` exists in Chrome MV3 but not in every browser, so it is
+ * feature-detected instead of assumed.
+ */
+function readCommandsChangedEvent(): CommandsChangedEvent | undefined {
+  const event = (browser as unknown as { commands?: { onChanged?: unknown } })
+    .commands?.onChanged;
+  if (event === null || typeof event !== "object") return undefined;
+  const candidate = event as Partial<CommandsChangedEvent>;
+  return typeof candidate.addListener === "function" &&
+    typeof candidate.removeListener === "function"
+    ? (candidate as CommandsChangedEvent)
+    : undefined;
+}
 
 /**
  * Read the shortcuts the browser currently has bound.
@@ -100,11 +124,30 @@ export function ShortcutsInfo({ t }: ShortcutsInfoProps) {
 
   useEffect(() => {
     let active = true;
-    void listShortcuts().then((entries) => {
-      if (active) setShortcuts(entries);
-    });
+
+    function refresh(): void {
+      void listShortcuts().then((entries) => {
+        if (active) setShortcuts(entries);
+      });
+    }
+
+    function handleVisibilityChange(): void {
+      if (document.visibilityState === "visible") refresh();
+    }
+
+    refresh();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", refresh);
+    // The user edits bindings on another browser page; refresh when the
+    // browser reports the change while this panel stays mounted.
+    const onChanged = readCommandsChangedEvent();
+    onChanged?.addListener(refresh);
+
     return () => {
       active = false;
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", refresh);
+      onChanged?.removeListener(refresh);
     };
   }, []);
 

@@ -1,5 +1,5 @@
 import { createTranslator } from "@savetabs/shared";
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { fakeBrowser } from "wxt/testing/fake-browser";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -32,6 +32,7 @@ afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
   fakeBrowser.reset();
+  Reflect.deleteProperty(fakeBrowser.commands, "onChanged");
   if (originalClipboard === undefined) {
     Reflect.deleteProperty(navigator, "clipboard");
   } else {
@@ -147,6 +148,75 @@ describe("ShortcutsInfo", () => {
     expect(
       await screen.findByText("Could not copy the path."),
     ).toBeInTheDocument();
+  });
+
+  it("refreshes the bindings when the options page becomes visible or focused", async () => {
+    const getAll = vi
+      .spyOn(fakeBrowser.commands, "getAll")
+      .mockImplementationOnce(async () => [
+        { name: "save-tabs", description: "", shortcut: "Alt+Shift+S" },
+      ])
+      .mockImplementation(async () => [
+        { name: "save-tabs", description: "", shortcut: "Ctrl+Shift+S" },
+      ]);
+
+    render(<ShortcutsInfo t={t} />);
+    expect(await screen.findByText("Alt+Shift+S")).toBeInTheDocument();
+
+    document.dispatchEvent(new Event("visibilitychange"));
+    expect(await screen.findByText("Ctrl+Shift+S")).toBeInTheDocument();
+    expect(screen.queryByText("Alt+Shift+S")).not.toBeInTheDocument();
+    expect(getAll).toHaveBeenCalledTimes(2);
+
+    window.dispatchEvent(new Event("focus"));
+    await waitFor(() => expect(getAll).toHaveBeenCalledTimes(3));
+  });
+
+  it("subscribes to command changes when available and unsubscribes on unmount", async () => {
+    let listener: (() => void) | undefined;
+    const addListener = vi.fn((callback: () => void) => {
+      listener = callback;
+    });
+    const removeListener = vi.fn();
+    Object.defineProperty(fakeBrowser.commands, "onChanged", {
+      configurable: true,
+      value: { addListener, removeListener },
+    });
+    const getAll = vi
+      .spyOn(fakeBrowser.commands, "getAll")
+      .mockImplementationOnce(async () => [
+        { name: "save-tabs", description: "", shortcut: "Alt+Shift+S" },
+      ])
+      .mockImplementation(async () => [
+        { name: "save-tabs", description: "", shortcut: "Ctrl+Alt+S" },
+      ]);
+
+    const { unmount } = render(<ShortcutsInfo t={t} />);
+
+    expect(await screen.findByText("Alt+Shift+S")).toBeInTheDocument();
+    expect(addListener).toHaveBeenCalledTimes(1);
+
+    listener?.();
+    expect(await screen.findByText("Ctrl+Alt+S")).toBeInTheDocument();
+    expect(getAll).toHaveBeenCalledTimes(2);
+
+    unmount();
+    expect(removeListener).toHaveBeenCalledWith(listener);
+  });
+
+  it("removes visibility and focus listeners on unmount", () => {
+    vi.spyOn(fakeBrowser.commands, "getAll").mockImplementation(async () => []);
+    const documentRemove = vi.spyOn(document, "removeEventListener");
+    const windowRemove = vi.spyOn(window, "removeEventListener");
+
+    const { unmount } = render(<ShortcutsInfo t={t} />);
+    unmount();
+
+    expect(documentRemove).toHaveBeenCalledWith(
+      "visibilitychange",
+      expect.any(Function),
+    );
+    expect(windowRemove).toHaveBeenCalledWith("focus", expect.any(Function));
   });
 
   it("keeps the instructions visible when the commands API fails", async () => {
