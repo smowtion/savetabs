@@ -369,6 +369,49 @@ describe("local caps", () => {
       tabs: LIMITS.maxLocalTabs,
     });
   });
+
+  it("throws LocalQuotaError when an update would exceed the tab cap", async () => {
+    await seedSessions([
+      makeSession({ id: "fixed", tabs: makeTabs(LIMITS.maxLocalTabs - 1) }),
+      makeSession({ id: "editable", tabs: makeTabs(1) }),
+    ]);
+    const before = await getSession("editable");
+    expect(before).toBeDefined();
+
+    const error = await updateSession("editable", {
+      tabs: makeTabs(2),
+      updatedAt: 999,
+    }).catch((failure: unknown) => failure);
+
+    expect(error).toBeInstanceOf(LocalQuotaError);
+    expect(error).toMatchObject({
+      name: "LocalQuotaError",
+      resource: "tabs",
+      usage: LIMITS.maxLocalTabs,
+      limit: LIMITS.maxLocalTabs,
+    });
+    await expect(getSession("editable")).resolves.toEqual(before);
+    await expect(getUsage()).resolves.toMatchObject({
+      tabs: LIMITS.maxLocalTabs,
+    });
+  });
+
+  it("updates tabs within the cap and bumps updatedAt", async () => {
+    const session = makeSession({
+      id: "editable",
+      tabs: makeTabs(5),
+      updatedAt: 200,
+    });
+    await seedSessions([session]);
+    vi.spyOn(Date, "now").mockReturnValue(7_000);
+
+    const updated = await updateSession(session.id, { tabs: makeTabs(10) });
+
+    expect(updated).toMatchObject({ id: session.id, updatedAt: 7_000 });
+    expect(updated?.tabs).toHaveLength(10);
+    await expect(getSession(session.id)).resolves.toEqual(updated);
+    await expect(getUsage()).resolves.toMatchObject({ tabs: 10 });
+  });
 });
 
 describe("getUsage", () => {

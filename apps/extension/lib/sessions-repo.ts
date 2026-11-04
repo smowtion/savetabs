@@ -166,24 +166,36 @@ export async function addSession(session: Session): Promise<Session> {
  * Merges `patch` into a session. `updatedAt` advances to the current time
  * unless the patch supplies its own value. Returns undefined when the session
  * does not exist.
+ *
+ * Patches may replace tabs; the update is rejected with `LocalQuotaError` when
+ * the resulting total tab count would exceed `LIMITS.maxLocalTabs`, leaving
+ * the stored session unchanged.
  */
 export async function updateSession(
   id: string,
   patch: SessionPatch,
 ): Promise<Session | undefined> {
   const database = await openSessionsDb();
-  const updated = await updateSessionRecord(database, id, (current) => ({
-    ...current,
-    ...patch,
-    id: current.id,
-    createdAt: current.createdAt,
-    updatedAt: patch.updatedAt ?? Date.now(),
-  }));
+  const result = await updateSessionRecord(
+    database,
+    id,
+    (current) => ({
+      ...current,
+      ...patch,
+      id: current.id,
+      createdAt: current.createdAt,
+      updatedAt: patch.updatedAt ?? Date.now(),
+    }),
+    LIMITS.maxLocalTabs,
+  );
 
-  if (updated === undefined) return undefined;
+  if (result === undefined) return undefined;
+  if (!result.ok) {
+    throw new LocalQuotaError(result.resource, result.usage, result.limit);
+  }
 
   await notifySessionsChanged();
-  return updated;
+  return result.session;
 }
 
 /**

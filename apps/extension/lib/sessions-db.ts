@@ -258,14 +258,29 @@ export async function addSessionRecord(
 }
 
 /**
- * Applies `mutate` to an existing session inside one read-write transaction.
+ * Result of a cap-checked update. A rejected update writes nothing. `usage`
+ * is the total tab count before the update, matching `AddSessionRecordResult`.
+ */
+export type UpdateSessionRecordResult =
+  | { ok: true; session: Session }
+  | {
+      ok: false;
+      resource: "tabs";
+      usage: number;
+      limit: number;
+    };
+
+/**
+ * Applies `mutate` to an existing session inside one read-write transaction,
+ * rejecting the update when it would push the total tab count over `maxTabs`.
  * Returns undefined, without writing, when the session does not exist.
  */
 export async function updateSessionRecord(
   database: IDBDatabase,
   id: string,
   mutate: (session: Session) => Session,
-): Promise<Session | undefined> {
+  maxTabs: number,
+): Promise<UpdateSessionRecordResult | undefined> {
   const transaction = database.transaction(SESSIONS_STORE_NAME, "readwrite");
   const done = transactionDone(transaction);
 
@@ -280,9 +295,26 @@ export async function updateSessionRecord(
     }
 
     const next = mutate(current);
+    const existing = (await requestResult(store.getAll())) as Session[];
+    const currentTabs = existing.reduce(
+      (total, candidate) => total + candidate.tabs.length,
+      0,
+    );
+    const projectedTabs =
+      currentTabs - current.tabs.length + next.tabs.length;
+    if (projectedTabs > maxTabs) {
+      await done;
+      return {
+        ok: false,
+        resource: "tabs",
+        usage: currentTabs,
+        limit: maxTabs,
+      };
+    }
+
     await requestResult(store.put(next));
     await done;
-    return next;
+    return { ok: true, session: next };
   } catch (error) {
     await done.catch(() => undefined);
     throw error;
