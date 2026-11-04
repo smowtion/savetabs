@@ -4,6 +4,7 @@ import { capacityMiddleware, ipRateLimitMiddleware } from "./counters";
 import type { Env } from "./env";
 import { apiError } from "./errors";
 import { sessionsRoutes } from "./routes/sessions";
+import { versionRoutes } from "./routes/version";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -17,6 +18,7 @@ app.use("*", ipRateLimitMiddleware);
 
 app.get("/v1/health", (c) => c.json({ ok: true }));
 
+app.route("/v1", versionRoutes);
 app.route("/v1", sessionsRoutes);
 
 app.notFound((c) => apiError(c, 404, "not_found", "Route not found."));
