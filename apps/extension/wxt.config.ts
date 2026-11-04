@@ -1,0 +1,41 @@
+import { defineConfig } from "wxt";
+import tailwindcss from "@tailwindcss/vite";
+
+const apiBase = (process.env.SAVETABS_API_BASE || "https://api.savetabs.example").replace(/\/+$/, "");
+
+export default defineConfig({
+  manifestVersion: 3,
+  modules: ["@wxt-dev/module-react"],
+  vite: () => ({
+    plugins: [tailwindcss()],
+  }),
+  manifest: ({ browser }) => ({
+    name: "SaveTabs",
+    description: "Save and restore browser tab sessions.",
+    permissions: ["tabs", "storage", "alarms", "contextMenus"],
+    host_permissions: [`${apiBase}/*`],
+    commands: {
+      "save-tabs": {
+        suggested_key: { default: "Alt+Shift+S" },
+        description: "Save all tabs in the current window",
+      },
+      "open-sessions": {
+        suggested_key: { default: "Alt+Shift+O" },
+        description: "Open the sessions page",
+      },
+      "discard-now": {
+        suggested_key: { default: "Alt+Shift+D" },
+        description: "Discard inactive tabs now",
+      },
+    },
+    browser_specific_settings:
+      browser === "firefox"
+        ? {
+            gecko: {
+              id: "savetabs@example.com",
+              strict_min_version: "121.0",
+            },
+          }
+        : undefined,
+  }),
+});
