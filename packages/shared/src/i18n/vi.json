@@ -214,7 +214,31 @@
     },
     "advanced": {
       "label": "Nâng cao",
-      "description": "Nhập, xuất, đặt lại và các thao tác bảo trì."
+      "description": "Nhập, xuất, đặt lại và các thao tác bảo trì.",
+      "storageUsage": "Đã dùng: {sessions} phiên, {tabs} tab",
+      "storageNearLimit": "Bộ nhớ cục bộ sắp đầy. Hãy xuất hoặc xóa bớt phiên để giải phóng dung lượng.",
+      "exportSettings": "Xuất cài đặt",
+      "importSettings": "Nhập cài đặt",
+      "exportSessions": "Xuất phiên",
+      "importSessions": "Nhập phiên",
+      "resetToDefaults": "Đặt lại về mặc định",
+      "clearSessions": "Xóa tất cả phiên cục bộ",
+      "sessionsPlaintextWarning": "Tệp xuất phiên chứa tiêu đề và URL dạng văn bản thuần. Hãy lưu tệp ở nơi riêng tư.",
+      "exportSuccess": "Đã xuất {filename}.",
+      "importSettingsSuccess": "Đã nhập cài đặt.",
+      "importSettingsFailed": "Nhập cài đặt thất bại:",
+      "importSessionsSuccess": "Đã nhập {added} phiên và cập nhật {updated}.",
+      "importSessionsPartial": "Đã nhập {added} phiên và cập nhật {updated}. Một số phiên không thể lưu:",
+      "importSessionsFailed": "Nhập phiên thất bại:",
+      "actionFailed": "Thao tác thất bại: {message}",
+      "resetTitle": "Đặt lại tất cả cài đặt?",
+      "resetMessage": "Mọi cài đặt sẽ trở về mặc định. Các phiên đã lưu không bị ảnh hưởng.",
+      "resetConfirm": "Đặt lại cài đặt",
+      "resetSuccess": "Đã đặt lại cài đặt về mặc định.",
+      "clearTitle": "Xóa tất cả phiên cục bộ?",
+      "clearMessage": "Mọi phiên đã lưu trên thiết bị này sẽ bị xóa vĩnh viễn. Hãy xuất bản sao lưu trước nếu cần.",
+      "clearConfirm": "Xóa phiên",
+      "clearSuccess": "Đã xóa tất cả phiên cục bộ."
     },
     "option": {
       "general": {

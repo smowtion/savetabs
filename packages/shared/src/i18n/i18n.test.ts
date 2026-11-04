@@ -65,6 +65,38 @@ describe("i18n", () => {
     expect(missingKeys("vi", optionKeys)).toEqual([]);
   });
 
+  it("covers the advanced actions strings in both languages", () => {
+    const advancedKeys = [
+      "settings.advanced.storageUsage",
+      "settings.advanced.storageNearLimit",
+      "settings.advanced.exportSettings",
+      "settings.advanced.importSettings",
+      "settings.advanced.exportSessions",
+      "settings.advanced.importSessions",
+      "settings.advanced.resetToDefaults",
+      "settings.advanced.clearSessions",
+      "settings.advanced.sessionsPlaintextWarning",
+      "settings.advanced.exportSuccess",
+      "settings.advanced.importSettingsSuccess",
+      "settings.advanced.importSettingsFailed",
+      "settings.advanced.importSessionsSuccess",
+      "settings.advanced.importSessionsPartial",
+      "settings.advanced.importSessionsFailed",
+      "settings.advanced.actionFailed",
+      "settings.advanced.resetTitle",
+      "settings.advanced.resetMessage",
+      "settings.advanced.resetConfirm",
+      "settings.advanced.resetSuccess",
+      "settings.advanced.clearTitle",
+      "settings.advanced.clearMessage",
+      "settings.advanced.clearConfirm",
+      "settings.advanced.clearSuccess",
+    ];
+
+    expect(missingKeys("en", advancedKeys)).toEqual([]);
+    expect(missingKeys("vi", advancedKeys)).toEqual([]);
+  });
+
   it("covers the setting control strings in both languages", () => {
     const controlKeys = [
       "options.tooltip",

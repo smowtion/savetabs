@@ -214,7 +214,31 @@
     },
     "advanced": {
       "label": "Advanced",
-      "description": "Import, export, reset and maintenance actions."
+      "description": "Import, export, reset and maintenance actions.",
+      "storageUsage": "Storage used: {sessions} sessions, {tabs} tabs",
+      "storageNearLimit": "Local storage is almost full. Export or delete sessions to free space.",
+      "exportSettings": "Export settings",
+      "importSettings": "Import settings",
+      "exportSessions": "Export sessions",
+      "importSessions": "Import sessions",
+      "resetToDefaults": "Reset to defaults",
+      "clearSessions": "Clear local sessions",
+      "sessionsPlaintextWarning": "Session exports contain plaintext titles and URLs. Store the file somewhere private.",
+      "exportSuccess": "Exported {filename}.",
+      "importSettingsSuccess": "Settings imported.",
+      "importSettingsFailed": "Settings import failed:",
+      "importSessionsSuccess": "Imported {added} sessions and updated {updated}.",
+      "importSessionsPartial": "Imported {added} sessions and updated {updated}. Some sessions could not be saved:",
+      "importSessionsFailed": "Sessions import failed:",
+      "actionFailed": "The action failed: {message}",
+      "resetTitle": "Reset all settings?",
+      "resetMessage": "All settings return to their defaults. Saved sessions are not affected.",
+      "resetConfirm": "Reset settings",
+      "resetSuccess": "Settings reset to defaults.",
+      "clearTitle": "Delete all local sessions?",
+      "clearMessage": "All sessions saved on this device will be deleted permanently. Export a backup first if you need one.",
+      "clearConfirm": "Delete sessions",
+      "clearSuccess": "All local sessions deleted."
     },
     "option": {
       "general": {

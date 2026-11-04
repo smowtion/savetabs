@@ -198,6 +198,30 @@ describe("options shell", () => {
     }
   });
 
+  it("renders the advanced actions inside the Advanced section", async () => {
+    render(<App />);
+
+    await userEvent.click(
+      within(main()).getByRole("button", { name: /Advanced/ }),
+    );
+
+    for (const name of [
+      "Export settings",
+      "Import settings",
+      "Export sessions",
+      "Import sessions",
+      "Reset to defaults",
+      "Clear local sessions",
+    ]) {
+      expect(screen.getByRole("button", { name })).toBeInTheDocument();
+    }
+    expect(
+      screen.getByText(
+        "Session exports contain plaintext titles and URLs. Store the file somewhere private.",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("disables memory settings when the browser cannot discard tabs", async () => {
     const originalDiscard = fakeBrowser.tabs.discard;
     Object.defineProperty(fakeBrowser.tabs, "discard", {

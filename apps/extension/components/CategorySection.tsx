@@ -17,6 +17,7 @@ import type {
 import type { ReactNode } from "react";
 
 import type { SettingValue } from "../lib/settings";
+import { AdvancedActions } from "./AdvancedActions";
 import { NumberInput } from "./NumberInput";
 import { Select } from "./Select";
 import { SettingRow, settingControlId } from "./SettingRow";
@@ -52,6 +53,12 @@ export function CategorySection({
   onChange,
   discardSupported,
 }: CategorySectionProps) {
+  // The Advanced category holds actions instead of schema settings; it owns
+  // its own import/export/reset UI.
+  if (categoryId === "advanced") {
+    return <AdvancedActions settings={values} t={t} />;
+  }
+
   if (settings.length === 0) return null;
 
   const memoryDisabled = categoryId === "memory" && !discardSupported;
