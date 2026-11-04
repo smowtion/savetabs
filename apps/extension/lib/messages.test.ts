@@ -1,0 +1,183 @@
+import {
+  DEFAULT_SETTINGS,
+  type SavedTab,
+  type Session,
+  type Settings,
+} from "@savetabs/shared";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { fakeBrowser } from "wxt/testing/fake-browser";
+
+import { handleUiMessage, type UiResponse } from "./messages";
+import type { SaveTabsResult } from "./save-flow";
+import { SESSIONS_DB_NAME, closeSessionsDb } from "./sessions-db";
+import { addSession, getSession, listSessions } from "./sessions-repo";
+
+function settingsWith(overrides: Settings = {}): Settings {
+  return { ...DEFAULT_SETTINGS, ...overrides };
+}
+
+function makeSession(id: string, tabs: readonly SavedTab[]): Session {
+  return { id, createdAt: 1, updatedAt: 1, source: "window", tabs: [...tabs] };
+}
+
+async function seedSettings(overrides: Settings = {}): Promise<void> {
+  await fakeBrowser.storage.local.set({
+    settings: settingsWith(overrides),
+  });
+}
+
+async function seedWindowWithTab(url: string): Promise<void> {
+  const window = await fakeBrowser.windows.create({
+    type: "normal",
+    focused: true,
+  });
+  if (window?.id === undefined) {
+    throw new Error("fakeBrowser.windows.create returned no window id");
+  }
+  await fakeBrowser.tabs.create({ url, windowId: window.id, active: true });
+}
+
+function deleteDatabase(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.deleteDatabase(SESSIONS_DB_NAME);
+    request.onsuccess = () => resolve();
+    request.onerror = () =>
+      reject(request.error ?? new Error("deleteDatabase failed"));
+    request.onblocked = () => reject(new Error("deleteDatabase blocked"));
+  });
+}
+
+function expectOk(response: UiResponse): unknown {
+  expect(response.ok).toBe(true);
+  if (!response.ok) {
+    throw new Error(`expected an ok response, got error "${response.code}"`);
+  }
+  return response.data;
+}
+
+beforeEach(async () => {
+  fakeBrowser.reset();
+  await closeSessionsDb();
+  await deleteDatabase();
+});
+
+afterEach(async () => {
+  vi.restoreAllMocks();
+  await closeSessionsDb();
+});
+
+describe("handleUiMessage", () => {
+  it("saves the window for SAVE_TABS", async () => {
+    await seedSettings({
+      "open.openSessionsAfterSave": false,
+      "tabs.closeAfterSave": false,
+    });
+    await seedWindowWithTab("https://example.com/saved");
+
+    const response = await handleUiMessage({
+      type: "SAVE_TABS",
+      source: "window",
+    });
+
+    const data = expectOk(response) as SaveTabsResult;
+    expect(data.session?.source).toBe("window");
+    expect(data.session?.tabs.map((tab) => tab.url)).toEqual([
+      "https://example.com/saved",
+    ]);
+    await expect(listSessions()).resolves.toHaveLength(1);
+  });
+
+  it("rejects SAVE_TABS with an unknown source", async () => {
+    const response = await handleUiMessage({
+      type: "SAVE_TABS",
+      source: "everywhere",
+    });
+
+    expect(response).toEqual({ ok: false, code: "invalid_message" });
+  });
+
+  it("restores a stored session for RESTORE_SESSION", async () => {
+    await addSession(
+      makeSession("restore-me", [
+        { url: "https://example.com/restore", title: "Restore" },
+      ]),
+    );
+    const createSpy = vi.spyOn(fakeBrowser.tabs, "create");
+
+    const response = await handleUiMessage({
+      type: "RESTORE_SESSION",
+      sessionId: "restore-me",
+    });
+
+    expect(expectOk(response)).toEqual({ opened: 1 });
+    expect(createSpy).toHaveBeenCalledWith({
+      url: "https://example.com/restore",
+      active: false,
+    });
+  });
+
+  it("reports a missing session for RESTORE_SESSION", async () => {
+    const response = await handleUiMessage({
+      type: "RESTORE_SESSION",
+      sessionId: "missing",
+    });
+
+    expect(response).toEqual({ ok: false, code: "not_found" });
+  });
+
+  it("rejects RESTORE_SESSION without a session id", async () => {
+    const response = await handleUiMessage({ type: "RESTORE_SESSION" });
+
+    expect(response).toEqual({ ok: false, code: "invalid_message" });
+  });
+
+  it("deletes a stored session for DELETE_SESSION", async () => {
+    await addSession(
+      makeSession("delete-me", [
+        { url: "https://example.com/delete", title: "Delete" },
+      ]),
+    );
+
+    const response = await handleUiMessage({
+      type: "DELETE_SESSION",
+      sessionId: "delete-me",
+    });
+
+    expect(expectOk(response)).toEqual({ deleted: "delete-me" });
+    await expect(getSession("delete-me")).resolves.toBeUndefined();
+    await expect(listSessions()).resolves.toEqual([]);
+  });
+
+  it("deletes idempotently when the session is already gone", async () => {
+    const response = await handleUiMessage({
+      type: "DELETE_SESSION",
+      sessionId: "already-gone",
+    });
+
+    expect(expectOk(response)).toEqual({ deleted: "already-gone" });
+  });
+
+  it.each(["SYNC_NOW", "DISCARD_NOW"] as const)(
+    "reports %s as not implemented",
+    async (type) => {
+      const response = await handleUiMessage({ type });
+
+      expect(response).toEqual({ ok: false, code: "not_implemented" });
+    },
+  );
+
+  it("reports unknown message types as not implemented", async () => {
+    const response = await handleUiMessage({ type: "NOT_A_REAL_MESSAGE" });
+
+    expect(response).toEqual({ ok: false, code: "not_implemented" });
+  });
+
+  it.each([null, "nope", 42, {}, { type: 42 }])(
+    "rejects malformed messages: %j",
+    async (message) => {
+      const response = await handleUiMessage(message);
+
+      expect(response).toEqual({ ok: false, code: "invalid_message" });
+    },
+  );
+});

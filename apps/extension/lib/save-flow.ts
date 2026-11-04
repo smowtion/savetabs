@@ -11,29 +11,16 @@ import { type Session, type SessionSource, type Settings } from "@savetabs/share
 import { browser } from "wxt/browser";
 
 import { loadSettings } from "./settings";
+import {
+  getSessionsPageUrl,
+  openOrReuseSessionsPage,
+} from "./sessions-page";
 import { addSession, listSessions } from "./sessions-repo";
 import {
   collectTabEntries,
   type CollectedTab,
   type TabLike,
 } from "./tab-collector";
-
-/** Path of the full-tab sessions page. */
-const SESSIONS_PAGE_PATH = "/sessions.html";
-
-/**
- * Absolute URL of the sessions page.
- *
- * WXT types `runtime.getURL` against generated public paths; the sessions
- * entrypoint is created in a later task, so widen the type here instead of
- * depending on generated types that do not exist yet.
- */
-function getSessionsPageUrl(): string {
-  const runtime = browser.runtime as unknown as {
-    getURL: (path: string) => string;
-  };
-  return runtime.getURL(SESSIONS_PAGE_PATH);
-}
 
 /**
  * Thrown when a save cannot determine which window it is scoped to. The flow
@@ -232,22 +219,6 @@ async function closeSavedTabs(
   return closable.length;
 }
 
-/** Opens the sessions page, reusing and focusing an existing tab if asked. */
-async function openOrReuseSessionsPage(reuse: boolean): Promise<void> {
-  const url = getSessionsPageUrl();
-
-  if (reuse) {
-    const tabs = await browser.tabs.query({});
-    const existing = tabs.find((tab) => tab.url === url);
-    if (existing?.id !== undefined) {
-      await browser.tabs.update(existing.id, { active: true });
-      return;
-    }
-  }
-
-  await browser.tabs.create({ url });
-}
-
 /**
  * Save the tabs in scope as a new session.
  *
@@ -319,9 +290,7 @@ export async function saveTabs(
 
   const closed = await closeSavedTabs(entries, closeAfterSave);
   if (readBoolean(settings, "open.openSessionsAfterSave")) {
-    await openOrReuseSessionsPage(
-      readBoolean(settings, "open.reuseSessionsTab"),
-    );
+    await openOrReuseSessionsPage(settings);
   }
 
   return { session, skipped, closed, overflow };
