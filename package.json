@@ -1,0 +1,19 @@
+{
+  "name": "savetabs",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SaveTabs — browser extension and E2EE sync backend monorepo",
+  "packageManager": "pnpm@9",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "build": "pnpm -r --if-present build"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.12"
+  }
+}
