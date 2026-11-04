@@ -3,6 +3,7 @@ import { fromBase64Url, toBase64Url } from "@savetabs/shared/base64url";
 import { sha256Hex, timingSafeEqual } from "../auth";
 import {
   DEFAULT_MAX_KEYS,
+  enforceAuthRateLimit,
   keysCreatedToday,
   parseLimit,
   recordKeyCreated,
@@ -101,6 +102,14 @@ sessionsRoutes.put("/keys/:authId/sessions/:sessionId", async (c) => {
     return unauthorized(c);
   }
 
+  // The bearer has been verified for an existing key, so charge its bucket
+  // before doing any further work. Auto-registration charges it below, after
+  // the new key row is established.
+  if (existingKey !== null) {
+    const limited = await enforceAuthRateLimit(c, authId);
+    if (limited !== null) return limited;
+  }
+
   const session = await readSessionBody(c);
   if (session === null) return invalidRequest(c);
 
@@ -161,6 +170,10 @@ sessionsRoutes.put("/keys/:authId/sessions/:sessionId", async (c) => {
         return unauthorized(c);
       }
     }
+
+    // The bearer now owns this authId; charge its bucket before writing.
+    const limited = await enforceAuthRateLimit(c, authId);
+    if (limited !== null) return limited;
   }
 
   // Session upsert and last-seen bump are atomic: either both land or neither.
@@ -297,6 +310,10 @@ async function authenticateExistingKey(
   if (!timingSafeEqual(key.key_hash, keyHash)) {
     return { response: unauthorized(c) };
   }
+
+  const limited = await enforceAuthRateLimit(c, authId);
+  if (limited !== null) return { response: limited };
+
   return { authId };
 }
 

@@ -13,8 +13,16 @@ export interface Env {
   GLOBAL_DAILY_REQUESTS: string;
   /** Maximum number of sync keys the service accepts (Task 23). */
   GLOBAL_MAX_KEYS: string;
-  /** Optional Cloudflare rate-limiting binding (Task 23). */
-  RATE_LIMITER?: RateLimiterBinding;
+  /**
+   * Optional per-IP rate-limiting binding (120 requests/minute). Absent means
+   * the bucket is disabled, e.g. in local development.
+   */
+  RATE_LIMITER_IP?: RateLimiterBinding;
+  /**
+   * Optional per-authId rate-limiting binding (240 requests/minute). Applied
+   * only after a bearer has been verified; absent disables the bucket.
+   */
+  RATE_LIMITER_AUTH?: RateLimiterBinding;
 }
 
 /** The subset of the Cloudflare rate-limit binding used by this Worker. */

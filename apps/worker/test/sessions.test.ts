@@ -507,48 +507,205 @@ describe("CORS", () => {
 });
 
 describe("rate limiting", () => {
-  function fakeEnv(
-    limiter: Env["RATE_LIMITER"] | undefined,
-  ): Env {
+  function fakeEnv(bindings: {
+    ip?: Env["RATE_LIMITER_IP"];
+    auth?: Env["RATE_LIMITER_AUTH"];
+  }): Env {
     return {
       DB: env.DB,
       RELEASES: env.RELEASES,
       WEB_ORIGIN: env.WEB_ORIGIN,
       GLOBAL_DAILY_REQUESTS: env.GLOBAL_DAILY_REQUESTS,
       GLOBAL_MAX_KEYS: env.GLOBAL_MAX_KEYS,
-      RATE_LIMITER: limiter,
+      RATE_LIMITER_IP: bindings.ip,
+      RATE_LIMITER_AUTH: bindings.auth,
     } as Env;
   }
 
-  it("checks the IP and authId buckets and returns 429 rate_limited", async () => {
-    const seen: string[] = [];
-    const limiter = {
-      limit: async ({ key }: { key: string }) => {
-        seen.push(key);
-        return { success: key !== "auth:blocked" };
-      },
-    };
+  function sessionsUrl(authId: string): string {
+    return `${BASE_URL}/v1/keys/${authId}/sessions`;
+  }
 
-    const response = await app.request(
-      `${BASE_URL}/v1/keys/blocked/sessions`,
-      {
-        headers: bearerHeaders({ "CF-Connecting-IP": "203.0.113.7" }),
+  it("enforces independent per-IP and per-authId limits", async () => {
+    const authId = "rate-independent";
+    await seedKey(authId);
+
+    const ipSeen: string[] = [];
+    const authSeen: string[] = [];
+    let ipCalls = 0;
+    let authCalls = 0;
+    const rateEnv = fakeEnv({
+      ip: {
+        limit: async ({ key }) => {
+          ipSeen.push(key);
+          ipCalls += 1;
+          return { success: ipCalls <= 2 };
+        },
       },
-      fakeEnv(limiter),
+      auth: {
+        limit: async ({ key }) => {
+          authSeen.push(key);
+          authCalls += 1;
+          return { success: authCalls <= 3 };
+        },
+      },
+    });
+    const headers = bearerHeaders({ "CF-Connecting-IP": "198.51.100.9" });
+
+    for (let index = 0; index < 2; index += 1) {
+      expect(
+        (await app.request(sessionsUrl(authId), { headers }, rateEnv)).status,
+      ).toBe(200);
+    }
+
+    const blocked = await app.request(
+      sessionsUrl(authId),
+      { headers },
+      rateEnv,
     );
-
-    expect(response.status).toBe(429);
-    expect(((await response.json()) as ErrorBody).error.code).toBe(
+    expect(blocked.status).toBe(429);
+    expect(((await blocked.json()) as ErrorBody).error.code).toBe(
       "rate_limited",
     );
-    expect(seen).toEqual(["ip:203.0.113.7", "auth:blocked"]);
+    expect(ipSeen).toEqual([
+      "ip:198.51.100.9",
+      "ip:198.51.100.9",
+      "ip:198.51.100.9",
+    ]);
+    // The IP bucket rejects before authentication, so the auth bucket is not
+    // charged for the rejected request.
+    expect(authSeen).toEqual([`auth:${authId}`, `auth:${authId}`]);
   });
 
-  it("is a no-op when the binding is absent", async () => {
+  it("enforces the authId budget independently of a permissive IP budget", async () => {
+    const authId = "rate-auth-tight";
+    await seedKey(authId);
+
+    let ipCalls = 0;
+    let authCalls = 0;
+    const rateEnv = fakeEnv({
+      ip: {
+        limit: async () => {
+          ipCalls += 1;
+          return { success: true };
+        },
+      },
+      auth: {
+        limit: async ({ key }) => {
+          expect(key).toBe(`auth:${authId}`);
+          authCalls += 1;
+          return { success: authCalls <= 1 };
+        },
+      },
+    });
+
+    expect(
+      (
+        await app.request(
+          sessionsUrl(authId),
+          { headers: bearerHeaders() },
+          rateEnv,
+        )
+      ).status,
+    ).toBe(200);
+
+    const blocked = await app.request(
+      sessionsUrl(authId),
+      { headers: bearerHeaders() },
+      rateEnv,
+    );
+    expect(blocked.status).toBe(429);
+    expect(ipCalls).toBe(2);
+  });
+
+  it("does not charge the authId bucket for an unverified bearer", async () => {
+    const authId = "rate-bad-bearer";
+    await seedKey(authId);
+
+    const seen: string[] = [];
+    const rateEnv = fakeEnv({
+      auth: {
+        limit: async ({ key }) => {
+          seen.push(key);
+          return { success: false };
+        },
+      },
+    });
+
+    const response = await app.request(
+      sessionsUrl(authId),
+      { headers: bearerHeaders({ Authorization: "Bearer not-the-key" }) },
+      rateEnv,
+    );
+
+    expect(response.status).toBe(401);
+    expect(seen).toEqual([]);
+  });
+
+  it("charges the authId bucket after the bearer verifies", async () => {
+    const authId = "rate-valid-bearer";
+    await seedKey(authId);
+
+    const seen: string[] = [];
+    const rateEnv = fakeEnv({
+      auth: {
+        limit: async ({ key }) => {
+          seen.push(key);
+          return { success: true };
+        },
+      },
+    });
+
+    const response = await app.request(
+      sessionsUrl(authId),
+      { headers: bearerHeaders() },
+      rateEnv,
+    );
+
+    expect(response.status).toBe(200);
+    expect(seen).toEqual([`auth:${authId}`]);
+  });
+
+  it("applies only the configured bucket when the other binding is absent", async () => {
+    const authId = "rate-one-binding";
+    await seedKey(authId);
+
+    const ipSeen: string[] = [];
+    const ipOnly = await app.request(
+      sessionsUrl(authId),
+      { headers: bearerHeaders({ "CF-Connecting-IP": "203.0.113.11" }) },
+      fakeEnv({
+        ip: {
+          limit: async ({ key }) => {
+            ipSeen.push(key);
+            return { success: true };
+          },
+        },
+      }),
+    );
+    expect(ipOnly.status).toBe(200);
+    expect(ipSeen).toEqual(["ip:203.0.113.11"]);
+
+    const authOnly = await app.request(
+      sessionsUrl(authId),
+      { headers: bearerHeaders() },
+      fakeEnv({
+        auth: {
+          limit: async () => ({ success: false }),
+        },
+      }),
+    );
+    expect(authOnly.status).toBe(429);
+    expect(((await authOnly.json()) as ErrorBody).error.code).toBe(
+      "rate_limited",
+    );
+  });
+
+  it("is a no-op when both bindings are absent", async () => {
     const response = await app.request(
       `${BASE_URL}/v1/health`,
       {},
-      fakeEnv(undefined),
+      fakeEnv({}),
     );
 
     expect(response.status).toBe(200);
@@ -557,7 +714,7 @@ describe("rate limiting", () => {
 
   it("wraps unexpected failures in the error envelope", async () => {
     const brokenEnv = {
-      ...fakeEnv(undefined),
+      ...fakeEnv({}),
       DB: {
         prepare() {
           throw new Error("database unavailable");
