@@ -17,6 +17,14 @@ import {
 import { SESSIONS_DB_NAME, closeSessionsDb } from "./sessions-db";
 import { addSession, listSessions } from "./sessions-repo";
 import { getSessionsPageUrl } from "./sessions-page";
+import { enqueueUpload } from "./sync/sync-service";
+
+vi.mock("./sync/sync-service", () => ({
+  enqueueUpload: vi.fn(),
+  syncNow: vi.fn(),
+}));
+
+const enqueueUploadMock = vi.mocked(enqueueUpload);
 
 function settingsWith(overrides: Settings = {}): Settings {
   return { ...DEFAULT_SETTINGS, ...overrides };
@@ -75,6 +83,8 @@ beforeEach(async () => {
   fakeBrowser.reset();
   // fake-browser leaves `action.setPopup` unimplemented; replace it with a spy.
   vi.spyOn(fakeBrowser.action, "setPopup").mockResolvedValue(undefined);
+  enqueueUploadMock.mockClear();
+  enqueueUploadMock.mockResolvedValue(undefined);
   await closeSessionsDb();
   await deleteDatabase();
 });
@@ -125,6 +135,39 @@ describe("handleToolbarClick", () => {
     ]);
   });
 
+  it("uploads only the freshly saved session when auto-upload is on", async () => {
+    await seedSettings({
+      "open.toolbarAction": "save",
+      "open.openSessionsAfterSave": false,
+      "tabs.closeAfterSave": false,
+      "sync.enabled": true,
+      "sync.autoUpload": true,
+    });
+    await seedWindowWithTab("https://example.com/synced");
+
+    await handleToolbarClick();
+
+    const sessions = await listSessions();
+    expect(enqueueUploadMock).toHaveBeenCalledTimes(1);
+    expect(enqueueUploadMock.mock.calls[0]?.[0]?.id).toBe(sessions[0]?.id);
+  });
+
+  it("does not upload the toolbar save when auto-upload is off", async () => {
+    await seedSettings({
+      "open.toolbarAction": "save",
+      "open.openSessionsAfterSave": false,
+      "tabs.closeAfterSave": false,
+      "sync.enabled": true,
+      "sync.autoUpload": false,
+    });
+    await seedWindowWithTab("https://example.com/local-only");
+
+    await handleToolbarClick();
+
+    await expect(listSessions()).resolves.toHaveLength(1);
+    expect(enqueueUploadMock).not.toHaveBeenCalled();
+  });
+
   it("opens the sessions page when the action is sessions", async () => {
     await seedSettings({
       "open.toolbarAction": "sessions",
@@ -163,6 +206,37 @@ describe("handleCommand", () => {
     expect(sessions[0]?.tabs.map((tab) => tab.url)).toEqual([
       "https://example.com/command",
     ]);
+  });
+
+  it("uploads only the freshly saved session for save-tabs when auto-upload is on", async () => {
+    await seedSettings({
+      "open.openSessionsAfterSave": false,
+      "tabs.closeAfterSave": false,
+      "sync.enabled": true,
+      "sync.autoUpload": true,
+    });
+    await seedWindowWithTab("https://example.com/command-synced");
+
+    await handleCommand("save-tabs");
+
+    const sessions = await listSessions();
+    expect(enqueueUploadMock).toHaveBeenCalledTimes(1);
+    expect(enqueueUploadMock.mock.calls[0]?.[0]?.id).toBe(sessions[0]?.id);
+  });
+
+  it("does not upload the save-tabs command when sync is disabled", async () => {
+    await seedSettings({
+      "open.openSessionsAfterSave": false,
+      "tabs.closeAfterSave": false,
+      "sync.enabled": false,
+      "sync.autoUpload": true,
+    });
+    await seedWindowWithTab("https://example.com/command-local");
+
+    await handleCommand("save-tabs");
+
+    await expect(listSessions()).resolves.toHaveLength(1);
+    expect(enqueueUploadMock).not.toHaveBeenCalled();
   });
 
   it("opens the sessions page for open-sessions", async () => {

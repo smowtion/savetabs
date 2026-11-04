@@ -275,9 +275,9 @@
       "authError": "The sync key was rejected or the cloud data cannot be decrypted. Re-import or rotate your key.",
       "deleteCloud": "Delete cloud data",
       "deleteCloudTitle": "Delete cloud data?",
-      "deleteCloudMessage": "This deletes every synced session stored on the server for this key. Local sessions stay on this device. This cannot be undone.",
+      "deleteCloudMessage": "This deletes every synced session stored on the server for this key, then turns sync off so your local sessions are not uploaded again. Local sessions stay on this device. This cannot be undone.",
       "deleteCloudConfirm": "Delete cloud data",
-      "deleteCloudSuccess": "Cloud data deleted. Local sessions were kept.",
+      "deleteCloudSuccess": "Cloud data deleted. Sync was turned off so local sessions are not uploaded again. You can re-enable sync later.",
       "enableConfirmTitle": "Enable encrypted sync?",
       "enableConfirmMessage": "Make sure you saved your sync key. It is the only way to recover synced data. You can reveal and copy it in the Sync section.",
       "enableConfirm": "Enable sync"

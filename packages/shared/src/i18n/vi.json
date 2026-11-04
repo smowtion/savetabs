@@ -275,9 +275,9 @@
       "authError": "Khóa đồng bộ bị từ chối hoặc dữ liệu trên đám mây không thể giải mã. Hãy nhập lại hoặc xoay khóa.",
       "deleteCloud": "Xóa dữ liệu đám mây",
       "deleteCloudTitle": "Xóa dữ liệu đám mây?",
-      "deleteCloudMessage": "Thao tác này xóa mọi phiên đã đồng bộ được lưu trên máy chủ cho khóa này. Các phiên cục bộ vẫn ở lại thiết bị này. Không thể hoàn tác.",
+      "deleteCloudMessage": "Thao tác này xóa mọi phiên đã đồng bộ được lưu trên máy chủ cho khóa này, sau đó tắt đồng bộ để các phiên cục bộ không bị tải lên lại. Các phiên cục bộ vẫn ở lại thiết bị này. Không thể hoàn tác.",
       "deleteCloudConfirm": "Xóa dữ liệu đám mây",
-      "deleteCloudSuccess": "Đã xóa dữ liệu đám mây. Các phiên cục bộ được giữ nguyên.",
+      "deleteCloudSuccess": "Đã xóa dữ liệu đám mây. Đồng bộ đã được tắt để các phiên cục bộ không bị tải lên lại. Bạn có thể bật lại đồng bộ sau.",
       "enableConfirmTitle": "Bật đồng bộ mã hóa đầu cuối?",
       "enableConfirmMessage": "Hãy đảm bảo bạn đã lưu khóa đồng bộ. Đây là cách duy nhất để khôi phục dữ liệu đã đồng bộ. Bạn có thể hiện và sao chép khóa trong mục Đồng bộ.",
       "enableConfirm": "Bật đồng bộ"

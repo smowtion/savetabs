@@ -11,6 +11,9 @@ import { fakeBrowser } from "wxt/testing/fake-browser";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { API_BASE } from "../config";
+import { SESSIONS_DB_NAME, closeSessionsDb } from "../sessions-db";
+import { addSession, listSessions } from "../sessions-repo";
+import { loadSettings, resetSettings } from "../settings";
 import { SYNC_KEY_STORAGE_KEY } from "./key-store";
 import {
   SYNC_LAST_AT_STORAGE_KEY,
@@ -19,7 +22,7 @@ import {
   applySyncAlarm,
   deleteAllCloudData,
   readLastSyncAt,
-  retryPendingSync,
+  retryPendingUploads,
   syncOnStartup,
   syncSavedSession,
 } from "./sync-lifecycle";
@@ -52,8 +55,21 @@ function makeSession(id: string, overrides: Partial<Session> = {}): Session {
   };
 }
 
+function deleteDatabase(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.deleteDatabase(SESSIONS_DB_NAME);
+    request.onsuccess = () => resolve();
+    request.onerror = () =>
+      reject(request.error ?? new Error("deleteDatabase failed"));
+    request.onblocked = () => reject(new Error("deleteDatabase blocked"));
+  });
+}
+
 beforeEach(async () => {
   fakeBrowser.reset();
+  await resetSettings();
+  await closeSessionsDb();
+  await deleteDatabase();
   vi.clearAllMocks();
   syncNowMock.mockResolvedValue({
     uploaded: 0,
@@ -64,9 +80,13 @@ beforeEach(async () => {
   enqueueUploadMock.mockResolvedValue(undefined);
 });
 
-afterEach(() => {
+afterEach(async () => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
+  await closeSessionsDb();
+  // Cancels any debounced settings write left by `deleteAllCloudData` before
+  // the next test resets the fake browser storage.
+  await resetSettings();
 });
 
 describe("applySyncAlarm", () => {
@@ -136,29 +156,70 @@ describe("syncOnStartup", () => {
   });
 });
 
-describe("retryPendingSync", () => {
-  it("runs a sync while sync is enabled", async () => {
-    await seedSettings({ "sync.enabled": true });
+describe("retryPendingUploads", () => {
+  it("uploads only pending sessions and never runs a full sync", async () => {
+    await seedSettings({ "sync.enabled": true, "sync.autoUpload": true });
+    await addSession(makeSession("pending", { pendingUpload: true }));
+    await addSession(makeSession("clean"));
+    await addSession(
+      makeSession("private", { pendingUpload: true, incognito: true }),
+    );
+    await addSession(
+      makeSession("excluded", { pendingUpload: true, syncExcluded: true }),
+    );
 
-    await retryPendingSync();
+    await retryPendingUploads();
 
-    expect(syncNowMock).toHaveBeenCalledTimes(1);
-    await expect(readLastSyncAt()).resolves.toEqual(expect.any(Number));
+    // No remote list, download or merge: the retry path is upload-only.
+    expect(syncNowMock).not.toHaveBeenCalled();
+    expect(enqueueUploadMock).toHaveBeenCalledTimes(1);
+    expect(enqueueUploadMock.mock.calls[0]?.[0]).toMatchObject({
+      id: "pending",
+      pendingUpload: true,
+    });
+
+    // Other local sessions are not modified by the retry pass.
+    const stored = await listSessions();
+    expect(stored.find((session) => session.id === "clean")).toMatchObject({
+      id: "clean",
+    });
+    expect(
+      stored.find((session) => session.id === "clean")?.pendingUpload,
+    ).toBeUndefined();
+    expect(
+      stored.find((session) => session.id === "excluded")?.syncExcluded,
+    ).toBe(true);
+  });
+
+  it("does nothing when auto-upload is off", async () => {
+    await seedSettings({ "sync.enabled": true, "sync.autoUpload": false });
+    await addSession(makeSession("pending", { pendingUpload: true }));
+
+    await retryPendingUploads();
+
+    expect(syncNowMock).not.toHaveBeenCalled();
+    expect(enqueueUploadMock).not.toHaveBeenCalled();
   });
 
   it("does nothing after sync is disabled", async () => {
-    await seedSettings({ "sync.enabled": false });
+    await seedSettings({ "sync.enabled": false, "sync.autoUpload": true });
+    await addSession(makeSession("pending", { pendingUpload: true }));
 
-    await retryPendingSync();
+    await retryPendingUploads();
 
     expect(syncNowMock).not.toHaveBeenCalled();
+    expect(enqueueUploadMock).not.toHaveBeenCalled();
   });
 
-  it("contains failures", async () => {
-    await seedSettings({ "sync.enabled": true });
-    syncNowMock.mockRejectedValue(new Error("boom"));
+  it("contains per-session failures and still tries the rest", async () => {
+    await seedSettings({ "sync.enabled": true, "sync.autoUpload": true });
+    await addSession(makeSession("first", { pendingUpload: true }));
+    await addSession(makeSession("second", { pendingUpload: true }));
+    enqueueUploadMock.mockRejectedValueOnce(new Error("network down"));
 
-    await expect(retryPendingSync()).resolves.toBeUndefined();
+    await expect(retryPendingUploads()).resolves.toBeUndefined();
+
+    expect(enqueueUploadMock).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -226,7 +287,10 @@ describe("readLastSyncAt", () => {
 });
 
 describe("deleteAllCloudData", () => {
-  it("deletes every cloud session for the derived key", async () => {
+  it("deletes cloud data, turns sync off and keeps local sessions", async () => {
+    await seedSettings({ "sync.enabled": true });
+    await addSession(makeSession("local"));
+    await addSession(makeSession("excluded", { syncExcluded: true }));
     const key = generateKey();
     await fakeBrowser.storage.local.set({ [SYNC_KEY_STORAGE_KEY]: key });
     const fetchMock = vi
@@ -242,9 +306,22 @@ describe("deleteAllCloudData", () => {
       `${API_BASE}/v1/keys/${derived.authId}`,
     );
     expect((fetchMock.mock.calls[0]?.[1] as RequestInit).method).toBe("DELETE");
+
+    // Sync is turned off so the kept local sessions are not re-uploaded.
+    await expect(loadSettings()).resolves.toMatchObject({
+      "sync.enabled": false,
+    });
+
+    const stored = await listSessions();
+    expect(stored).toHaveLength(2);
+    expect(stored.find((session) => session.id === "local")).toBeDefined();
+    expect(
+      stored.find((session) => session.id === "excluded")?.syncExcluded,
+    ).toBe(true);
   });
 
-  it("treats a 404 as success because a fresh key has no cloud data", async () => {
+  it("treats a 404 as success and still turns sync off", async () => {
+    await seedSettings({ "sync.enabled": true });
     await fakeBrowser.storage.local.set({
       [SYNC_KEY_STORAGE_KEY]: generateKey(),
     });
@@ -258,9 +335,13 @@ describe("deleteAllCloudData", () => {
     );
 
     await expect(deleteAllCloudData()).resolves.toBeUndefined();
+    await expect(loadSettings()).resolves.toMatchObject({
+      "sync.enabled": false,
+    });
   });
 
   it("rejects with an auth error when the server rejects the key", async () => {
+    await seedSettings({ "sync.enabled": true });
     await fakeBrowser.storage.local.set({
       [SYNC_KEY_STORAGE_KEY]: generateKey(),
     });
@@ -274,6 +355,9 @@ describe("deleteAllCloudData", () => {
     );
 
     await expect(deleteAllCloudData()).rejects.toBeInstanceOf(SyncAuthError);
+    await expect(loadSettings()).resolves.toMatchObject({
+      "sync.enabled": true,
+    });
   });
 
   it("rejects without contacting the server when no key exists", async () => {

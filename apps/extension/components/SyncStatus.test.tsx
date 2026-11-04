@@ -172,7 +172,7 @@ describe("SyncStatus", () => {
 
     expect(
       await screen.findByText(
-        "Cloud data deleted. Local sessions were kept.",
+        "Cloud data deleted. Sync was turned off so local sessions are not uploaded again. You can re-enable sync later.",
       ),
     ).toBeInTheDocument();
     expect(deleteAllCloudDataMock).toHaveBeenCalledTimes(1);

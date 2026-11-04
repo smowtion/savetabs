@@ -16,6 +16,7 @@ import { saveTabs } from "./save-flow";
 import { getUsage } from "./sessions-repo";
 import { openOrReuseSessionsPage } from "./sessions-page";
 import { loadSettings } from "./settings";
+import { syncSavedSession } from "./sync/sync-lifecycle";
 
 /** Popup entrypoint path passed to `action.setPopup` (WXT build output). */
 export const ACTION_POPUP_PATH = "popup.html";
@@ -55,7 +56,7 @@ export async function handleToolbarClick(): Promise<void> {
   const action = resolveToolbarAction(settings);
 
   if (action === "save") {
-    await saveTabs("window");
+    await saveTabs("window", { onSaved: syncSavedSession });
     return;
   }
   if (action === "sessions") {
@@ -72,7 +73,7 @@ export async function handleToolbarClick(): Promise<void> {
  */
 export async function handleCommand(command: string): Promise<void> {
   if (command === "save-tabs") {
-    await saveTabs("window");
+    await saveTabs("window", { onSaved: syncSavedSession });
     return;
   }
   if (command === "open-sessions") {

@@ -1,19 +1,50 @@
-import { DEFAULT_SETTINGS, type Settings } from "@savetabs/shared";
+import {
+  DEFAULT_SETTINGS,
+  type Session,
+  type Settings,
+} from "@savetabs/shared";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fakeBrowser } from "wxt/testing/fake-browser";
 
+/** The session a real save flow would hand to its `onSaved` hook. */
+const freshSessionRef = vi.hoisted(() => ({
+  current: {
+    id: "fresh-session",
+    createdAt: 1,
+    updatedAt: 1,
+    source: "window" as const,
+    tabs: [],
+  } as Session,
+}));
+
 const saveTabsMock = vi.hoisted(() =>
-  vi.fn(async () => ({ skipped: 0, closed: 0, overflow: 0 })),
+  vi.fn(
+    async (
+      _source: unknown,
+      options?: { onSaved?: (session: Session) => Promise<void> },
+    ) => {
+      await options?.onSaved?.(freshSessionRef.current);
+      return { skipped: 0, closed: 0, overflow: 0 };
+    },
+  ),
 );
 
 vi.mock("./save-flow", () => ({ saveTabs: saveTabsMock }));
+vi.mock("./sync/sync-service", () => ({
+  enqueueUpload: vi.fn(),
+  syncNow: vi.fn(),
+}));
 
 import {
   CONTEXT_MENU_IDS,
   handleContextMenuClick,
   rebuildContextMenus,
 } from "./context-menus";
+import { syncSavedSession } from "./sync/sync-lifecycle";
+import { enqueueUpload } from "./sync/sync-service";
 import type { TabLike } from "./tab-collector";
+
+const enqueueUploadMock = vi.mocked(enqueueUpload);
 
 function settingsWith(overrides: Settings = {}): Settings {
   return { ...DEFAULT_SETTINGS, ...overrides };
@@ -32,6 +63,8 @@ beforeEach(() => {
     () => "menu-id",
   );
   saveTabsMock.mockClear();
+  enqueueUploadMock.mockClear();
+  enqueueUploadMock.mockResolvedValue(undefined);
 });
 
 afterEach(() => {
@@ -131,6 +164,7 @@ describe("handleContextMenuClick", () => {
     expect(saveTabsMock).toHaveBeenCalledWith("tab", {
       tabs: [tab],
       windowId: 7,
+      onSaved: syncSavedSession,
     });
   });
 
@@ -145,6 +179,7 @@ describe("handleContextMenuClick", () => {
     expect(saveTabsMock).toHaveBeenCalledWith("tab", {
       tabs: [tab],
       windowId: 7,
+      onSaved: syncSavedSession,
     });
   });
 
@@ -153,7 +188,9 @@ describe("handleContextMenuClick", () => {
       menuItemId: CONTEXT_MENU_IDS.SAVE_TAB,
     });
 
-    expect(saveTabsMock).toHaveBeenCalledWith("tab");
+    expect(saveTabsMock).toHaveBeenCalledWith("tab", {
+      onSaved: syncSavedSession,
+    });
   });
 
   it("saves the whole window for save-window", async () => {
@@ -162,7 +199,10 @@ describe("handleContextMenuClick", () => {
       windowId: 7,
     });
 
-    expect(saveTabsMock).toHaveBeenCalledWith("window", { windowId: 7 });
+    expect(saveTabsMock).toHaveBeenCalledWith("window", {
+      windowId: 7,
+      onSaved: syncSavedSession,
+    });
   });
 
   it("lets the save flow resolve the window when save-window has no window id", async () => {
@@ -170,7 +210,9 @@ describe("handleContextMenuClick", () => {
       menuItemId: CONTEXT_MENU_IDS.SAVE_WINDOW,
     });
 
-    expect(saveTabsMock).toHaveBeenCalledWith("window");
+    expect(saveTabsMock).toHaveBeenCalledWith("window", {
+      onSaved: syncSavedSession,
+    });
   });
 
   it("saves the highlighted tabs for save-selection", async () => {
@@ -188,6 +230,7 @@ describe("handleContextMenuClick", () => {
     expect(saveTabsMock).toHaveBeenCalledWith("selection", {
       tabs,
       windowId: 7,
+      onSaved: syncSavedSession,
     });
   });
 
@@ -209,4 +252,64 @@ describe("handleContextMenuClick", () => {
 
     expect(saveTabsMock).not.toHaveBeenCalled();
   });
+
+  it.each([
+    ["save-tab", CONTEXT_MENU_IDS.SAVE_TAB],
+    ["save-window", CONTEXT_MENU_IDS.SAVE_WINDOW],
+    ["save-selection", CONTEXT_MENU_IDS.SAVE_SELECTION],
+  ] as const)(
+    "uploads the fresh session for %s when auto-upload is on",
+    async (_label, menuItemId) => {
+      await fakeBrowser.storage.local.set({
+        settings: settingsWith({
+          "sync.enabled": true,
+          "sync.autoUpload": true,
+        }),
+      });
+      const tabs = [makeTab(31)];
+      vi.spyOn(fakeBrowser.tabs, "query").mockResolvedValue(
+        tabs as unknown as never,
+      );
+
+      await handleContextMenuClick({
+        menuItemId,
+        windowId: 7,
+        tab: tabs[0],
+      });
+
+      expect(enqueueUploadMock).toHaveBeenCalledTimes(1);
+      expect(enqueueUploadMock).toHaveBeenCalledWith(
+        freshSessionRef.current,
+      );
+    },
+  );
+
+  it.each([
+    ["save-tab", CONTEXT_MENU_IDS.SAVE_TAB],
+    ["save-window", CONTEXT_MENU_IDS.SAVE_WINDOW],
+    ["save-selection", CONTEXT_MENU_IDS.SAVE_SELECTION],
+  ] as const)(
+    "does not upload the fresh session for %s when auto-upload is off",
+    async (_label, menuItemId) => {
+      await fakeBrowser.storage.local.set({
+        settings: settingsWith({
+          "sync.enabled": true,
+          "sync.autoUpload": false,
+        }),
+      });
+      const tabs = [makeTab(32)];
+      vi.spyOn(fakeBrowser.tabs, "query").mockResolvedValue(
+        tabs as unknown as never,
+      );
+
+      await handleContextMenuClick({
+        menuItemId,
+        windowId: 7,
+        tab: tabs[0],
+      });
+
+      expect(saveTabsMock).toHaveBeenCalledTimes(1);
+      expect(enqueueUploadMock).not.toHaveBeenCalled();
+    },
+  );
 });

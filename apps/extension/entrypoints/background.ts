@@ -40,7 +40,7 @@ import { getOrCreateKey } from "../lib/sync/key-store";
 import {
   SYNC_RETRY_ALARM_NAME,
   applySyncAlarm,
-  retryPendingSync,
+  retryPendingUploads,
   syncOnStartup,
 } from "../lib/sync/sync-lifecycle";
 
@@ -111,7 +111,7 @@ export default defineBackground(() => {
 
   browser.alarms.onAlarm.addListener((alarm) => {
     if (alarm.name === DISCARD_ALARM_NAME) run(evaluateAndDiscard());
-    if (alarm.name === SYNC_RETRY_ALARM_NAME) run(retryPendingSync());
+    if (alarm.name === SYNC_RETRY_ALARM_NAME) run(retryPendingUploads());
   });
 
   // Activity tracking feeds the idle threshold. URL changes cover in-page

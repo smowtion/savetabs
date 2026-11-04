@@ -4,7 +4,7 @@
  * Owns the automatic sync triggers that live outside the options page:
  * - a full sync at browser startup when `sync.autoDownload` is on,
  * - an upload of the freshly saved session when `sync.autoUpload` is on,
- * - a five-minute retry alarm for sessions left in `pendingUpload`.
+ * - a five-minute retry alarm that uploads only `pendingUpload` sessions.
  *
  * Every trigger is gated by `sync.enabled` and contains its own failures: a
  * broken network or a rejected key must never crash the service worker or
@@ -13,7 +13,8 @@
  *
  * The module also records `syncLastAt` in `storage.local` after a completed
  * full sync so the options UI can show a relative timestamp, and owns the
- * "Delete cloud data" primitive (local sessions are never touched).
+ * "Delete cloud data" primitive, which turns sync off so the kept local
+ * sessions are not re-uploaded.
  */
 
 import {
@@ -28,7 +29,8 @@ import {
 import { browser } from "wxt/browser";
 
 import { API_BASE } from "../config";
-import { loadSettings } from "../settings";
+import { listSessions } from "../sessions-repo";
+import { loadSettings, saveSetting } from "../settings";
 import { getKey } from "./key-store";
 import { enqueueUpload, syncNow } from "./sync-service";
 
@@ -110,14 +112,37 @@ export async function syncOnStartup(): Promise<void> {
 }
 
 /**
- * Retry alarm handler. `syncNow` uploads local sessions marked
- * `pendingUpload`; the alarm only exists while sync is enabled, but a queued
- * alarm can still fire after the user disables sync, so re-check.
+ * Retry alarm handler: upload only local sessions marked `pendingUpload`.
+ *
+ * Deliberately narrower than `syncNow`: it never lists, downloads or merges
+ * remote sessions and never uploads clean local sessions, so it cannot bypass
+ * `sync.autoDownload` or `sync.autoUpload`. The alarm only exists while sync
+ * is enabled, but a queued alarm can fire after the user disables sync, so
+ * both settings are re-checked.
  */
-export async function retryPendingSync(): Promise<void> {
+export async function retryPendingUploads(): Promise<void> {
   const settings = await loadSettings();
-  if (!isSyncEnabled(settings)) return;
-  await runFullSync();
+  if (!isSyncEnabled(settings) || settings["sync.autoUpload"] !== true) return;
+
+  const pending = (await listSessions()).filter(
+    (session) =>
+      session.pendingUpload === true &&
+      !session.incognito &&
+      !session.syncExcluded,
+  );
+
+  for (const session of pending) {
+    try {
+      await enqueueUpload(session);
+    } catch (error) {
+      // The flag stays set for the next retry, and one failed session must
+      // not prevent the others from uploading.
+      console.error(
+        `[savetabs] failed to retry the upload of ${session.id}`,
+        error,
+      );
+    }
+  }
 }
 
 /**
@@ -146,7 +171,12 @@ export async function syncSavedSession(session: Session): Promise<void> {
  *
  * A 404 means the key was never registered on the server (or its data is
  * already gone), which is the desired end state, so it counts as success.
- * Local sessions and their `syncExcluded` flags are deliberately untouched.
+ *
+ * After a successful delete, sync is turned off in the same flow. Local
+ * sessions are deliberately kept, so leaving sync on would let the retry
+ * alarm or the next auto-upload recreate the cloud data immediately. The user
+ * can re-enable sync later through the key-saved confirmation. `syncExcluded`
+ * flags and every other local field stay untouched.
  */
 export async function deleteAllCloudData(): Promise<void> {
   const key = await getKey();
@@ -161,7 +191,10 @@ export async function deleteAllCloudData(): Promise<void> {
   try {
     await client.deleteAll();
   } catch (error) {
-    if (error instanceof SyncHttpError && error.status === 404) return;
-    throw error;
+    if (!(error instanceof SyncHttpError && error.status === 404)) throw error;
   }
+
+  // The settings listener in the background clears the retry alarm when this
+  // change lands.
+  await saveSetting("sync.enabled", false);
 }
