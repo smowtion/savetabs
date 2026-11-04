@@ -499,7 +499,7 @@ apps/extension/
 ### 9.1 Worker
 
 - TypeScript + Wrangler; router nhỏ tự viết hoặc Hono (chọn Hono nếu cần middleware CORS/rate limit gọn — quyết định của builder, ưu tiên ít dependency).
-- Bindings: `DB` (D1), `RELEASES` (R2), `RATE_LIMITER` (Rate Limiting), env `WEB_ORIGIN`, `API_ORIGIN`, `GLOBAL_DAILY_REQUESTS`, `GLOBAL_MAX_KEYS`.
+- Bindings: `DB` (D1), `RELEASES` (R2), `RATE_LIMITER_IP` + `RATE_LIMITER_AUTH` (Rate Limiting, 120/60s và 240/60s), env `WEB_ORIGIN`, `API_ORIGIN`, `GLOBAL_DAILY_REQUESTS`, `GLOBAL_MAX_KEYS`.
 - Global caps: đếm request/ngày và số key tạo mới/ngày trong D1; vượt → 429 `capacity_exceeded`. Không Turnstile ở v1.
 - Không log body/ciphertext; log chỉ method, path (đã che authId? authId là public id, giữ được), status, latency.
 
