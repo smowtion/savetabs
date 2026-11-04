@@ -1,19 +1,21 @@
 /**
  * Compact toolbar popup (360x420).
  *
- * The popup is a thin, read-only overview of the current window: it shows how
- * many tabs a save would store, the most recent sessions, the auto-discard
- * state and a sync indicator. Nothing here duplicates the options page; every
- * setting lives in Options and is only read here.
+ * The popup is a thin, read-only overview of what a save would cover: it
+ * shows how many tabs the save would store, the most recent sessions, the
+ * auto-discard state and a sync indicator. Nothing here duplicates the options
+ * page; every setting lives in Options and is only read here.
  *
  * The save button asks the background service worker through the typed
  * message contract. When the background answers `confirmation_required`,
  * nothing has been saved or closed yet, so the popup shows the shared
  * `ConfirmDialog` and only then resends `SAVE_TABS` with `confirmed: true`.
  *
- * The count is never a raw tab count: it runs the same `collectTabsForSave`
- * filters as the save flow (scheme, pinned, audible, excluded domains and
- * duplicate rules against every stored session) over the current window.
+ * The count is never a raw tab count: it resolves the same save scope as the
+ * background (current window, or every normal window when
+ * `tabs.saveAllWindows` is on) and runs the same `collectTabsForSave` filters
+ * (scheme, pinned, audible, excluded domains and duplicate rules against every
+ * stored session) over it.
  */
 
 import { APP_NAME, type Session, type Settings } from "@savetabs/shared";
@@ -32,6 +34,7 @@ import {
 import type { UiResponse } from "../../lib/messages";
 import type { RestoreResult } from "../../lib/restore";
 import type { SaveTabsResult } from "../../lib/save-flow";
+import { queryTabsForSaveScope } from "../../lib/save-scope";
 import { formatSessionTime } from "../../lib/session-time";
 import { listSessions, onSessionsChanged } from "../../lib/sessions-repo";
 import { SYNC_KEY_STORAGE_KEY, getKey } from "../../lib/sync/key-store";
@@ -92,7 +95,7 @@ export function App() {
     const refresh = async (): Promise<void> => {
       try {
         const [tabs, existingSessions] = await Promise.all([
-          browser.tabs.query({ currentWindow: true }),
+          queryTabsForSaveScope("window", settings),
           listSessions(),
         ]);
         if (!active) return;

@@ -10,6 +10,12 @@
 import { type Session, type SessionSource, type Settings } from "@savetabs/shared";
 import { browser } from "wxt/browser";
 
+import {
+  getCurrentWindow,
+  getWindow,
+  querySaveScope,
+  type SaveScope,
+} from "./save-scope";
 import { loadSettings } from "./settings";
 import {
   getSessionsPageUrl,
@@ -22,17 +28,7 @@ import {
   type TabLike,
 } from "./tab-collector";
 
-/**
- * Thrown when a save cannot determine which window it is scoped to. The flow
- * fails closed: it never widens the scope to every window, because that could
- * close tabs the user did not select.
- */
-export class WindowUnavailableError extends Error {
-  constructor() {
-    super("Cannot resolve the target browser window for this save");
-    this.name = "WindowUnavailableError";
-  }
-}
+export { WindowUnavailableError } from "./save-scope";
 
 /**
  * Asked before a save closes more tabs than `general.confirmThreshold`.
@@ -64,12 +60,6 @@ export type SaveTabsResult = {
   overflow: number;
 };
 
-type TabScope = {
-  tabs: TabLike[];
-  /** True when the scope contained at least one incognito window or tab. */
-  incognito: boolean;
-};
-
 function readBoolean(settings: Settings, key: string): boolean {
   return settings[key] === true;
 }
@@ -77,124 +67,6 @@ function readBoolean(settings: Settings, key: string): boolean {
 function readNumber(settings: Settings, key: string): number {
   const value = settings[key];
   return typeof value === "number" && Number.isFinite(value) ? value : 0;
-}
-
-/**
- * Incognito access is a browser-managed permission. When the API is missing
- * or fails, rely on the fact that incognito windows are only visible to an
- * extension that already has access.
- */
-async function isIncognitoAllowed(): Promise<boolean> {
-  const extensionApi = browser.extension as typeof browser.extension & {
-    isAllowedIncognitoAccess?: () => Promise<boolean>;
-  };
-  if (typeof extensionApi.isAllowedIncognitoAccess !== "function") return true;
-  try {
-    return await extensionApi.isAllowedIncognitoAccess();
-  } catch {
-    return true;
-  }
-}
-
-async function getWindow(
-  windowId: number,
-): Promise<{ id?: number; incognito?: boolean } | undefined> {
-  try {
-    return await browser.windows.get(windowId);
-  } catch {
-    return undefined;
-  }
-}
-
-/** The focused window, falling back to the most recently focused one. */
-async function getCurrentWindow(): Promise<
-  { id?: number; incognito?: boolean } | undefined
-> {
-  try {
-    const current = await browser.windows.getCurrent();
-    if (current) return current;
-  } catch {
-    // Fall through to the last focused window.
-  }
-  try {
-    return await browser.windows.getLastFocused();
-  } catch {
-    return undefined;
-  }
-}
-
-async function queryTabsInWindow(
-  windowId: number | undefined,
-  filter: { active?: boolean; highlighted?: boolean },
-): Promise<TabScope> {
-  const window =
-    windowId === undefined ? await getCurrentWindow() : await getWindow(windowId);
-  const targetId = windowId ?? window?.id;
-  if (targetId === undefined) throw new WindowUnavailableError();
-
-  const tabs = await browser.tabs.query({ ...filter, windowId: targetId });
-
-  return {
-    tabs,
-    incognito:
-      window?.incognito === true ||
-      tabs.some((tab) => tab.incognito === true),
-  };
-}
-
-/** Every window allowed by `incognito.includeInSaveAll`. */
-async function queryAllWindows(settings: Settings): Promise<TabScope> {
-  const includeIncognito =
-    readBoolean(settings, "incognito.includeInSaveAll") &&
-    (await isIncognitoAllowed());
-  const windows = await browser.windows.getAll({ populate: true });
-
-  const tabs: TabLike[] = [];
-  let incognito = false;
-
-  for (const window of windows) {
-    // Save-all covers normal browser windows only; popup and app windows are
-    // not part of the user's browsing session.
-    if (window.type !== "normal") continue;
-    if (window.incognito === true) {
-      if (!includeIncognito) continue;
-      incognito = true;
-    }
-    if (Array.isArray(window.tabs)) {
-      tabs.push(...window.tabs);
-    } else if (typeof window.id === "number") {
-      tabs.push(...(await browser.tabs.query({ windowId: window.id })));
-    }
-  }
-
-  return { tabs, incognito };
-}
-
-async function queryTabsForSave(
-  source: SessionSource,
-  windowId: number | undefined,
-  settings: Settings,
-): Promise<TabScope> {
-  const saveAllWindows = readBoolean(settings, "tabs.saveAllWindows");
-
-  if (source === "all-windows") {
-    return saveAllWindows
-      ? queryAllWindows(settings)
-      : queryTabsInWindow(windowId, {});
-  }
-
-  if (source === "window" && windowId === undefined && saveAllWindows) {
-    return queryAllWindows(settings);
-  }
-
-  if (source === "tab") {
-    return queryTabsInWindow(windowId, { active: true });
-  }
-  if (source === "selection") {
-    return queryTabsInWindow(windowId, { highlighted: true });
-  }
-
-  return queryTabsInWindow(windowId, {});
 }
 
 /**
@@ -234,7 +106,7 @@ export async function saveTabs(
   const settings = await loadSettings();
   const providedTabs = opts.tabs;
 
-  let scope: TabScope;
+  let scope: SaveScope;
   if (providedTabs !== undefined) {
     const window =
       opts.windowId !== undefined
@@ -247,7 +119,7 @@ export async function saveTabs(
         providedTabs.some((tab) => tab.incognito === true),
     };
   } else {
-    scope = await queryTabsForSave(source, opts.windowId, settings);
+    scope = await querySaveScope(source, settings, opts.windowId);
   }
 
   const existingSessions = await listSessions();

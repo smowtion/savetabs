@@ -97,6 +97,24 @@ async function seedTab(url: string, pinned = false): Promise<void> {
 }
 
 /**
+ * Create a real `normal` window. The save scope only considers normal windows
+ * for all-windows saves, so tests that exercise that path need the type.
+ */
+async function createNormalWindow(
+  options: { focused?: boolean; incognito?: boolean } = {},
+): Promise<number> {
+  const created = await fakeBrowser.windows.create({
+    focused: options.focused ?? false,
+    incognito: options.incognito ?? false,
+    type: "normal",
+  });
+  if (created?.id === undefined) {
+    throw new Error("fakeBrowser.windows.create returned no window id");
+  }
+  return created.id;
+}
+
+/**
  * fakeBrowser types `runtime.sendMessage` as returning void because the
  * default fake has no background listener; the tests answer with typed
  * UiResponses instead, so the stub casts each reply. Multiple replies are
@@ -118,8 +136,8 @@ beforeEach(async () => {
   await deleteDatabase();
   document.documentElement.removeAttribute("data-theme");
   stubMatchMedia();
-  // `tabs.query({ currentWindow: true })` needs a focused window.
-  await fakeBrowser.windows.create({ focused: true });
+  // `windows.getCurrent()` and all-window saves need a real normal window.
+  await createNormalWindow({ focused: true });
 });
 
 afterEach(async () => {
@@ -153,6 +171,75 @@ describe("popup", () => {
     // Seven raw tabs; only two survive every save filter.
     expect(
       await screen.findByRole("button", { name: "Save 2 tabs" }),
+    ).toBeInTheDocument();
+  });
+
+  it("counts tabs from every normal window when all-windows saving is enabled", async () => {
+    await seedSettings({ "tabs.saveAllWindows": true });
+    const otherWindow = await createNormalWindow();
+    await seedTab("https://current-one.example");
+    await seedTab("https://current-two.example");
+    for (let index = 0; index < 10; index += 1) {
+      await fakeBrowser.tabs.create({
+        url: `https://other-${index}.example`,
+        windowId: otherWindow,
+      });
+    }
+
+    render(<App />);
+
+    expect(
+      await screen.findByRole("button", { name: "Save 12 tabs" }),
+    ).toBeInTheDocument();
+  });
+
+  it("counts only the current window when all-windows saving is disabled", async () => {
+    const otherWindow = await createNormalWindow();
+    await seedTab("https://current.example");
+    await fakeBrowser.tabs.create({
+      url: "https://other.example",
+      windowId: otherWindow,
+    });
+
+    render(<App />);
+
+    expect(
+      await screen.findByRole("button", { name: "Save 1 tabs" }),
+    ).toBeInTheDocument();
+  });
+
+  it("excludes incognito windows from the count unless the setting allows them", async () => {
+    await seedSettings({
+      "tabs.saveAllWindows": true,
+      "incognito.includeInSaveAll": false,
+    });
+    const incognitoWindow = await createNormalWindow({ incognito: true });
+    await seedTab("https://normal.example");
+    await fakeBrowser.tabs.create({
+      url: "https://private-one.example",
+      windowId: incognitoWindow,
+    });
+    await fakeBrowser.tabs.create({
+      url: "https://private-two.example",
+      windowId: incognitoWindow,
+    });
+
+    render(<App />);
+
+    expect(
+      await screen.findByRole("button", { name: "Save 1 tabs" }),
+    ).toBeInTheDocument();
+
+    await fakeBrowser.storage.local.set({
+      settings: {
+        ...DEFAULT_SETTINGS,
+        "tabs.saveAllWindows": true,
+        "incognito.includeInSaveAll": true,
+      },
+    });
+
+    expect(
+      await screen.findByRole("button", { name: "Save 3 tabs" }),
     ).toBeInTheDocument();
   });
 
