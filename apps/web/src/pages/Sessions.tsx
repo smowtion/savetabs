@@ -14,8 +14,10 @@
  *   vault; show a dedicated "no synced data for this key" state that asks the
  *   user to check the key. The generic empty state is reserved for a successful
  *   response with zero sessions.
- * - A blob that fails to decrypt is counted and skipped; the other sessions
- *   still render.
+ * - A blob that fails to decrypt, or that decrypts to a value without the
+ *   required session fields, is counted and skipped; the other sessions still
+ *   render. The header links to the landing page and privacy policy and offers
+ *   a confirmed "Forget key" action that clears storage and returns home.
  */
 
 import {
@@ -27,8 +29,9 @@ import {
   type Session,
 } from "@savetabs/shared";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
+import { ConfirmDialog } from "../components/ConfirmDialog";
 import { SessionCard } from "../components/SessionCard";
 import { useI18n } from "../hooks/useI18n";
 import { API_BASE } from "../lib/config";
@@ -40,8 +43,49 @@ const MAX_PAGES = 10_000;
 
 type Status = { kind: "success" | "error"; message: string };
 
+const SESSION_SOURCES: ReadonlySet<string> = new Set([
+  "window",
+  "all-windows",
+  "tab",
+  "selection",
+]);
+
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isTimestamp(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0;
+}
+
+/**
+ * A decrypted blob is untrusted input: a corrupted or malicious entry may
+ * decrypt but still lack the fields the card renders. Reject it here so one
+ * bad session cannot break the whole page.
+ */
+function isValidSession(value: unknown): value is Session {
+  if (!isRecord(value)) return false;
+  if (typeof value.id !== "string" || value.id.length === 0) return false;
+  if (!isTimestamp(value.createdAt) || !isTimestamp(value.updatedAt)) {
+    return false;
+  }
+  if (
+    typeof value.source !== "string" ||
+    !SESSION_SOURCES.has(value.source)
+  ) {
+    return false;
+  }
+  if (!Array.isArray(value.tabs)) return false;
+  return value.tabs.every(
+    (tab) =>
+      isRecord(tab) &&
+      typeof tab.url === "string" &&
+      typeof tab.title === "string",
+  );
 }
 
 /** Newest first, matching the extension's sessions list. */
@@ -72,6 +116,7 @@ export default function Sessions() {
   const [keyUnknown, setKeyUnknown] = useState(false);
   const [loadFailed, setLoadFailed] = useState(false);
   const [status, setStatus] = useState<Status | null>(null);
+  const [forgetConfirmOpen, setForgetConfirmOpen] = useState(false);
   const [query, setQuery] = useState("");
   const clientRef = useRef<SyncClient | null>(null);
 
@@ -104,12 +149,16 @@ export default function Sessions() {
 
         for (const blob of blobs) {
           try {
-            const session = await decryptSession(
+            const session: unknown = await decryptSession(
               encKey,
               authId,
               blob.id,
               blob.ciphertext,
             );
+            if (!isValidSession(session)) {
+              failures += 1;
+              continue;
+            }
             // The server never stores incognito sessions; filter defensively
             // so a future server bug cannot leak private data into the UI.
             if (session.incognito === true) continue;
@@ -153,6 +202,13 @@ export default function Sessions() {
   }, [sessions, query]);
 
   function changeKey(): void {
+    clearKey();
+    navigate("/", { replace: true });
+  }
+
+  /** Explicit "Forget key": same effect as changeKey, behind a confirmation. */
+  function forgetKey(): void {
+    setForgetConfirmOpen(false);
     clearKey();
     navigate("/", { replace: true });
   }
@@ -202,7 +258,28 @@ export default function Sessions() {
         <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-3 px-4 py-4">
           <h1 className="text-lg font-semibold">{t("web.sessions.title")}</h1>
 
-          <div className="flex flex-1 justify-end">
+          <div className="flex flex-1 flex-wrap items-center justify-end gap-3">
+            <nav className="flex items-center gap-3 text-xs font-medium">
+              <Link
+                to="/"
+                className="text-indigo-700 underline-offset-4 hover:underline dark:text-indigo-400"
+              >
+                {t("web.sessions.home")}
+              </Link>
+              <Link
+                to="/privacy"
+                className="text-indigo-700 underline-offset-4 hover:underline dark:text-indigo-400"
+              >
+                {t("web.sessions.privacy")}
+              </Link>
+              <button
+                type="button"
+                onClick={() => setForgetConfirmOpen(true)}
+                className="rounded-md border border-neutral-300 bg-white px-2.5 py-1.5 text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800"
+              >
+                {t("web.sessions.forgetKey")}
+              </button>
+            </nav>
             <label htmlFor="sessions-search" className="sr-only">
               {t("web.sessions.searchLabel")}
             </label>
@@ -324,6 +401,18 @@ export default function Sessions() {
           </div>
         )}
       </main>
+
+      {forgetConfirmOpen && (
+        <ConfirmDialog
+          title={t("web.sessions.forgetKeyTitle")}
+          message={t("web.sessions.forgetKeyMessage")}
+          confirmLabel={t("web.sessions.forgetKeyConfirm")}
+          cancelLabel={t("common.cancel")}
+          destructive
+          onConfirm={forgetKey}
+          onCancel={() => setForgetConfirmOpen(false)}
+        />
+      )}
     </div>
   );
 }

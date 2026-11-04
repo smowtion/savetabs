@@ -8,11 +8,13 @@
  * extension settings, and export writes the standard single-session envelope.
  * Delete is routed through the modal `ConfirmDialog`.
  *
- * The body renders every tab as a real link with its title and domain. Links
- * are keyboard navigable and always open in a new tab without an opener.
+ * The body renders every tab with its title and domain. Restorable URLs are
+ * real links, keyboard navigable and opening in a new tab without an opener;
+ * any other scheme is rendered as plain text so it can never be clicked.
  */
 
 import {
+  isRestorableUrl,
   type Lang,
   type SavedTab,
   type Session,
@@ -56,16 +58,6 @@ function hostnameOf(url: string): string {
   }
 }
 
-/** Protocols the restore action is willing to open in a new browser tab. */
-function isRestorable(url: string): boolean {
-  try {
-    const protocol = new URL(url).protocol;
-    return protocol === "http:" || protocol === "https:" || protocol === "file:";
-  } catch {
-    return false;
-  }
-}
-
 /** Visible label for one saved tab. */
 function tabLabel(tab: SavedTab): string {
   return tab.title.trim() !== "" ? tab.title : tab.url;
@@ -91,7 +83,9 @@ function downloadJson(filename: string, text: string): void {
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
-  URL.revokeObjectURL(url);
+  // Revoking synchronously can abort the download in some browsers; let the
+  // click be processed first.
+  setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
 export function SessionCard({
@@ -138,7 +132,7 @@ export function SessionCard({
     let blocked = 0;
 
     for (const tab of session.tabs) {
-      if (!isRestorable(tab.url)) continue;
+      if (!isRestorableUrl(tab.url)) continue;
       const openedWindow = window.open(tab.url, "_blank");
       if (openedWindow === null) {
         blocked += 1;
@@ -243,22 +237,39 @@ export function SessionCard({
 
       {hasTabs ? (
         <ul className="mt-3 grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
-          {session.tabs.map((tab, index) => (
-            <li key={`${index}-${tab.url}`} className="min-w-0">
-              <a
-                href={tab.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={tab.url}
-                className="flex min-w-0 flex-col rounded-md px-2 py-1.5 text-sm text-indigo-700 transition-colors hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950"
-              >
+          {session.tabs.map((tab, index) => {
+            const label = (
+              <>
                 <span className="truncate font-medium">{tabLabel(tab)}</span>
                 <span className="truncate text-xs text-neutral-500 dark:text-neutral-400">
                   {hostnameOf(tab.url)}
                 </span>
-              </a>
-            </li>
-          ))}
+              </>
+            );
+
+            return (
+              <li key={`${index}-${tab.url}`} className="min-w-0">
+                {isRestorableUrl(tab.url) ? (
+                  <a
+                    href={tab.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={tab.url}
+                    className="flex min-w-0 flex-col rounded-md px-2 py-1.5 text-sm text-indigo-700 transition-colors hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950"
+                  >
+                    {label}
+                  </a>
+                ) : (
+                  <span
+                    title={tab.url}
+                    className="flex min-w-0 flex-col rounded-md px-2 py-1.5 text-sm text-neutral-500 dark:text-neutral-400"
+                  >
+                    {label}
+                  </span>
+                )}
+              </li>
+            );
+          })}
         </ul>
       ) : (
         <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400">

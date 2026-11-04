@@ -44,6 +44,12 @@ const WEB_SESSION_KEYS = [
   "web.sessions.deleteFailed",
   "web.sessions.authError",
   "web.sessions.changeKey",
+  "web.sessions.forgetKey",
+  "web.sessions.forgetKeyTitle",
+  "web.sessions.forgetKeyMessage",
+  "web.sessions.forgetKeyConfirm",
+  "web.sessions.home",
+  "web.sessions.privacy",
   "web.sessions.decryptError",
   "web.sessions.loadFailed",
   "web.sessions.noTabs",
@@ -409,7 +415,91 @@ describe("Sessions page", () => {
     expect(typeof parsed.exportedAt).toBe("string");
     expect(Number.isNaN(Date.parse(parsed.exportedAt))).toBe(false);
     expect(filename).toBe(`savetabs-session-${SESSION_ID}.json`);
-    expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:test");
+    // Revocation is deferred so the click can start the download first.
+    await waitFor(() =>
+      expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:test"),
+    );
+  });
+
+  it("renders a non-restorable URL as text instead of a link", async () => {
+    const session = sessionFixture({
+      title: "Mixed session",
+      tabs: [
+        { url: "https://safe.example", title: "Safe tab" },
+        { url: "javascript:alert(1)", title: "Script tab" },
+      ],
+    });
+    const blob = await encryptedBlob(session);
+    mockFetch(() => jsonResponse({ blobs: [blob] }));
+
+    renderSessions();
+
+    expect(
+      await screen.findByRole("link", { name: /Safe tab/ }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Script tab")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: /Script tab/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("counts a decrypted blob with an invalid shape as a failure", async () => {
+    const good = sessionFixture({ title: "Readable session" });
+    const goodBlob = await encryptedBlob(good);
+    const malformed = {
+      id: "malformed",
+      createdAt: 1,
+      updatedAt: 1,
+      source: "window",
+    } as unknown as Session;
+    const malformedBlob = await encryptedBlob(malformed);
+    mockFetch(() => jsonResponse({ blobs: [goodBlob, malformedBlob] }));
+
+    renderSessions();
+
+    expect(
+      await screen.findByRole("heading", { name: "Readable session" }),
+    ).toBeInTheDocument();
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /could not be decrypted/i,
+    );
+  });
+
+  it("links to the landing page and privacy policy and forgets the key after confirmation", async () => {
+    const user = userEvent.setup();
+    mockFetch(() => jsonResponse({ blobs: [] }));
+
+    renderSessions();
+
+    expect(
+      await screen.findByRole("link", { name: "Home" }),
+    ).toHaveAttribute("href", "/");
+    expect(screen.getByRole("link", { name: "Privacy" })).toHaveAttribute(
+      "href",
+      "/privacy",
+    );
+
+    await user.click(screen.getByRole("button", { name: "Forget key" }));
+    const dialog = screen.getByRole("dialog", {
+      name: "Forget the sync key?",
+    });
+    expect(within(dialog).getByText(/stays on the server/i)).toBeInTheDocument();
+
+    // Cancelling keeps the key.
+    await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(loadKey()).toBe(VALID_KEY);
+
+    await user.click(screen.getByRole("button", { name: "Forget key" }));
+    const secondDialog = await screen.findByRole("dialog", {
+      name: "Forget the sync key?",
+    });
+    await user.click(
+      within(secondDialog).getByRole("button", { name: "Forget key" }),
+    );
+
+    expect(await screen.findByTestId("landing-page")).toBeInTheDocument();
+    expect(loadKey()).toBeNull();
   });
 
   it("copies session tabs as plain URLs", async () => {
