@@ -414,6 +414,11 @@
     "restoreSession": "Restore {time}",
     "loadFailed": "Could not load the popup data."
   },
+  "update": {
+    "title": "Update available",
+    "message": "SaveTabs {version} is ready to install.",
+    "action": "View in store"
+  },
   "sessions": {
     "title": "Saved sessions",
     "searchLabel": "Search sessions",

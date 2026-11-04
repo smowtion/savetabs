@@ -19,6 +19,12 @@ import { DISCARD_STATS_KEY } from "../../lib/discard";
 import { SESSIONS_DB_NAME, closeSessionsDb } from "../../lib/sessions-db";
 import { addSession } from "../../lib/sessions-repo";
 import { resetSettings } from "../../lib/settings";
+import {
+  LATEST_VERSION_STORAGE_KEY,
+  UPDATE_AVAILABLE_STORAGE_KEY,
+  currentBrowser,
+  storeListingUrl,
+} from "../../lib/version-check";
 import { App } from "./App";
 
 const HOUR_MS = 60 * 60 * 1000;
@@ -522,5 +528,39 @@ describe("popup", () => {
       screen.getByRole("button", { name: "Mở trang phiên" }),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Cài đặt" })).toBeInTheDocument();
+  });
+
+  it("shows the update banner and opens the browser's store listing", async () => {
+    await seedSettings();
+    await fakeBrowser.storage.local.set({
+      [UPDATE_AVAILABLE_STORAGE_KEY]: true,
+      [LATEST_VERSION_STORAGE_KEY]: "1.2.3",
+    });
+    const createSpy = vi.spyOn(fakeBrowser.tabs, "create");
+
+    render(<App />);
+
+    expect(await screen.findByText("Update available")).toBeInTheDocument();
+    expect(
+      screen.getByText("SaveTabs 1.2.3 is ready to install."),
+    ).toBeInTheDocument();
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "View in store" }),
+    );
+
+    expect(createSpy).toHaveBeenCalledWith({
+      url: storeListingUrl(currentBrowser()),
+    });
+  });
+
+  it("hides the update banner when no update is recorded", async () => {
+    await seedSettings();
+
+    render(<App />);
+
+    await waitFor(() =>
+      expect(screen.queryByText("Update available")).not.toBeInTheDocument(),
+    );
   });
 });

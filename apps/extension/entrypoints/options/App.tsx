@@ -21,6 +21,7 @@ import { ConfirmDialog } from "../../components/ConfirmDialog";
 import { SearchBar } from "../../components/SearchBar";
 import { SettingsSidebar } from "../../components/SettingsSidebar";
 import { SyncSection } from "../../components/SyncSection";
+import { UpdateBanner } from "../../components/UpdateBanner";
 import { useI18n } from "../../hooks/useI18n";
 import { useOpenSections } from "../../hooks/useOpenSections";
 import { useSettings } from "../../hooks/useSettings";
@@ -184,6 +185,8 @@ export function App() {
             </div>
           </div>
         </header>
+
+        <UpdateBanner t={t} className="mb-4" />
 
         {groups.length === 0 ? (
           <p className="rounded-lg border border-dashed border-neutral-300 px-4 py-8 text-center text-sm text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">

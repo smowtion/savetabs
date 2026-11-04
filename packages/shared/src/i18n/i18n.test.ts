@@ -205,6 +205,19 @@ describe("i18n", () => {
     expect(missingKeys("vi", popupKeys)).toEqual([]);
   });
 
+  it("covers the update banner strings in both languages", () => {
+    const updateKeys = ["update.title", "update.message", "update.action"];
+
+    expect(missingKeys("en", updateKeys)).toEqual([]);
+    expect(missingKeys("vi", updateKeys)).toEqual([]);
+    expect(
+      createTranslator("en")("update.message", { version: "2.0.0" }),
+    ).toContain("2.0.0");
+    expect(
+      createTranslator("vi")("update.message", { version: "2.0.0" }),
+    ).toContain("2.0.0");
+  });
+
   it("covers the sessions page strings in both languages", () => {
     const sessionKeys = [
       "sessions.title",

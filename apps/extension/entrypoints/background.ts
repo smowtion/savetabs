@@ -9,6 +9,9 @@
  * disabled until the user turns it on in the options page; while it is on,
  * startup runs an auto-download merge, a save queues its new session for
  * upload, and a five-minute alarm retries pending uploads.
+ *
+ * A daily alarm checks the release API for a newer extension version and
+ * leaves a badge and banner hint behind.
  */
 
 import type { Settings } from "@savetabs/shared";
@@ -43,6 +46,11 @@ import {
   retryPendingUploads,
   syncOnStartup,
 } from "../lib/sync/sync-lifecycle";
+import {
+  VERSION_CHECK_ALARM_NAME,
+  ensureVersionCheckAlarm,
+  runVersionCheck,
+} from "../lib/version-check";
 
 /**
  * Background work is fire-and-forget from event listeners: log failures so a
@@ -71,6 +79,16 @@ async function applyCurrentSettings(): Promise<void> {
 }
 
 /**
+ * Daily update check. The check already contains network and storage
+ * failures; the badge is repainted afterwards from whatever state persisted,
+ * so a failed check cannot crash the worker or blank the icon.
+ */
+async function refreshUpdateState(): Promise<void> {
+  await runVersionCheck();
+  await updateBadge(await loadSettings());
+}
+
+/**
  * Install and startup restore settings, drop stale tab activity and make sure
  * a sync key is available. A fresh key never enables sync by itself. Startup
  * additionally runs the auto-download merge, which contains its own failures.
@@ -79,6 +97,7 @@ async function initialize(runStartupSync = false): Promise<void> {
   await applyCurrentSettings();
   await pruneActivity();
   await getOrCreateKey();
+  await ensureVersionCheckAlarm();
   if (runStartupSync) await syncOnStartup();
 }
 
@@ -112,6 +131,7 @@ export default defineBackground(() => {
   browser.alarms.onAlarm.addListener((alarm) => {
     if (alarm.name === DISCARD_ALARM_NAME) run(evaluateAndDiscard());
     if (alarm.name === SYNC_RETRY_ALARM_NAME) run(retryPendingUploads());
+    if (alarm.name === VERSION_CHECK_ALARM_NAME) run(refreshUpdateState());
   });
 
   // Activity tracking feeds the idle threshold. URL changes cover in-page

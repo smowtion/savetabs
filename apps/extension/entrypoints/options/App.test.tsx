@@ -12,6 +12,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { OPEN_SECTIONS_STORAGE_KEY } from "../../lib/open-sections";
 import { loadSettings, resetSettings } from "../../lib/settings";
+import {
+  LATEST_VERSION_STORAGE_KEY,
+  UPDATE_AVAILABLE_STORAGE_KEY,
+  currentBrowser,
+  storeListingUrl,
+} from "../../lib/version-check";
 import { App } from "./App";
 
 function stubMatchMedia(matches = false): void {
@@ -335,5 +341,41 @@ describe("options shell", () => {
         writable: true,
       });
     }
+  });
+
+  it("shows the update banner and opens the browser's store listing", async () => {
+    await fakeBrowser.storage.local.set({
+      [UPDATE_AVAILABLE_STORAGE_KEY]: true,
+      [LATEST_VERSION_STORAGE_KEY]: "1.2.3",
+    });
+    const createSpy = vi.spyOn(fakeBrowser.tabs, "create");
+
+    render(<App />);
+
+    expect(await screen.findByText("Update available")).toBeInTheDocument();
+    expect(
+      screen.getByText("SaveTabs 1.2.3 is ready to install."),
+    ).toBeInTheDocument();
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "View in store" }),
+    );
+
+    expect(createSpy).toHaveBeenCalledWith({
+      url: storeListingUrl(currentBrowser()),
+    });
+  });
+
+  it("hides the update banner when no update is recorded", async () => {
+    await fakeBrowser.storage.local.set({
+      [UPDATE_AVAILABLE_STORAGE_KEY]: false,
+      [LATEST_VERSION_STORAGE_KEY]: "1.2.3",
+    });
+
+    render(<App />);
+
+    await waitFor(() =>
+      expect(screen.queryByText("Update available")).not.toBeInTheDocument(),
+    );
   });
 });

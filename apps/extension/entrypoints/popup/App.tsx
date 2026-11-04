@@ -23,6 +23,7 @@ import { useEffect, useState } from "react";
 import { browser } from "wxt/browser";
 
 import { ConfirmDialog } from "../../components/ConfirmDialog";
+import { UpdateBanner } from "../../components/UpdateBanner";
 import { useI18n } from "../../hooks/useI18n";
 import { useSettings } from "../../hooks/useSettings";
 import { useTheme } from "../../hooks/useTheme";
@@ -343,6 +344,8 @@ export function App() {
       </header>
 
       <main className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-3">
+        <UpdateBanner t={t} />
+
         <button
           type="button"
           onClick={() => void saveWindow()}

@@ -17,12 +17,16 @@ import { getUsage } from "./sessions-repo";
 import { openOrReuseSessionsPage } from "./sessions-page";
 import { loadSettings } from "./settings";
 import { syncSavedSession } from "./sync/sync-lifecycle";
+import { isUpdateAvailable } from "./version-check";
 
 /** Popup entrypoint path passed to `action.setPopup` (WXT build output). */
 export const ACTION_POPUP_PATH = "popup.html";
 
 /** Largest three-digit count a badge can show. */
 export const BADGE_COUNT_MAX = 999;
+
+/** Badge shown while an extension update is available; outranks the count. */
+export const UPDATE_BADGE_TEXT = "↑";
 
 export type ToolbarAction = "popup" | "save" | "sessions";
 
@@ -97,8 +101,16 @@ export function formatBadgeCount(total: number): string {
 /**
  * Show the total number of saved tabs across every local session, or clear the
  * badge when `general.showBadgeCount` is off.
+ *
+ * An available extension update always wins: the arrow tells the user to act
+ * regardless of whether the tab count badge is enabled.
  */
 export async function updateBadge(settings: Settings): Promise<void> {
+  if (await isUpdateAvailable()) {
+    await browser.action.setBadgeText({ text: UPDATE_BADGE_TEXT });
+    return;
+  }
+
   if (settings["general.showBadgeCount"] !== true) {
     await browser.action.setBadgeText({ text: "" });
     return;

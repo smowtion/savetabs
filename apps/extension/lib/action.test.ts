@@ -18,6 +18,7 @@ import { SESSIONS_DB_NAME, closeSessionsDb } from "./sessions-db";
 import { addSession, listSessions } from "./sessions-repo";
 import { getSessionsPageUrl } from "./sessions-page";
 import { enqueueUpload } from "./sync/sync-service";
+import { UPDATE_AVAILABLE_STORAGE_KEY } from "./version-check";
 
 vi.mock("./sync/sync-service", () => ({
   enqueueUpload: vi.fn(),
@@ -343,5 +344,40 @@ describe("updateBadge", () => {
     await updateBadge(settingsWith({ "general.showBadgeCount": true }));
 
     expect(spy).toHaveBeenCalledWith({ text: "999+" });
+  });
+
+  it("shows the update arrow while a badge count is enabled", async () => {
+    await addSession(makeSession("session-1", 3));
+    await fakeBrowser.storage.local.set({
+      [UPDATE_AVAILABLE_STORAGE_KEY]: true,
+    });
+    const spy = vi.spyOn(fakeBrowser.action, "setBadgeText");
+
+    await updateBadge(settingsWith({ "general.showBadgeCount": true }));
+
+    expect(spy).toHaveBeenCalledWith({ text: "↑" });
+  });
+
+  it("shows the update arrow even when the badge count is disabled", async () => {
+    await fakeBrowser.storage.local.set({
+      [UPDATE_AVAILABLE_STORAGE_KEY]: true,
+    });
+    const spy = vi.spyOn(fakeBrowser.action, "setBadgeText");
+
+    await updateBadge(settingsWith({ "general.showBadgeCount": false }));
+
+    expect(spy).toHaveBeenCalledWith({ text: "↑" });
+  });
+
+  it("falls back to the tab count once the update flag clears", async () => {
+    await addSession(makeSession("session-1", 3));
+    await fakeBrowser.storage.local.set({
+      [UPDATE_AVAILABLE_STORAGE_KEY]: false,
+    });
+    const spy = vi.spyOn(fakeBrowser.action, "setBadgeText");
+
+    await updateBadge(settingsWith({ "general.showBadgeCount": true }));
+
+    expect(spy).toHaveBeenCalledWith({ text: "3" });
   });
 });

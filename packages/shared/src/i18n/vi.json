@@ -414,6 +414,11 @@
     "restoreSession": "Khôi phục {time}",
     "loadFailed": "Không thể tải dữ liệu cửa sổ bật lên."
   },
+  "update": {
+    "title": "Có bản cập nhật",
+    "message": "SaveTabs {version} đã sẵn sàng để cài đặt.",
+    "action": "Xem trong cửa hàng"
+  },
   "sessions": {
     "title": "Phiên đã lưu",
     "searchLabel": "Tìm kiếm phiên",
