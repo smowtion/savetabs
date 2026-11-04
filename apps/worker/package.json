@@ -12,6 +12,7 @@
     "db:migrate:remote": "wrangler d1 migrations apply savetabs --remote"
   },
   "dependencies": {
+    "@savetabs/shared": "workspace:*",
     "hono": "^4.13.16"
   },
   "devDependencies": {
