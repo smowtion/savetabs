@@ -1,0 +1,206 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "copy": "Copy",
+    "confirm": "Confirm",
+    "restore": "Restore",
+    "settings": "Settings",
+    "openSessions": "Open sessions",
+    "syncNow": "Sync now",
+    "retry": "Retry",
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "empty": "Nothing here yet",
+    "tabsCount": "{count} tabs"
+  },
+  "settings": {
+    "general": {
+      "label": "General",
+      "theme": {
+        "label": "Theme",
+        "description": "Choose light, dark, or follow the system appearance."
+      },
+      "language": {
+        "label": "Language",
+        "description": "Choose the display language, or follow the browser language automatically."
+      },
+      "showBadgeCount": {
+        "label": "Show tab count badge",
+        "description": "Display the number of open tabs on the toolbar icon."
+      },
+      "confirmThreshold": {
+        "label": "Confirm before closing many tabs",
+        "description": "Ask for confirmation when saving would close at least this many tabs. Set to 0 to disable."
+      }
+    },
+    "tabs": {
+      "label": "Tabs",
+      "saveAllWindows": {
+        "label": "Save all windows",
+        "description": "Include tabs from every browser window, not only the current one."
+      },
+      "closeAfterSave": {
+        "label": "Close tabs after saving",
+        "description": "Close saved tabs once the session is stored."
+      },
+      "skipAudible": {
+        "label": "Skip tabs playing audio",
+        "description": "Leave tabs that are currently playing sound open."
+      },
+      "excludedDomains": {
+        "label": "Excluded domains",
+        "description": "Tabs from these domains are never saved or closed. One domain per line."
+      },
+      "includeFileUrls": {
+        "label": "Include local file URLs",
+        "description": "Allow saving tabs that point to files on this computer. Requires file access permission."
+      }
+    },
+    "duplicates": {
+      "label": "Duplicates",
+      "removeOnSave": {
+        "label": "Remove duplicate tabs",
+        "description": "Close repeated tabs and keep only one copy of each URL in the session."
+      },
+      "matchMode": {
+        "label": "Duplicate matching",
+        "description": "How URLs are compared: exact, ignoring the hash fragment, or ignoring query parameters."
+      },
+      "skipAlreadySaved": {
+        "label": "Skip already saved tabs",
+        "description": "Do not save URLs that already exist in another session."
+      }
+    },
+    "pinned": {
+      "label": "Pinned tabs",
+      "skipOnSave": {
+        "label": "Skip pinned tabs when saving",
+        "description": "Leave pinned tabs open and out of new sessions."
+      },
+      "restoreAsPinned": {
+        "label": "Restore pinned tabs as pinned",
+        "description": "Reopen saved pinned tabs as pinned when restoring a session."
+      }
+    },
+    "open": {
+      "label": "Opening sessions",
+      "toolbarAction": {
+        "label": "Toolbar button action",
+        "description": "What happens when the toolbar icon is clicked: open the popup, save tabs immediately, or open the sessions page."
+      },
+      "openSessionsAfterSave": {
+        "label": "Open sessions page after saving",
+        "description": "Show the saved session in the sessions page right after saving."
+      },
+      "reuseSessionsTab": {
+        "label": "Reuse the sessions tab",
+        "description": "Open sessions in an existing sessions tab instead of creating a new one."
+      }
+    },
+    "urlDisplay": {
+      "label": "URL display",
+      "mode": {
+        "label": "URL display mode",
+        "description": "Show saved tabs by title, by domain, or as the full URL."
+      },
+      "showFavicons": {
+        "label": "Show favicons",
+        "description": "Display each site's favicon in session lists."
+      },
+      "showTabCount": {
+        "label": "Show tab count",
+        "description": "Display how many tabs each session contains."
+      }
+    },
+    "restore": {
+      "label": "Restoring",
+      "targetWindow": {
+        "label": "Restore target window",
+        "description": "Open restored tabs in the current window or in a new window."
+      },
+      "openInBackground": {
+        "label": "Open restored tabs in the background",
+        "description": "Restore tabs without switching focus away from the current tab."
+      },
+      "skipExisting": {
+        "label": "Skip tabs that are already open",
+        "description": "Do not reopen URLs that are already open in the browser."
+      }
+    },
+    "clipboard": {
+      "label": "Clipboard",
+      "format": {
+        "label": "Copy format",
+        "description": "Format used when copying session tabs: plain URLs, Markdown links, or titles with URLs."
+      }
+    },
+    "contextMenu": {
+      "label": "Context menu",
+      "enabled": {
+        "label": "Enable context menu items",
+        "description": "Show SaveTabs actions in the browser context menu."
+      },
+      "saveTab": {
+        "label": "Save current tab",
+        "description": "Add a context menu item that saves the current tab."
+      },
+      "saveWindow": {
+        "label": "Save current window",
+        "description": "Add a context menu item that saves every tab in the current window."
+      },
+      "saveSelection": {
+        "label": "Save selected tabs",
+        "description": "Add a context menu item that saves the selected tabs."
+      }
+    },
+    "memory": {
+      "label": "Memory saver",
+      "autoDiscard": {
+        "label": "Automatically discard inactive tabs",
+        "description": "Free memory by discarding tabs that have been inactive for the timeout below."
+      },
+      "timeoutMinutes": {
+        "label": "Inactivity timeout",
+        "description": "How many minutes a tab must be inactive before it can be discarded."
+      },
+      "keepAudible": {
+        "label": "Keep tabs playing audio",
+        "description": "Never discard tabs that are playing sound."
+      },
+      "keepPinned": {
+        "label": "Keep pinned tabs",
+        "description": "Never discard pinned tabs."
+      }
+    },
+    "shortcuts": {
+      "label": "Shortcuts"
+    },
+    "incognito": {
+      "label": "Incognito",
+      "includeInSaveAll": {
+        "label": "Include incognito windows",
+        "description": "Include private windows when saving all windows. Requires incognito access permission."
+      }
+    },
+    "sync": {
+      "label": "Sync",
+      "enabled": {
+        "label": "Enable end-to-end encrypted sync",
+        "description": "Back up sessions to your sync account with end-to-end encryption."
+      },
+      "autoUpload": {
+        "label": "Automatically upload changes",
+        "description": "Upload new and changed sessions automatically."
+      },
+      "autoDownload": {
+        "label": "Automatically download changes",
+        "description": "Download and merge sessions saved on other devices automatically."
+      }
+    },
+    "advanced": {
+      "label": "Advanced"
+    }
+  }
+}

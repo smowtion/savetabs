@@ -1,0 +1,206 @@
+{
+  "common": {
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "copy": "Sao chép",
+    "confirm": "Xác nhận",
+    "restore": "Khôi phục",
+    "settings": "Cài đặt",
+    "openSessions": "Mở phiên",
+    "syncNow": "Đồng bộ ngay",
+    "retry": "Thử lại",
+    "loading": "Đang tải…",
+    "error": "Đã xảy ra lỗi",
+    "empty": "Chưa có gì ở đây",
+    "tabsCount": "{count} tab"
+  },
+  "settings": {
+    "general": {
+      "label": "Chung",
+      "theme": {
+        "label": "Giao diện",
+        "description": "Chọn giao diện sáng, tối hoặc theo hệ thống."
+      },
+      "language": {
+        "label": "Ngôn ngữ",
+        "description": "Chọn ngôn ngữ hiển thị hoặc tự động theo ngôn ngữ trình duyệt."
+      },
+      "showBadgeCount": {
+        "label": "Hiện số lượng tab trên biểu tượng",
+        "description": "Hiển thị số tab đang mở trên biểu tượng thanh công cụ."
+      },
+      "confirmThreshold": {
+        "label": "Xác nhận trước khi đóng nhiều tab",
+        "description": "Hỏi xác nhận khi việc lưu sẽ đóng ít nhất số tab này. Đặt thành 0 để tắt."
+      }
+    },
+    "tabs": {
+      "label": "Tab",
+      "saveAllWindows": {
+        "label": "Lưu tất cả cửa sổ",
+        "description": "Bao gồm tab từ mọi cửa sổ trình duyệt, không chỉ cửa sổ hiện tại."
+      },
+      "closeAfterSave": {
+        "label": "Đóng tab sau khi lưu",
+        "description": "Đóng các tab đã lưu sau khi phiên được lưu lại."
+      },
+      "skipAudible": {
+        "label": "Bỏ qua tab đang phát âm thanh",
+        "description": "Giữ mở các tab đang phát âm thanh."
+      },
+      "excludedDomains": {
+        "label": "Tên miền loại trừ",
+        "description": "Tab từ các tên miền này không bao giờ được lưu hoặc đóng. Mỗi dòng một tên miền."
+      },
+      "includeFileUrls": {
+        "label": "Bao gồm URL tệp cục bộ",
+        "description": "Cho phép lưu các tab trỏ đến tệp trên máy này. Cần quyền truy cập tệp."
+      }
+    },
+    "duplicates": {
+      "label": "Tab trùng lặp",
+      "removeOnSave": {
+        "label": "Xóa tab trùng lặp",
+        "description": "Đóng các tab trùng và chỉ giữ một bản của mỗi URL trong phiên."
+      },
+      "matchMode": {
+        "label": "Cách so khớp trùng lặp",
+        "description": "Cách so sánh URL: chính xác, bỏ qua phần hash hoặc bỏ qua tham số truy vấn."
+      },
+      "skipAlreadySaved": {
+        "label": "Bỏ qua tab đã được lưu",
+        "description": "Không lưu các URL đã có trong phiên khác."
+      }
+    },
+    "pinned": {
+      "label": "Tab ghim",
+      "skipOnSave": {
+        "label": "Bỏ qua tab ghim khi lưu",
+        "description": "Giữ mở tab ghim và không đưa vào phiên mới."
+      },
+      "restoreAsPinned": {
+        "label": "Khôi phục tab ghim dưới dạng ghim",
+        "description": "Mở lại tab ghim đã lưu dưới dạng tab ghim khi khôi phục phiên."
+      }
+    },
+    "open": {
+      "label": "Mở phiên",
+      "toolbarAction": {
+        "label": "Hành động của nút trên thanh công cụ",
+        "description": "Điều xảy ra khi nhấn biểu tượng thanh công cụ: mở cửa sổ bật lên, lưu tab ngay hoặc mở trang phiên."
+      },
+      "openSessionsAfterSave": {
+        "label": "Mở trang phiên sau khi lưu",
+        "description": "Hiển thị phiên đã lưu trong trang phiên ngay sau khi lưu."
+      },
+      "reuseSessionsTab": {
+        "label": "Dùng lại tab phiên",
+        "description": "Mở phiên trong tab phiên đang có thay vì tạo tab mới."
+      }
+    },
+    "urlDisplay": {
+      "label": "Hiển thị URL",
+      "mode": {
+        "label": "Chế độ hiển thị URL",
+        "description": "Hiển thị tab đã lưu theo tiêu đề, theo tên miền hoặc theo URL đầy đủ."
+      },
+      "showFavicons": {
+        "label": "Hiện biểu tượng trang",
+        "description": "Hiển thị biểu tượng của từng trang trong danh sách phiên."
+      },
+      "showTabCount": {
+        "label": "Hiện số lượng tab",
+        "description": "Hiển thị số tab trong mỗi phiên."
+      }
+    },
+    "restore": {
+      "label": "Khôi phục",
+      "targetWindow": {
+        "label": "Cửa sổ khôi phục",
+        "description": "Mở tab khôi phục trong cửa sổ hiện tại hoặc cửa sổ mới."
+      },
+      "openInBackground": {
+        "label": "Mở tab khôi phục ở chế độ nền",
+        "description": "Khôi phục tab mà không chuyển tiêu điểm khỏi tab hiện tại."
+      },
+      "skipExisting": {
+        "label": "Bỏ qua tab đã mở",
+        "description": "Không mở lại các URL đang được mở trong trình duyệt."
+      }
+    },
+    "clipboard": {
+      "label": "Bộ nhớ tạm",
+      "format": {
+        "label": "Định dạng sao chép",
+        "description": "Định dạng khi sao chép tab của phiên: URL thuần, liên kết Markdown hoặc tiêu đề kèm URL."
+      }
+    },
+    "contextMenu": {
+      "label": "Menu chuột phải",
+      "enabled": {
+        "label": "Bật các mục menu chuột phải",
+        "description": "Hiển thị các hành động của SaveTabs trong menu chuột phải."
+      },
+      "saveTab": {
+        "label": "Lưu tab hiện tại",
+        "description": "Thêm mục menu chuột phải để lưu tab hiện tại."
+      },
+      "saveWindow": {
+        "label": "Lưu cửa sổ hiện tại",
+        "description": "Thêm mục menu chuột phải để lưu mọi tab trong cửa sổ hiện tại."
+      },
+      "saveSelection": {
+        "label": "Lưu các tab đã chọn",
+        "description": "Thêm mục menu chuột phải để lưu các tab đã chọn."
+      }
+    },
+    "memory": {
+      "label": "Tiết kiệm bộ nhớ",
+      "autoDiscard": {
+        "label": "Tự động giải phóng tab không hoạt động",
+        "description": "Giải phóng bộ nhớ bằng cách đóng các tab không hoạt động quá thời gian chờ bên dưới."
+      },
+      "timeoutMinutes": {
+        "label": "Thời gian chờ không hoạt động",
+        "description": "Số phút một tab phải không hoạt động trước khi có thể bị giải phóng."
+      },
+      "keepAudible": {
+        "label": "Giữ tab đang phát âm thanh",
+        "description": "Không bao giờ giải phóng tab đang phát âm thanh."
+      },
+      "keepPinned": {
+        "label": "Giữ tab ghim",
+        "description": "Không bao giờ giải phóng tab ghim."
+      }
+    },
+    "shortcuts": {
+      "label": "Phím tắt"
+    },
+    "incognito": {
+      "label": "Ẩn danh",
+      "includeInSaveAll": {
+        "label": "Bao gồm cửa sổ ẩn danh",
+        "description": "Bao gồm cửa sổ riêng tư khi lưu tất cả cửa sổ. Cần quyền truy cập ẩn danh."
+      }
+    },
+    "sync": {
+      "label": "Đồng bộ",
+      "enabled": {
+        "label": "Bật đồng bộ mã hóa đầu cuối",
+        "description": "Sao lưu phiên lên tài khoản đồng bộ với mã hóa đầu cuối."
+      },
+      "autoUpload": {
+        "label": "Tự động tải lên thay đổi",
+        "description": "Tự động tải lên các phiên mới và đã thay đổi."
+      },
+      "autoDownload": {
+        "label": "Tự động tải xuống thay đổi",
+        "description": "Tự động tải xuống và hợp nhất các phiên được lưu trên thiết bị khác."
+      }
+    },
+    "advanced": {
+      "label": "Nâng cao"
+    }
+  }
+}
