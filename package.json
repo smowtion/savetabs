@@ -11,7 +11,9 @@
     "test": "pnpm -r --if-present test",
     "typecheck": "pnpm -r --if-present typecheck",
     "build": "pnpm -r --if-present build",
-    "build:ext": "pnpm --filter @savetabs/extension build"
+    "build:ext": "pnpm --filter @savetabs/extension build",
+    "dev:worker": "pnpm --filter @savetabs/worker dev",
+    "db:migrate:local": "pnpm --filter @savetabs/worker db:migrate:local"
   },
   "devDependencies": {
     "typescript": "^5.9.3",

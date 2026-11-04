@@ -1,0 +1,24 @@
+name = "savetabs-api"
+main = "src/index.ts"
+compatibility_date = "2026-08-01"
+
+# Sync metadata (keys, encrypted sessions, tombstones, daily counters).
+# Replace `database_id` with the id printed by `wrangler d1 create savetabs`
+# before the first remote deploy; local dev and tests use the local database.
+[[d1_databases]]
+binding = "DB"
+database_name = "savetabs"
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+# Release artifacts and versions.json served by GET /v1/version.
+[[r2_buckets]]
+binding = "RELEASES"
+bucket_name = "savetabs-releases"
+
+[vars]
+# Only this origin (the web app) may call the API from a browser; the
+# extension sends a bearer token and no cookies.
+WEB_ORIGIN = "https://savetabs.pages.dev"
+GLOBAL_DAILY_REQUESTS = "100000"
+GLOBAL_MAX_KEYS = "10000"
