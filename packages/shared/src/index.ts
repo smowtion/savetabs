@@ -2,4 +2,5 @@ export * from "./base64url";
 export * from "./constants";
 export * from "./crypto/key";
 export * from "./crypto/session-cipher";
+export * from "./settings-schema";
 export * from "./types";
