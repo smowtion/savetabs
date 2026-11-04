@@ -48,4 +48,37 @@ describe("i18n", () => {
     expect(missingKeys("en", shellKeys)).toEqual([]);
     expect(missingKeys("vi", shellKeys)).toEqual([]);
   });
+
+  it("labels every enum option in both languages", () => {
+    const optionKeys = SETTINGS_SCHEMA.flatMap((category) =>
+      category.settings.flatMap((setting) =>
+        setting.type === "enum"
+          ? setting.values.map(
+              (value) => `settings.option.${setting.key}.${String(value)}`,
+            )
+          : [],
+      ),
+    );
+
+    expect(optionKeys.length).toBeGreaterThan(0);
+    expect(missingKeys("en", optionKeys)).toEqual([]);
+    expect(missingKeys("vi", optionKeys)).toEqual([]);
+  });
+
+  it("covers the setting control strings in both languages", () => {
+    const controlKeys = [
+      "options.tooltip",
+      "options.memoryUnsupported",
+      "options.stringList.placeholder",
+      "options.stringList.add",
+      "options.stringList.remove",
+      "options.validation.numberRange",
+      "options.validation.maxItems",
+      "options.validation.duplicateEntry",
+      "options.validation.emptyEntry",
+    ];
+
+    expect(missingKeys("en", controlKeys)).toEqual([]);
+    expect(missingKeys("vi", controlKeys)).toEqual([]);
+  });
 });

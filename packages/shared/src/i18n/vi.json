@@ -215,6 +215,63 @@
     "advanced": {
       "label": "Nâng cao",
       "description": "Nhập, xuất, đặt lại và các thao tác bảo trì."
+    },
+    "option": {
+      "general": {
+        "theme": {
+          "system": "Hệ thống",
+          "light": "Sáng",
+          "dark": "Tối"
+        },
+        "language": {
+          "auto": "Tự động",
+          "en": "Tiếng Anh",
+          "vi": "Tiếng Việt"
+        }
+      },
+      "duplicates": {
+        "matchMode": {
+          "exact": "URL chính xác",
+          "ignore-hash": "Bỏ qua #fragment",
+          "ignore-query": "Bỏ qua ?query"
+        }
+      },
+      "open": {
+        "toolbarAction": {
+          "popup": "Mở cửa sổ bật lên",
+          "save": "Lưu tab ngay",
+          "sessions": "Mở trang phiên"
+        }
+      },
+      "urlDisplay": {
+        "mode": {
+          "title": "Tiêu đề",
+          "domain": "Tên miền",
+          "full-url": "URL đầy đủ"
+        }
+      },
+      "restore": {
+        "targetWindow": {
+          "current": "Cửa sổ hiện tại",
+          "new": "Cửa sổ mới"
+        }
+      },
+      "clipboard": {
+        "format": {
+          "plain-urls": "URL thuần",
+          "markdown": "Liên kết Markdown",
+          "titled": "Tiêu đề kèm URL"
+        }
+      },
+      "memory": {
+        "timeoutMinutes": {
+          "5": "5 phút",
+          "15": "15 phút",
+          "30": "30 phút",
+          "60": "60 phút",
+          "120": "120 phút"
+        }
+      }
     }
   },
   "options": {
@@ -226,6 +283,19 @@
     "settingCount": "{count} cài đặt",
     "saved": "Đã lưu",
     "noResults": "Không có cài đặt nào khớp với tìm kiếm.",
+    "tooltip": "Thông tin thêm về {setting}",
+    "memoryUnsupported": "Trình duyệt này không hỗ trợ giải phóng tab.",
+    "stringList": {
+      "placeholder": "Thêm tên miền…",
+      "add": "Thêm",
+      "remove": "Xóa {item}"
+    },
+    "validation": {
+      "numberRange": "Nhập số nguyên từ {min} đến {max}.",
+      "maxItems": "Chỉ có thể thêm tối đa {count} mục.",
+      "duplicateEntry": "Mục này đã có trong danh sách.",
+      "emptyEntry": "Nhập giá trị trước khi thêm."
+    },
     "theme": {
       "system": "Hệ thống",
       "light": "Sáng",

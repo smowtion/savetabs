@@ -215,6 +215,63 @@
     "advanced": {
       "label": "Advanced",
       "description": "Import, export, reset and maintenance actions."
+    },
+    "option": {
+      "general": {
+        "theme": {
+          "system": "System",
+          "light": "Light",
+          "dark": "Dark"
+        },
+        "language": {
+          "auto": "Automatic",
+          "en": "English",
+          "vi": "Vietnamese"
+        }
+      },
+      "duplicates": {
+        "matchMode": {
+          "exact": "Exact URL",
+          "ignore-hash": "Ignore #fragment",
+          "ignore-query": "Ignore ?query"
+        }
+      },
+      "open": {
+        "toolbarAction": {
+          "popup": "Open popup",
+          "save": "Save tabs now",
+          "sessions": "Open sessions page"
+        }
+      },
+      "urlDisplay": {
+        "mode": {
+          "title": "Title",
+          "domain": "Domain",
+          "full-url": "Full URL"
+        }
+      },
+      "restore": {
+        "targetWindow": {
+          "current": "Current window",
+          "new": "New window"
+        }
+      },
+      "clipboard": {
+        "format": {
+          "plain-urls": "Plain URLs",
+          "markdown": "Markdown links",
+          "titled": "Titles with URLs"
+        }
+      },
+      "memory": {
+        "timeoutMinutes": {
+          "5": "5 minutes",
+          "15": "15 minutes",
+          "30": "30 minutes",
+          "60": "60 minutes",
+          "120": "120 minutes"
+        }
+      }
     }
   },
   "options": {
@@ -226,6 +283,19 @@
     "settingCount": "{count} settings",
     "saved": "Saved",
     "noResults": "No settings match your search.",
+    "tooltip": "More information about {setting}",
+    "memoryUnsupported": "Tab discarding is not available in this browser.",
+    "stringList": {
+      "placeholder": "Add a domain…",
+      "add": "Add",
+      "remove": "Remove {item}"
+    },
+    "validation": {
+      "numberRange": "Enter a whole number between {min} and {max}.",
+      "maxItems": "You can add at most {count} items.",
+      "duplicateEntry": "This entry is already in the list.",
+      "emptyEntry": "Enter a value before adding it."
+    },
     "theme": {
       "system": "System",
       "light": "Light",

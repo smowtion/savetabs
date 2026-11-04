@@ -16,12 +16,14 @@ import { Monitor, Moon, Sun } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { Accordion } from "../../components/Accordion";
+import { CategorySection } from "../../components/CategorySection";
 import { SearchBar } from "../../components/SearchBar";
 import { SettingsSidebar } from "../../components/SettingsSidebar";
 import { useI18n } from "../../hooks/useI18n";
 import { useOpenSections } from "../../hooks/useOpenSections";
 import { useSettings } from "../../hooks/useSettings";
 import { useTheme } from "../../hooks/useTheme";
+import { isDiscardSupported } from "../../lib/discard";
 import {
   filterSettings,
   type SettingsSearchGroup,
@@ -53,6 +55,10 @@ export function App() {
 
   const themePreference = normalizeThemePreference(settings?.["general.theme"]);
   useTheme(themePreference);
+
+  // Firefox builds have no `tabs.discard`; the memory rows then render
+  // disabled with an explanation instead of offering dead controls.
+  const discardSupported = isDiscardSupported();
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -169,7 +175,16 @@ export function App() {
                   count={group.settings.length}
                   open={isSearching || openSections.has(group.category)}
                   onToggle={(next) => setSectionOpen(group.category, next)}
-                />
+                >
+                  <CategorySection
+                    categoryId={group.category}
+                    settings={group.settings}
+                    values={settings}
+                    t={t}
+                    onChange={updateSetting}
+                    discardSupported={discardSupported}
+                  />
+                </Accordion>
               );
             })}
           </div>

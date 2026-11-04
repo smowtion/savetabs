@@ -1,3 +1,4 @@
+import { SETTINGS_SCHEMA, SETTING_KEYS } from "@savetabs/shared";
 import {
   cleanup,
   render,
@@ -176,5 +177,58 @@ describe("options shell", () => {
     expect(
       within(main()).queryAllByRole("button", { expanded: false }),
     ).toHaveLength(0);
+  });
+
+  it("renders all 36 settings exactly once inside their category panels", () => {
+    render(<App />);
+
+    expect(SETTING_KEYS).toHaveLength(36);
+    expect(screen.getAllByTestId(/^setting-/)).toHaveLength(36);
+
+    for (const category of SETTINGS_SCHEMA) {
+      const panel = document.getElementById(
+        `settings-section-${category.id}-panel`,
+      );
+      expect(panel).not.toBeNull();
+      for (const def of category.settings) {
+        expect(
+          within(panel as HTMLElement).getAllByTestId(`setting-${def.key}`),
+        ).toHaveLength(1);
+      }
+    }
+  });
+
+  it("disables memory settings when the browser cannot discard tabs", async () => {
+    const originalDiscard = fakeBrowser.tabs.discard;
+    Object.defineProperty(fakeBrowser.tabs, "discard", {
+      value: undefined,
+      configurable: true,
+      writable: true,
+    });
+
+    try {
+      render(<App />);
+
+      await userEvent.click(
+        within(main()).getByRole("button", { name: /Memory saver/ }),
+      );
+
+      expect(
+        await screen.findByRole("switch", {
+          name: "Automatically discard inactive tabs",
+        }),
+      ).toBeDisabled();
+      expect(
+        screen.getAllByText(
+          "Tab discarding is not available in this browser.",
+        ),
+      ).toHaveLength(4);
+    } finally {
+      Object.defineProperty(fakeBrowser.tabs, "discard", {
+        value: originalDiscard,
+        configurable: true,
+        writable: true,
+      });
+    }
   });
 });
