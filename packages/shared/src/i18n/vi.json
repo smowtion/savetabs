@@ -453,5 +453,30 @@
       "hoursAgo": "{count} giờ trước",
       "daysAgo": "{count} ngày trước"
     }
+  },
+  "web": {
+    "landing": {
+      "title": "Mở các tab đã lưu",
+      "description": "Nhập key đồng bộ để xem các phiên đã lưu. Mọi dữ liệu được giải mã ngay trong trình duyệt của bạn.",
+      "keyLabel": "Key đồng bộ",
+      "keyPlaceholder": "ST-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-X",
+      "continue": "Tiếp tục",
+      "invalidKey": "Key đồng bộ không hợp lệ. Hãy kiểm tra và thử lại.",
+      "loseKeyWarning": "Key đồng bộ là cách duy nhất để giải mã các phiên của bạn. Nếu mất key, dữ liệu đã lưu không thể khôi phục.",
+      "rememberLabel": "Ghi nhớ trên thiết bị này",
+      "rememberWarning": "Chỉ dùng trên thiết bị bạn tin cậy. Key sẽ được lưu trong trình duyệt này cho đến khi bạn xoá.",
+      "privacyLink": "Chính sách riêng tư",
+      "sessionsPlaceholder": "Các phiên của bạn sẽ xuất hiện ở đây.",
+      "privacyPlaceholder": "Chính sách riêng tư sẽ có trong thời gian tới."
+    },
+    "language": {
+      "toggle": "Đổi ngôn ngữ"
+    },
+    "theme": {
+      "toggle": "Đổi giao diện",
+      "system": "Theo hệ thống",
+      "light": "Sáng",
+      "dark": "Tối"
+    }
   }
 }

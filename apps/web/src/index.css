@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+/*
+ * The resolved theme is always written to <html data-theme="light|dark"> by
+ * useTheme, so utilities follow that attribute rather than the operating
+ * system media query directly.
+ */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}

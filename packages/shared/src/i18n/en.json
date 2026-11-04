@@ -453,5 +453,30 @@
       "hoursAgo": "{count} hours ago",
       "daysAgo": "{count} days ago"
     }
+  },
+  "web": {
+    "landing": {
+      "title": "Open your saved tabs",
+      "description": "Enter your sync key to view your saved sessions. Everything is decrypted in your browser.",
+      "keyLabel": "Sync key",
+      "keyPlaceholder": "ST-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-X",
+      "continue": "Continue",
+      "invalidKey": "That sync key is not valid. Check it and try again.",
+      "loseKeyWarning": "Your sync key is the only way to decrypt your sessions. If you lose it, your saved data cannot be recovered.",
+      "rememberLabel": "Remember on this device",
+      "rememberWarning": "Only use this on a device you trust. The key stays in this browser until you clear it.",
+      "privacyLink": "Privacy policy",
+      "sessionsPlaceholder": "Your sessions will appear here.",
+      "privacyPlaceholder": "The privacy policy is coming soon."
+    },
+    "language": {
+      "toggle": "Switch language"
+    },
+    "theme": {
+      "toggle": "Change theme",
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
+    }
   }
 }
