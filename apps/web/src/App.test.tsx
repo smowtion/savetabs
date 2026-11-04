@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import App from "./App";
 import { saveKeyForSession } from "./lib/key-session";
@@ -21,6 +22,11 @@ beforeEach(() => {
   sessionStorage.clear();
 });
 
+afterEach(() => {
+  vi.unstubAllGlobals();
+  delete document.documentElement.dataset.theme;
+});
+
 describe("App routing", () => {
   it("redirects to the landing page when no key is stored", () => {
     renderApp("/sessions");
@@ -29,18 +35,45 @@ describe("App routing", () => {
       screen.getByRole("heading", { name: "Open your saved tabs" }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByText("Your sessions will appear here."),
+      screen.queryByRole("heading", { name: "Saved sessions" }),
     ).not.toBeInTheDocument();
   });
 
-  it("shows the sessions placeholder when a key is stored", () => {
+  it("shows the sessions page when a key is stored", async () => {
     saveKeyForSession(VALID_KEY);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>().mockResolvedValue(
+        new Response(JSON.stringify({ blobs: [] }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      ),
+    );
 
     renderApp("/sessions");
 
     expect(
-      screen.getByText("Your sessions will appear here."),
+      await screen.findByRole("heading", { name: "Saved sessions" }),
     ).toBeInTheDocument();
+  });
+
+  it("shares the stored theme with every route and keeps the landing toggle working", async () => {
+    localStorage.setItem("web-theme", "light");
+    const user = userEvent.setup();
+
+    renderApp("/");
+
+    await waitFor(() =>
+      expect(document.documentElement.dataset.theme).toBe("light"),
+    );
+
+    await user.click(screen.getByRole("button", { name: /Change theme/i }));
+
+    await waitFor(() =>
+      expect(document.documentElement.dataset.theme).toBe("dark"),
+    );
+    expect(localStorage.getItem("web-theme")).toBe("dark");
   });
 
   it("allows the privacy page without a key", () => {

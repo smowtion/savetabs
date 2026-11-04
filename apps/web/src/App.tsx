@@ -1,9 +1,11 @@
 import type { ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
+import { ThemeProvider } from "./hooks/useTheme";
 import { useI18n } from "./hooks/useI18n";
 import { loadKey } from "./lib/key-session";
 import Landing from "./pages/Landing";
+import Sessions from "./pages/Sessions";
 
 /** Route guard: session pages require a stored sync key. */
 function RequireKey({ children }: { children: ReactNode }) {
@@ -18,12 +20,6 @@ function Placeholder({ message }: { message: string }) {
   );
 }
 
-/** Filled in by the sessions page task. */
-function SessionsPlaceholder() {
-  const { t } = useI18n();
-  return <Placeholder message={t("web.landing.sessionsPlaceholder")} />;
-}
-
 /** Filled in by the privacy page task. */
 function PrivacyPlaceholder() {
   const { t } = useI18n();
@@ -32,18 +28,20 @@ function PrivacyPlaceholder() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route
-        path="/sessions"
-        element={
-          <RequireKey>
-            <SessionsPlaceholder />
-          </RequireKey>
-        }
-      />
-      <Route path="/privacy" element={<PrivacyPlaceholder />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <ThemeProvider>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route
+          path="/sessions"
+          element={
+            <RequireKey>
+              <Sessions />
+            </RequireKey>
+          }
+        />
+        <Route path="/privacy" element={<PrivacyPlaceholder />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </ThemeProvider>
   );
 }

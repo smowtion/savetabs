@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 
 /**
  * Theme preference for the web app.
@@ -8,6 +15,10 @@ import { useCallback, useEffect, useState } from "react";
  * `web-theme` key so it never overlaps the extension's settings storage. The
  * resolved value is written to `<html data-theme>` for Tailwind's custom dark
  * variant.
+ *
+ * `App` mounts a single {@link ThemeProvider} so every route applies the stored
+ * theme. `useTheme` keeps working when a component is rendered on its own (for
+ * example in a focused test) by falling back to local state.
  */
 
 export type WebThemePreference = "system" | "light" | "dark";
@@ -47,15 +58,27 @@ export function nextThemePreference(
   return THEME_CYCLE[(index + 1) % THEME_CYCLE.length] as WebThemePreference;
 }
 
-export function useTheme(): {
+export type ThemeControls = {
   preference: WebThemePreference;
   setPreference: (preference: WebThemePreference) => void;
   toggleTheme: () => void;
-} {
+};
+
+const ThemeContext = createContext<ThemeControls | null>(null);
+
+/**
+ * Own the theme preference and apply it to the document.
+ *
+ * `active` is false for the inert fallback `useTheme` creates while a provider
+ * supplies the shared controls, so only one instance writes `data-theme`.
+ */
+function useThemeState(active = true): ThemeControls {
   const [preference, setPreferenceState] =
     useState<WebThemePreference>(readStoredTheme);
 
   useEffect(() => {
+    if (!active) return undefined;
+
     const media =
       typeof window.matchMedia === "function"
         ? window.matchMedia("(prefers-color-scheme: dark)")
@@ -77,7 +100,7 @@ export function useTheme(): {
       return () => media.removeEventListener("change", apply);
     }
     return undefined;
-  }, [preference]);
+  }, [preference, active]);
 
   const setPreference = useCallback((next: WebThemePreference) => {
     setPreferenceState(next);
@@ -89,4 +112,27 @@ export function useTheme(): {
   }, [preference, setPreference]);
 
   return { preference, setPreference, toggleTheme };
+}
+
+/** Share one theme preference with every route below it. */
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const controls = useThemeState();
+  return (
+    <ThemeContext.Provider value={controls}>{children}</ThemeContext.Provider>
+  );
+}
+
+/**
+ * Theme controls for the current component.
+ *
+ * Inside `App` this reads the shared provider state, so a toggle on any page
+ * updates the document and every other consumer. Without a provider it owns
+ * local state and behaves exactly as before.
+ */
+export function useTheme(): ThemeControls {
+  const controls = useContext(ThemeContext);
+  // Always call the fallback hook so hook order stays stable; it is inert
+  // whenever a provider is present.
+  const fallback = useThemeState(controls === null);
+  return controls ?? fallback;
 }
