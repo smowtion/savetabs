@@ -186,7 +186,21 @@
     },
     "shortcuts": {
       "label": "Shortcuts",
-      "description": "View the keyboard shortcuts assigned to SaveTabs."
+      "description": "View the keyboard shortcuts assigned to SaveTabs.",
+      "tableCaption": "Keyboard shortcuts for SaveTabs",
+      "commandHeader": "Command",
+      "bindingHeader": "Shortcut",
+      "notSet": "Not set",
+      "instructions": "To change a shortcut, open the shortcuts page below and edit the shortcut for SaveTabs.",
+      "pagePathLabel": "Shortcuts page path",
+      "copyPath": "Copy path",
+      "copySuccess": "Path copied to the clipboard.",
+      "copyFailed": "Could not copy the path.",
+      "commandLabel": {
+        "save-tabs": "Save all tabs in the current window",
+        "open-sessions": "Open the sessions page",
+        "discard-now": "Discard inactive tabs now"
+      }
     },
     "incognito": {
       "label": "Incognito",
@@ -194,7 +208,18 @@
       "includeInSaveAll": {
         "label": "Include incognito windows",
         "description": "Include private windows when saving all windows. Requires incognito access permission."
-      }
+      },
+      "status": {
+        "label": "Incognito access",
+        "allowed": "Allowed",
+        "denied": "Not allowed"
+      },
+      "deniedNote": "This setting is disabled because SaveTabs is not allowed in incognito windows.",
+      "enableInstructions": "To allow access, open the extensions page below, open the SaveTabs details, and allow the extension in private windows.",
+      "pagePathLabel": "Extensions page path",
+      "copyPath": "Copy path",
+      "copySuccess": "Path copied to the clipboard.",
+      "copyFailed": "Could not copy the path."
     },
     "sync": {
       "label": "Sync",

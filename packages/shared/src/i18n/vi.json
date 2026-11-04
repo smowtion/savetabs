@@ -186,7 +186,21 @@
     },
     "shortcuts": {
       "label": "Phím tắt",
-      "description": "Xem các phím tắt được gán cho SaveTabs."
+      "description": "Xem các phím tắt được gán cho SaveTabs.",
+      "tableCaption": "Phím tắt của SaveTabs",
+      "commandHeader": "Lệnh",
+      "bindingHeader": "Phím tắt",
+      "notSet": "Chưa đặt",
+      "instructions": "Để thay đổi phím tắt, mở trang phím tắt bên dưới và sửa phím tắt của SaveTabs.",
+      "pagePathLabel": "Đường dẫn trang phím tắt",
+      "copyPath": "Sao chép đường dẫn",
+      "copySuccess": "Đã sao chép đường dẫn.",
+      "copyFailed": "Không thể sao chép đường dẫn.",
+      "commandLabel": {
+        "save-tabs": "Lưu tất cả tab trong cửa sổ hiện tại",
+        "open-sessions": "Mở trang phiên",
+        "discard-now": "Giải phóng tab không hoạt động ngay"
+      }
     },
     "incognito": {
       "label": "Ẩn danh",
@@ -194,7 +208,18 @@
       "includeInSaveAll": {
         "label": "Bao gồm cửa sổ ẩn danh",
         "description": "Bao gồm cửa sổ riêng tư khi lưu tất cả cửa sổ. Cần quyền truy cập ẩn danh."
-      }
+      },
+      "status": {
+        "label": "Quyền ẩn danh",
+        "allowed": "Được phép",
+        "denied": "Không được phép"
+      },
+      "deniedNote": "Cài đặt này bị tắt vì SaveTabs không được phép chạy trong cửa sổ ẩn danh.",
+      "enableInstructions": "Để cấp quyền, mở trang tiện ích bên dưới, mở thông tin SaveTabs và cho phép tiện ích chạy trong cửa sổ riêng tư.",
+      "pagePathLabel": "Đường dẫn trang tiện ích",
+      "copyPath": "Sao chép đường dẫn",
+      "copySuccess": "Đã sao chép đường dẫn.",
+      "copyFailed": "Không thể sao chép đường dẫn."
     },
     "sync": {
       "label": "Đồng bộ",

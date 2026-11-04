@@ -6,6 +6,11 @@
  * `settings.option.<settingKey>.<value>` and fall back to the raw value when a
  * translation is missing. Memory settings are disabled when the browser lacks
  * `tabs.discard`, with a note explaining the dead feature.
+ *
+ * Two categories carry extra content besides their schema settings:
+ * `incognito` reports whether the extension may run in private windows and
+ * disables `incognito.includeInSaveAll` while access is missing, and
+ * `shortcuts` lists the bindings the browser currently has assigned.
  */
 
 import type {
@@ -14,15 +19,21 @@ import type {
   Settings,
   Translator,
 } from "@savetabs/shared";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
+import { copyText } from "../lib/clipboard-write";
+import { EXTENSIONS_PAGE_PATH, isIncognitoAllowed } from "../lib/incognito";
 import type { SettingValue } from "../lib/settings";
 import { AdvancedActions } from "./AdvancedActions";
 import { NumberInput } from "./NumberInput";
 import { Select } from "./Select";
 import { SettingRow, settingControlId } from "./SettingRow";
+import { ShortcutsInfo } from "./ShortcutsInfo";
 import { StringListInput } from "./StringListInput";
 import { Toggle } from "./Toggle";
+
+const BUTTON_CLASS =
+  "rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800";
 
 export type CategorySectionProps = {
   categoryId: CategoryId;
@@ -45,27 +56,25 @@ function enumOptionLabel(
   return translated === labelKey ? String(value) : translated;
 }
 
-export function CategorySection({
-  categoryId,
+type SettingsListProps = Pick<
+  CategorySectionProps,
+  "settings" | "values" | "t" | "onChange"
+> & {
+  /** Disables every control, e.g. when the browser lacks the feature. */
+  disabled?: boolean;
+  /** Why the controls are disabled; rendered under every description. */
+  note?: string;
+};
+
+/** Schema-driven rows shared by the plain and incognito category bodies. */
+function SettingsList({
   settings,
   values,
   t,
   onChange,
-  discardSupported,
-}: CategorySectionProps) {
-  // The Advanced category holds actions instead of schema settings; it owns
-  // its own import/export/reset UI.
-  if (categoryId === "advanced") {
-    return <AdvancedActions settings={values} t={t} />;
-  }
-
-  if (settings.length === 0) return null;
-
-  const memoryDisabled = categoryId === "memory" && !discardSupported;
-  const unsupportedNote = memoryDisabled
-    ? t("options.memoryUnsupported")
-    : undefined;
-
+  disabled = false,
+  note,
+}: SettingsListProps) {
   async function write(key: string, value: SettingValue): Promise<void> {
     try {
       await onChange(key, value);
@@ -81,7 +90,6 @@ export function CategorySection({
       {settings.map((def) => {
         const controlId = settingControlId(def.key);
         const raw = values?.[def.key];
-        const disabled = memoryDisabled;
         let control: ReactNode = null;
 
         switch (def.type) {
@@ -196,7 +204,7 @@ export function CategorySection({
               text: t(def.descriptionKey),
               label: t("options.tooltip", { setting: t(def.labelKey) }),
             }}
-            note={unsupportedNote}
+            note={note}
             disabled={disabled}
           >
             {control}
@@ -204,5 +212,168 @@ export function CategorySection({
         );
       })}
     </div>
+  );
+}
+
+type IncognitoSectionProps = Pick<
+  CategorySectionProps,
+  "settings" | "values" | "t" | "onChange"
+>;
+
+type CopyStatus = "success" | "error";
+
+/**
+ * Incognito status plus the schema rows. Access is checked once on mount; the
+ * setting is disabled when the browser reports no access, because the control
+ * could never take effect in that state.
+ */
+function IncognitoSection({
+  settings,
+  values,
+  t,
+  onChange,
+}: IncognitoSectionProps) {
+  const [allowed, setAllowed] = useState<boolean | null>(null);
+  const [copyStatus, setCopyStatus] = useState<CopyStatus | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    void isIncognitoAllowed().then((value) => {
+      if (active) setAllowed(value);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  async function copyPath(): Promise<void> {
+    try {
+      await copyText(EXTENSIONS_PAGE_PATH);
+      setCopyStatus("success");
+    } catch {
+      setCopyStatus("error");
+    }
+  }
+
+  const denied = allowed === false;
+  const statusClass =
+    allowed === null
+      ? "text-neutral-500 dark:text-neutral-400"
+      : allowed
+        ? "text-green-600 dark:text-green-400"
+        : "text-amber-600 dark:text-amber-400";
+
+  return (
+    <div className="flex flex-col divide-y divide-neutral-100 dark:divide-neutral-800">
+      <div
+        data-testid="incognito-status"
+        className="flex items-start justify-between gap-4 py-3"
+      >
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+            {t("settings.incognito.status.label")}
+          </p>
+          <p role="status" className={`mt-0.5 text-xs ${statusClass}`}>
+            {allowed === null
+              ? t("common.loading")
+              : allowed
+                ? t("settings.incognito.status.allowed")
+                : t("settings.incognito.status.denied")}
+          </p>
+        </div>
+      </div>
+
+      {denied && (
+        <div className="py-3">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400">
+            {t("settings.incognito.enableInstructions")}
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <code
+              aria-label={t("settings.incognito.pagePathLabel")}
+              className="min-w-0 break-all rounded-md bg-neutral-100 px-2 py-1 font-mono text-xs dark:bg-neutral-800"
+            >
+              {EXTENSIONS_PAGE_PATH}
+            </code>
+            <button
+              type="button"
+              onClick={() => void copyPath()}
+              className={BUTTON_CLASS}
+            >
+              {t("settings.incognito.copyPath")}
+            </button>
+          </div>
+          {copyStatus !== null && (
+            <p
+              role={copyStatus === "success" ? "status" : "alert"}
+              className={`mt-1 text-xs ${
+                copyStatus === "success"
+                  ? "text-green-600 dark:text-green-400"
+                  : "text-red-600 dark:text-red-400"
+              }`}
+            >
+              {copyStatus === "success"
+                ? t("settings.incognito.copySuccess")
+                : t("settings.incognito.copyFailed")}
+            </p>
+          )}
+        </div>
+      )}
+
+      <SettingsList
+        settings={settings}
+        values={values}
+        t={t}
+        onChange={onChange}
+        disabled={denied}
+        note={denied ? t("settings.incognito.deniedNote") : undefined}
+      />
+    </div>
+  );
+}
+
+export function CategorySection({
+  categoryId,
+  settings,
+  values,
+  t,
+  onChange,
+  discardSupported,
+}: CategorySectionProps) {
+  // The Advanced category holds actions instead of schema settings; it owns
+  // its own import/export/reset UI.
+  if (categoryId === "advanced") {
+    return <AdvancedActions settings={values} t={t} />;
+  }
+
+  // Shortcuts has no schema settings at all; the browser owns the bindings.
+  if (categoryId === "shortcuts") {
+    return <ShortcutsInfo t={t} />;
+  }
+
+  if (settings.length === 0) return null;
+
+  if (categoryId === "incognito") {
+    return (
+      <IncognitoSection
+        settings={settings}
+        values={values}
+        t={t}
+        onChange={onChange}
+      />
+    );
+  }
+
+  const memoryDisabled = categoryId === "memory" && !discardSupported;
+
+  return (
+    <SettingsList
+      settings={settings}
+      values={values}
+      t={t}
+      onChange={onChange}
+      disabled={memoryDisabled}
+      note={memoryDisabled ? t("options.memoryUnsupported") : undefined}
+    />
   );
 }

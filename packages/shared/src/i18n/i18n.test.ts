@@ -132,6 +132,35 @@ describe("i18n", () => {
     expect(missingKeys("vi", syncKeys)).toEqual([]);
   });
 
+  it("covers the incognito and shortcuts strings in both languages", () => {
+    const categoryKeys = [
+      "settings.incognito.status.label",
+      "settings.incognito.status.allowed",
+      "settings.incognito.status.denied",
+      "settings.incognito.deniedNote",
+      "settings.incognito.enableInstructions",
+      "settings.incognito.pagePathLabel",
+      "settings.incognito.copyPath",
+      "settings.incognito.copySuccess",
+      "settings.incognito.copyFailed",
+      "settings.shortcuts.tableCaption",
+      "settings.shortcuts.commandHeader",
+      "settings.shortcuts.bindingHeader",
+      "settings.shortcuts.notSet",
+      "settings.shortcuts.instructions",
+      "settings.shortcuts.pagePathLabel",
+      "settings.shortcuts.copyPath",
+      "settings.shortcuts.copySuccess",
+      "settings.shortcuts.copyFailed",
+      "settings.shortcuts.commandLabel.save-tabs",
+      "settings.shortcuts.commandLabel.open-sessions",
+      "settings.shortcuts.commandLabel.discard-now",
+    ];
+
+    expect(missingKeys("en", categoryKeys)).toEqual([]);
+    expect(missingKeys("vi", categoryKeys)).toEqual([]);
+  });
+
   it("covers the popup strings in both languages", () => {
     const popupKeys = [
       "popup.saveTabs",

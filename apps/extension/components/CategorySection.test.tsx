@@ -17,8 +17,9 @@ import {
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { fakeBrowser } from "wxt/testing/fake-browser";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { EXTENSIONS_PAGE_PATH } from "../lib/incognito";
 import {
   loadSettings,
   resetSettings,
@@ -28,6 +29,18 @@ import {
 import { CategorySection } from "./CategorySection";
 
 const t = createTranslator("en");
+
+const originalClipboard = Object.getOwnPropertyDescriptor(
+  navigator,
+  "clipboard",
+);
+
+function stubClipboard(writeText: (text: string) => Promise<void>): void {
+  Object.defineProperty(navigator, "clipboard", {
+    configurable: true,
+    value: { writeText },
+  });
+}
 
 function category(id: CategoryId) {
   const found = SETTINGS_SCHEMA.find((entry) => entry.id === id);
@@ -80,8 +93,15 @@ beforeEach(async () => {
 
 afterEach(async () => {
   cleanup();
+  vi.restoreAllMocks();
   await resetSettings();
   fakeBrowser.reset();
+  if (originalClipboard === undefined) {
+    Reflect.deleteProperty(navigator, "clipboard");
+  } else {
+    Object.defineProperty(navigator, "clipboard", originalClipboard);
+  }
+  Reflect.deleteProperty(document, "execCommand");
 });
 
 describe("CategorySection", () => {
@@ -359,5 +379,83 @@ describe("CategorySection", () => {
     expect(
       screen.queryByText("Tab discarding is not available in this browser."),
     ).not.toBeInTheDocument();
+  });
+
+  it("shows incognito access as allowed and keeps the setting enabled", async () => {
+    vi.spyOn(
+      fakeBrowser.extension,
+      "isAllowedIncognitoAccess",
+    ).mockImplementation(async () => true);
+
+    render(<Harness categoryId="incognito" />);
+
+    expect(await screen.findByText("Allowed")).toBeInTheDocument();
+    expect(
+      screen.getByRole("switch", { name: "Include incognito windows" }),
+    ).toBeEnabled();
+    expect(screen.queryByText("Not allowed")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Copy path" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("disables the incognito setting and explains how to allow access", async () => {
+    vi.spyOn(
+      fakeBrowser.extension,
+      "isAllowedIncognitoAccess",
+    ).mockImplementation(async () => false);
+
+    render(<Harness categoryId="incognito" />);
+
+    expect(await screen.findByText("Not allowed")).toBeInTheDocument();
+    expect(
+      screen.getByRole("switch", { name: "Include incognito windows" }),
+    ).toBeDisabled();
+    expect(
+      screen.getByText(
+        "This setting is disabled because SaveTabs is not allowed in incognito windows.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "To allow access, open the extensions page below, open the SaveTabs details, and allow the extension in private windows.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText(EXTENSIONS_PAGE_PATH)).toBeInTheDocument();
+  });
+
+  it("copies the extensions page path when incognito access is denied", async () => {
+    vi.spyOn(
+      fakeBrowser.extension,
+      "isAllowedIncognitoAccess",
+    ).mockImplementation(async () => false);
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    stubClipboard(writeText);
+
+    render(<Harness categoryId="incognito" />);
+
+    await screen.findByText("Not allowed");
+    await userEvent.click(screen.getByRole("button", { name: "Copy path" }));
+
+    expect(writeText).toHaveBeenCalledWith(EXTENSIONS_PAGE_PATH);
+    expect(
+      screen.getByText("Path copied to the clipboard."),
+    ).toBeInTheDocument();
+  });
+
+  it("renders real command bindings in the shortcuts category", async () => {
+    vi.spyOn(fakeBrowser.commands, "getAll").mockImplementation(async () => [
+      { name: "save-tabs", description: "", shortcut: "Alt+Shift+S" },
+    ]);
+
+    render(<Harness categoryId="shortcuts" />);
+
+    const table = await screen.findByRole("table", {
+      name: "Keyboard shortcuts for SaveTabs",
+    });
+    expect(
+      within(table).getByText("Save all tabs in the current window"),
+    ).toBeInTheDocument();
+    expect(within(table).getByText("Alt+Shift+S")).toBeInTheDocument();
   });
 });
