@@ -27,6 +27,12 @@ export type Session = {
   pendingUpload?: boolean;
   /** Local-only: incognito sessions are never uploaded or synced. */
   incognito?: boolean;
+  /**
+   * Local-only: the user chose "skip upload" when importing a sync key.
+   * Existing sessions keep this flag so the sync service never uploads them;
+   * sessions created afterwards are not flagged and sync normally.
+   */
+  syncExcluded?: boolean;
 };
 
 /** Settings values persisted in chrome.storage.local, keyed by setting key. */

@@ -529,7 +529,7 @@ apps/extension/
 - Placeholder env:
   - API: `https://api.savetabs.example` (đổi sau);
   - Web: `https://app.savetabs.example`;
-  - `host_permissions` của extension đọc từ env lúc build (`wxt.config.ts` dùng `process.env.SAVETABS_API_BASE`).
+  - `host_permissions` và API origin của extension đọc từ env lúc build; biến chuẩn là `WXT_SAVETABS_API_BASE` (WXT inject qua Vite `define` để manifest và runtime luôn khớp). `SAVETABS_API_BASE` vẫn được chấp nhận như alias; chuỗi rỗng coi như không đặt.
 - Khi có domain thật: đổi DNS Cloudflare, cập nhật env + Pages custom domain + `WEB_ORIGIN`; không sửa logic.
 
 ---

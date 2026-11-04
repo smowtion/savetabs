@@ -1,13 +1,24 @@
 import { defineConfig } from "wxt";
 import tailwindcss from "@tailwindcss/vite";
 
-const apiBase = (process.env.SAVETABS_API_BASE || "https://api.savetabs.example").replace(/\/+$/, "");
+// WXT_SAVETABS_API_BASE is the canonical name; SAVETABS_API_BASE is accepted
+// as an alias so older deploy scripts keep working. `||` (not `??`) treats an
+// empty value as unset. The origin is injected below so the manifest host
+// permission and the runtime client always read the same value.
+const apiBase = (
+  process.env.WXT_SAVETABS_API_BASE ||
+  process.env.SAVETABS_API_BASE ||
+  "https://api.savetabs.example"
+).replace(/\/+$/, "");
 
 export default defineConfig({
   manifestVersion: 3,
   modules: ["@wxt-dev/module-react"],
   vite: () => ({
     plugins: [tailwindcss()],
+    define: {
+      "import.meta.env.WXT_SAVETABS_API_BASE": JSON.stringify(apiBase),
+    },
   }),
   manifest: ({ browser }) => ({
     name: "SaveTabs",

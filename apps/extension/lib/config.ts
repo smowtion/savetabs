@@ -1,11 +1,11 @@
 /**
  * Build-time configuration for the extension.
  *
- * WXT exposes environment variables prefixed with `WXT_` through
- * `import.meta.env`. Deployments set `WXT_SAVETABS_API_BASE` to the Worker
- * origin; the placeholder below keeps development builds running without
- * pointing at a real account. `wxt.config.ts` derives the manifest host
- * permission from the same origin (via `SAVETABS_API_BASE`).
+ * `WXT_SAVETABS_API_BASE` is the canonical deployment variable. WXT exposes
+ * `WXT_`-prefixed variables through `import.meta.env`, and `wxt.config.ts`
+ * also injects the resolved origin with Vite `define`, so the manifest host
+ * permission and this runtime value can never disagree. The placeholder below
+ * keeps development builds running without pointing at a real account.
  */
 
 const DEFAULT_API_BASE = "https://api.savetabs.example";

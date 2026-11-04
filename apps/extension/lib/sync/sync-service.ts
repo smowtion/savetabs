@@ -8,11 +8,13 @@
  *
  * Behaviour that callers depend on:
  * - Incognito sessions are never encrypted for upload and never leave the
- *   device.
+ *   device. Sessions marked `syncExcluded` by a "skip upload" key import are
+ *   never uploaded either.
  * - Oversized sessions stay local and produce a visible error; they are never
  *   sent and never dropped.
  * - A 401 (or a missing key) raises `SyncAuthError` so the UI can show an auth
- *   problem instead of a fake empty state.
+ *   problem instead of a fake empty state. Other whole-run read failures are
+ *   reported in `errors` with a partial result.
  * - Transient per-item failures are collected in `errors` and retried on the
  *   next sync; the affected sessions are marked `pendingUpload`.
  * - `sync.enabled` is the master switch: with it off, nothing touches the
@@ -133,6 +135,7 @@ function toRemoteSession(session: Session): Session {
   const copy: Session = { ...session };
   delete copy.pendingUpload;
   delete copy.incognito;
+  delete copy.syncExcluded;
   return copy;
 }
 
@@ -172,12 +175,13 @@ export function createSyncService(
 
   /**
    * Delete local sessions for remote tombstones that are at least as new as
-   * the local copy. The repository write also records a local tombstone so a
-   * later blob download cannot resurrect the session.
+   * the local copy. The server's tombstone timestamp is preserved so a blob
+   * updated after the deletion (but before "now") can still win the merge.
+   * The repository write also records a local tombstone so a later blob
+   * download cannot resurrect the session.
    */
   async function applyDeletions(
     deletions: readonly RemoteDeletion[],
-    now: number,
   ): Promise<number> {
     if (deletions.length === 0) return 0;
 
@@ -192,7 +196,7 @@ export function createSyncService(
       const local = localById.get(deletion.id);
       if (local === undefined || deletion.deletedAt < local.updatedAt) continue;
 
-      await deps.repo.deleteSession(deletion.id, now);
+      await deps.repo.deleteSession(deletion.id, deletion.deletedAt);
       localById.delete(deletion.id);
       deleted += 1;
     }
@@ -296,9 +300,10 @@ export function createSyncService(
     const local = await deps.repo.listSessions();
 
     for (const session of local) {
-      // Incognito sessions must never reach the server, not even after a key
-      // rebind that force-uploads everything else.
-      if (session.incognito) continue;
+      // Incognito sessions and sessions excluded by a "skip upload" key
+      // import must never reach the server, not even after a rebind that
+      // force-uploads everything else.
+      if (session.incognito || session.syncExcluded) continue;
 
       if (!force) {
         const remote = remoteById.get(session.id);
@@ -349,24 +354,56 @@ export function createSyncService(
   }
 
   /**
-   * Push local tombstones. DELETE is idempotent, so re-sending a deletion the
-   * server already knows is safe. The tombstones stay in IndexedDB for the
-   * full 30-day window to block resurrection races; only expired entries are
-   * skipped here (the repository also prunes them).
+   * Push local tombstones the server does not know yet. A tombstone the server
+   * already stores at least as recently is skipped: re-sending it would renew
+   * its `deleted_at` and could suppress a newer remote edit. Local tombstones
+   * stay in IndexedDB for the full 30-day window to block resurrection races;
+   * only expired entries are left out here (the repository also prunes them).
+   *
+   * A 404 means the key has no server row yet (nothing to delete), so a fresh
+   * key does not report a spurious error.
    */
   async function pushLocalTombstones(
     client: SyncClientApi,
     tombstones: readonly Tombstone[],
+    remoteDeletions: readonly RemoteDeletion[],
     now: number,
     result: SyncResult,
   ): Promise<void> {
+    const serverDeletedAt = new Map<string, number>();
+    for (const deletion of remoteDeletions) {
+      const known = serverDeletedAt.get(deletion.id);
+      if (known === undefined || deletion.deletedAt > known) {
+        serverDeletedAt.set(deletion.id, deletion.deletedAt);
+      }
+    }
+
     for (const tombstone of pruneTombstones(tombstones, now)) {
+      const known = serverDeletedAt.get(tombstone.id);
+      if (known !== undefined && known >= tombstone.deletedAt) continue;
+
       try {
         await client.delete(tombstone.id);
       } catch (error) {
         if (error instanceof SyncAuthError) throw error;
+        if (error instanceof SyncHttpError && error.status === 404) continue;
         result.errors.push(`delete ${tombstone.id}: ${errorMessage(error)}`);
       }
+    }
+  }
+
+  /**
+   * Persist the "skip upload" decision from a key import: sessions that exist
+   * right now are excluded from every future upload. Sessions created after
+   * the import are unaffected and sync normally.
+   */
+  async function markLocalSessionsSyncExcluded(): Promise<void> {
+    for (const session of await deps.repo.listSessions()) {
+      if (session.incognito || session.syncExcluded) continue;
+      await deps.repo.updateSession(session.id, {
+        syncExcluded: true,
+        updatedAt: session.updatedAt,
+      });
     }
   }
 
@@ -441,19 +478,49 @@ export function createSyncService(
     const client = deps.createClient(derived.authId, derived.authKey);
     const now = deps.now();
 
-    const summaries = await readRemoteOrEmpty<SessionSummary[]>(
-      () => client.listSummaries(),
-      [],
-    );
-    const remoteDeletions = await readRemoteOrEmpty<RemoteDeletion[]>(
-      () => client.listDeletions(),
-      [],
-    );
+    // The initial reads decide whether this run is meaningful at all. A 401
+    // must surface as SyncAuthError; every other failure is reported in the
+    // partial result instead of throwing out of the UI handler.
+    let summaries: SessionSummary[];
+    let remoteDeletions: RemoteDeletion[];
+    try {
+      summaries = await readRemoteOrEmpty<SessionSummary[]>(
+        () => client.listSummaries(),
+        [],
+      );
+      remoteDeletions = await readRemoteOrEmpty<RemoteDeletion[]>(
+        () => client.listDeletions(),
+        [],
+      );
+    } catch (error) {
+      if (error instanceof SyncAuthError) throw error;
+      result.errors.push(errorMessage(error));
+      return result;
+    }
 
-    result.deleted = await applyDeletions(remoteDeletions, now);
+    // Consume the key-rebind decision before merging so "skip" marks only the
+    // sessions that existed at import time, not copies downloaded in this run.
+    const rebind = await deps.consumePendingRebind();
+    let forceUpload = false;
+    if (rebind === "skip") {
+      await markLocalSessionsSyncExcluded();
+    } else if (rebind === "upload") {
+      forceUpload = true;
+    }
+
+    result.deleted = await applyDeletions(remoteDeletions);
 
     const localTombstones = await deps.repo.getTombstones();
-    const remoteSessions = await downloadRemoteSessions(client, derived, result);
+
+    let remoteSessions: Session[];
+    try {
+      remoteSessions = await downloadRemoteSessions(client, derived, result);
+    } catch (error) {
+      if (error instanceof SyncAuthError) throw error;
+      result.errors.push(errorMessage(error));
+      return result;
+    }
+
     await persistMergedSessions(
       remoteSessions,
       localTombstones,
@@ -462,17 +529,14 @@ export function createSyncService(
       result,
     );
 
-    // Consumed once per key change: "upload" forces every local non-incognito
-    // session under the new key, "skip" leaves the cloud copy alone.
-    const rebind = await deps.consumePendingRebind();
-    await uploadLocalSessions(
+    await uploadLocalSessions(client, derived, summaries, forceUpload, result);
+    await pushLocalTombstones(
       client,
-      derived,
-      summaries,
-      rebind === "upload",
+      localTombstones,
+      remoteDeletions,
+      now,
       result,
     );
-    await pushLocalTombstones(client, localTombstones, now, result);
 
     return result;
   }
@@ -480,7 +544,7 @@ export function createSyncService(
   async function applyRemoteDeletions(
     deletions: readonly RemoteDeletion[],
   ): Promise<number> {
-    return applyDeletions(deletions, deps.now());
+    return applyDeletions(deletions);
   }
 
   return { enqueueUpload, syncNow, applyRemoteDeletions };
@@ -503,9 +567,10 @@ export function enqueueUpload(session: Session): Promise<void> {
 }
 
 /**
- * Run a full two-way sync. Returns counters plus per-item error messages and
- * throws `SyncAuthError` (or a `SyncHttpError`) for failures that make the
- * whole run meaningless.
+ * Run a full two-way sync. Returns counters plus per-item error messages.
+ * `SyncAuthError` always propagates so the UI can show an auth problem; other
+ * whole-run read failures are reported in `errors` and return the partial
+ * result instead of throwing.
  */
 export function syncNow(): Promise<SyncResult> {
   return getDefaultService().syncNow();

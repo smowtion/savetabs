@@ -127,6 +127,7 @@ class FakeClient implements SyncClientApi {
   deletedIds: string[] = [];
   blobPageRequests: number[] = [];
   putError: unknown = null;
+  deleteError: unknown = null;
   summariesError: unknown = null;
   deletionsError: unknown = null;
   blobsError: unknown = null;
@@ -159,6 +160,7 @@ class FakeClient implements SyncClientApi {
   }
 
   async delete(id: string): Promise<void> {
+    if (this.deleteError !== null) throw this.deleteError;
     this.deletedIds.push(id);
   }
 }
@@ -179,10 +181,16 @@ async function createHarness(options: HarnessOptions = {}) {
   const createClient = vi.fn(
     options.createClient ?? ((_authId: string, _authKey: string) => client),
   );
+  // Like the real key store, a pending rebind decision is consumed once.
+  let rebind = options.rebind;
   const service = createSyncService({
     repo,
     getKey: async () => ("key" in options ? options.key : KEY),
-    consumePendingRebind: async () => options.rebind,
+    consumePendingRebind: async () => {
+      const pending = rebind;
+      rebind = undefined;
+      return pending;
+    },
     loadSettings: async () =>
       ({ "sync.enabled": options.enabled ?? true }) as Settings,
     createClient,
@@ -253,6 +261,23 @@ describe("enqueueUpload", () => {
       pendingUpload: false,
       updatedAt: session.updatedAt,
     });
+  });
+
+  it("strips syncExcluded from the encrypted payload", async () => {
+    const { client, derived, service } = await createHarness();
+    const session = makeSession({ id: "session-1", syncExcluded: true });
+
+    await service.enqueueUpload(session);
+
+    expect(client.puts).toHaveLength(1);
+    const decrypted = await decryptSession(
+      derived.encKey,
+      derived.authId,
+      "session-1",
+      client.puts[0]!.ciphertext,
+    );
+    expect(decrypted).not.toHaveProperty("syncExcluded");
+    expect(decrypted).toMatchObject({ id: "session-1" });
   });
 
   it("marks a session pendingUpload when the network fails", async () => {
@@ -344,6 +369,42 @@ describe("syncNow", () => {
     expect(client.puts.map((put) => put.id)).toEqual(["session-1"]);
   });
 
+  it("returns errors instead of throwing when the initial read fails", async () => {
+    const { client, repo, service } = await createHarness();
+    repo.seed(makeSession({ id: "session-1" }));
+    client.summariesError = new Error("offline");
+
+    const result = await service.syncNow();
+
+    expect(result).toEqual({
+      uploaded: 0,
+      downloaded: 0,
+      deleted: 0,
+      errors: ["offline"],
+    });
+    expect(client.puts).toEqual([]);
+  });
+
+  it("returns partial counts when blob paging fails", async () => {
+    const { client, repo, service } = await createHarness();
+    repo.seed(
+      makeSession({ id: "deleted", updatedAt: 5 }),
+      makeSession({ id: "local", updatedAt: 9 }),
+    );
+    client.deletions = [{ id: "deleted", deletedAt: 6 }];
+    client.blobsError = new SyncHttpError(500, "internal_error", "server error");
+
+    const result = await service.syncNow();
+
+    expect(result).toMatchObject({
+      uploaded: 0,
+      downloaded: 0,
+      deleted: 1,
+    });
+    expect(result.errors).toEqual(["server error"]);
+    expect(client.puts).toEqual([]);
+  });
+
   it("applies remote tombstones newer than the local session", async () => {
     const { client, repo, service } = await createHarness();
     repo.seed(
@@ -360,15 +421,44 @@ describe("syncNow", () => {
     expect(result.deleted).toBe(1);
     expect(repo.sessions.has("deleted")).toBe(false);
     expect(repo.sessions.has("kept")).toBe(true);
+    // The server's tombstone timestamp is preserved, not replaced with "now".
     expect(repo.tombstones.get("deleted")).toEqual({
       id: "deleted",
-      deletedAt: NOW,
+      deletedAt: 6,
     });
     // "kept" is missing remotely, so the newer local copy is uploaded.
     expect(result.uploaded).toBe(1);
     expect(client.puts.map((put) => put.id)).toEqual(["kept"]);
-    // The local tombstone created from the remote deletion is pushed back.
-    expect(client.deletedIds).toEqual(["deleted"]);
+    // The server already stores this deletion, so it is not re-posted.
+    expect(client.deletedIds).toEqual([]);
+  });
+
+  it("keeps a remote blob updated after the deletion timestamp", async () => {
+    const { client, derived, repo, service } = await createHarness();
+    repo.seed(makeSession({ id: "edited", updatedAt: NOW - 3_000 }));
+    client.deletions = [{ id: "edited", deletedAt: NOW - 2_000 }];
+    const remote = makeSession({
+      id: "edited",
+      updatedAt: NOW - 1_000,
+      title: "remote edit",
+    });
+    client.summaries = [{ id: "edited", updatedAt: NOW - 1_000, size: 1 }];
+    client.pages = [[await encryptedBlob(remote, derived)]];
+
+    const result = await service.syncNow();
+
+    // The stale local copy is removed, but the newer remote edit wins the
+    // merge instead of being suppressed by a tombstone stamped "now".
+    expect(repo.sessions.get("edited")).toMatchObject({
+      updatedAt: NOW - 1_000,
+      title: "remote edit",
+    });
+    expect(repo.tombstones.get("edited")).toEqual({
+      id: "edited",
+      deletedAt: NOW - 2_000,
+    });
+    expect(result.downloaded).toBe(1);
+    expect(result.errors).toEqual([]);
   });
 
   it("merges remote pages and counts downloads and uploads", async () => {
@@ -488,12 +578,13 @@ describe("syncNow", () => {
     expect(repo.sessions.get("good")).toBeDefined();
   });
 
-  it("force-uploads every non-incognito session after an upload rebind", async () => {
+  it("force-uploads every eligible session after an upload rebind", async () => {
     const { client, repo, service } = await createHarness({ rebind: "upload" });
     repo.seed(
       makeSession({ id: "a", updatedAt: 100 }),
       makeSession({ id: "b", updatedAt: 200 }),
-      makeSession({ id: "private", updatedAt: 300, incognito: true }),
+      makeSession({ id: "excluded", updatedAt: 300, syncExcluded: true }),
+      makeSession({ id: "private", updatedAt: 400, incognito: true }),
     );
     client.summaries = [
       { id: "a", updatedAt: 100, size: 1 },
@@ -519,6 +610,71 @@ describe("syncNow", () => {
     expect(client.deletedIds).toEqual(["recent"]);
     expect(repo.tombstones.has("recent")).toBe(true);
   });
+
+  it("does not re-post tombstones the server already has", async () => {
+    const { client, repo, service } = await createHarness();
+    repo.tombstones.set("equal", { id: "equal", deletedAt: NOW - DAY_MS });
+    repo.tombstones.set("older-local", {
+      id: "older-local",
+      deletedAt: NOW - 2 * DAY_MS,
+    });
+    client.deletions = [
+      { id: "equal", deletedAt: NOW - DAY_MS },
+      { id: "older-local", deletedAt: NOW - DAY_MS },
+    ];
+
+    await service.syncNow();
+
+    expect(client.deletedIds).toEqual([]);
+    expect(repo.tombstones.has("equal")).toBe(true);
+    expect(repo.tombstones.has("older-local")).toBe(true);
+  });
+
+  it("treats a DELETE 404 on a fresh key as a no-op", async () => {
+    const { client, repo, service } = await createHarness();
+    repo.tombstones.set("pending", { id: "pending", deletedAt: NOW - DAY_MS });
+    client.deleteError = new SyncHttpError(
+      404,
+      "not_found",
+      "Sync key not found.",
+    );
+
+    const result = await service.syncNow();
+
+    expect(result.errors).toEqual([]);
+    expect(client.deletedIds).toEqual([]);
+  });
+
+  it("marks existing sessions on a skip rebind and never uploads them", async () => {
+    const { client, repo, service } = await createHarness({ rebind: "skip" });
+    repo.seed(
+      makeSession({ id: "local-1", updatedAt: 100 }),
+      makeSession({ id: "private", updatedAt: 200, incognito: true }),
+    );
+
+    const result = await service.syncNow();
+
+    expect(repo.sessions.get("local-1")).toMatchObject({
+      syncExcluded: true,
+      updatedAt: 100,
+    });
+    expect(repo.sessions.get("private")?.syncExcluded).toBeUndefined();
+    expect(result.uploaded).toBe(0);
+    expect(client.puts).toEqual([]);
+  });
+
+  it("still uploads sessions created after a skip rebind", async () => {
+    const { client, repo, service } = await createHarness({ rebind: "skip" });
+    repo.seed(makeSession({ id: "old", updatedAt: 100 }));
+    await service.syncNow();
+    expect(repo.sessions.get("old")?.syncExcluded).toBe(true);
+
+    repo.seed(makeSession({ id: "new", updatedAt: 200 }));
+    const result = await service.syncNow();
+
+    expect(result.uploaded).toBe(1);
+    expect(client.puts.map((put) => put.id)).toEqual(["new"]);
+  });
 });
 
 describe("applyRemoteDeletions", () => {
@@ -538,5 +694,7 @@ describe("applyRemoteDeletions", () => {
     expect(deleted).toBe(1);
     expect(repo.sessions.has("old")).toBe(false);
     expect(repo.sessions.has("new")).toBe(true);
+    // The server tombstone timestamp, not "now", is stored locally.
+    expect(repo.tombstones.get("old")).toEqual({ id: "old", deletedAt: 6 });
   });
 });
