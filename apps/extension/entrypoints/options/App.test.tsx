@@ -12,6 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { OPEN_SECTIONS_STORAGE_KEY } from "../../lib/open-sections";
 import { loadSettings, resetSettings } from "../../lib/settings";
+import { syncNow } from "../../lib/sync/sync-service";
 import {
   LATEST_VERSION_STORAGE_KEY,
   UPDATE_AVAILABLE_STORAGE_KEY,
@@ -19,6 +20,14 @@ import {
   storeListingUrl,
 } from "../../lib/version-check";
 import { App } from "./App";
+
+vi.mock("../../lib/sync/sync-service", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("../../lib/sync/sync-service")>();
+  return { ...actual, syncNow: vi.fn() };
+});
+
+const syncNowMock = vi.mocked(syncNow);
 
 function stubMatchMedia(matches = false): void {
   Object.defineProperty(window, "matchMedia", {
@@ -41,6 +50,13 @@ beforeEach(async () => {
   fakeBrowser.reset();
   await resetSettings();
   fakeBrowser.reset();
+  vi.clearAllMocks();
+  syncNowMock.mockResolvedValue({
+    uploaded: 0,
+    downloaded: 0,
+    deleted: 0,
+    errors: [],
+  });
   document.documentElement.removeAttribute("data-theme");
   stubMatchMedia();
 });
@@ -277,6 +293,7 @@ describe("options shell", () => {
     await expect(loadSettings()).resolves.toMatchObject({
       "sync.enabled": false,
     });
+    expect(syncNowMock).not.toHaveBeenCalled();
   });
 
   it("enables sync after the key confirmation", async () => {
@@ -307,6 +324,8 @@ describe("options shell", () => {
         }),
       ).toHaveAttribute("aria-checked", "true"),
     );
+    // Enabling sync reconciles with the server immediately.
+    await waitFor(() => expect(syncNowMock).toHaveBeenCalledTimes(1));
   });
 
   it("disables memory settings when the browser cannot discard tabs", async () => {
@@ -334,6 +353,9 @@ describe("options shell", () => {
           "Tab discarding is not available in this browser.",
         ),
       ).toHaveLength(4);
+      expect(
+        screen.getByRole("button", { name: "Discard now" }),
+      ).toBeDisabled();
     } finally {
       Object.defineProperty(fakeBrowser.tabs, "discard", {
         value: originalDiscard,
@@ -341,6 +363,23 @@ describe("options shell", () => {
         writable: true,
       });
     }
+  });
+
+  it("discards inactive tabs from the Memory section", async () => {
+    const sendMessage = vi
+      .spyOn(fakeBrowser.runtime, "sendMessage")
+      .mockResolvedValue({ ok: true, data: { discarded: 3 } } as never);
+
+    render(<App />);
+    await userEvent.click(
+      within(main()).getByRole("button", { name: /Memory saver/ }),
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Discard now" }));
+
+    await waitFor(() =>
+      expect(sendMessage).toHaveBeenCalledWith({ type: "DISCARD_NOW" }),
+    );
+    expect(await screen.findByText("Discarded 3 tabs.")).toBeInTheDocument();
   });
 
   it("shows the update banner and opens the browser's store listing", async () => {

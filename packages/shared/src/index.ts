@@ -10,3 +10,4 @@ export * from "./i18n";
 export * from "./merge";
 export * from "./settings-schema";
 export * from "./types";
+export * from "./url";

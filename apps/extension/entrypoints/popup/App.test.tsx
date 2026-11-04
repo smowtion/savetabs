@@ -276,6 +276,50 @@ describe("popup", () => {
     expect(await screen.findByText("Saved 1 tabs.")).toBeInTheDocument();
   });
 
+  it("reports tabs left open when the session limit is reached", async () => {
+    stubSendMessage({
+      ok: true,
+      data: {
+        session: makeSession({ tabs: savedTabs(500) }),
+        skipped: 3,
+        closed: 500,
+        overflow: 3,
+      },
+    });
+    await seedTab("https://a.example");
+
+    render(<App />);
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Save 1 tabs" }),
+    );
+
+    expect(
+      await screen.findByText(
+        "Saved 500 tabs; 3 left open (session limit).",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("discards inactive tabs from the popup", async () => {
+    const sendMessage = stubSendMessage({
+      ok: true,
+      data: { discarded: 2 },
+    });
+    await seedTab("https://a.example");
+
+    render(<App />);
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Discard now" }),
+    );
+
+    await waitFor(() =>
+      expect(sendMessage).toHaveBeenCalledWith({ type: "DISCARD_NOW" }),
+    );
+    expect(await screen.findByText("Discarded 2 tabs.")).toBeInTheDocument();
+  });
+
   it("asks for confirmation and resends the save with confirmed true", async () => {
     const sendMessage = stubSendMessage(
       { ok: false, code: "confirmation_required", data: { count: 21 } },

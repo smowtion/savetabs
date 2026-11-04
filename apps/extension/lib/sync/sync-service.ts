@@ -106,9 +106,19 @@ export type SyncServiceDeps = {
 
 export type SyncService = {
   enqueueUpload(session: Session): Promise<void>;
-  syncNow(): Promise<SyncResult>;
+  /**
+   * Run a two-way sync. `allowUpload: false` downloads and merges (when the
+   * caller already checked `sync.autoDownload`) but sends nothing new; the
+   * startup path uses it to honor `sync.autoUpload`.
+   */
+  syncNow(options?: SyncNowOptions): Promise<SyncResult>;
   applyRemoteDeletions(deletions: readonly RemoteDeletion[]): Promise<number>;
   applySkipRebindIfPending(): Promise<void>;
+};
+
+export type SyncNowOptions = {
+  /** Defaults to true. When false, the upload phase is skipped entirely. */
+  allowUpload?: boolean;
 };
 
 const defaultDeps: SyncServiceDeps = {
@@ -430,7 +440,9 @@ export function createSyncService(
   }
 
   async function enqueueUpload(session: Session): Promise<void> {
-    if (session.incognito) return;
+    // Incognito sessions and sessions excluded by a "skip upload" key import
+    // must never reach the server, even when a caller hands us a stale object.
+    if (session.incognito || session.syncExcluded) return;
 
     const settings = await deps.loadSettings();
     if (settings["sync.enabled"] !== true) return;
@@ -476,7 +488,10 @@ export function createSyncService(
     }
   }
 
-  async function syncNow(): Promise<SyncResult> {
+  async function syncNow(
+    options: SyncNowOptions = {},
+  ): Promise<SyncResult> {
+    const allowUpload = options.allowUpload ?? true;
     const result: SyncResult = {
       uploaded: 0,
       downloaded: 0,
@@ -520,13 +535,16 @@ export function createSyncService(
       return result;
     }
 
-    // Consume the key-rebind decision before merging so "skip" marks only the
+    // Peek at the key-rebind decision before merging so "skip" marks only the
     // sessions that existed at import time, not copies downloaded in this run.
-    const rebind = await deps.consumePendingRebind();
+    // An "upload" marker is consumed only after the merge succeeds, so a
+    // download failure cannot lose the promised force-upload.
+    const rebind = await deps.peekPendingRebind();
     let forceUpload = false;
     if (rebind === "skip") {
+      await deps.consumePendingRebind();
       await markLocalSessionsSyncExcluded();
-    } else if (rebind === "upload") {
+    } else if (rebind === "upload" && allowUpload) {
       forceUpload = true;
     }
 
@@ -551,14 +569,20 @@ export function createSyncService(
       result,
     );
 
-    await uploadLocalSessions(client, derived, summaries, forceUpload, result);
-    await pushLocalTombstones(
-      client,
-      localTombstones,
-      remoteDeletions,
-      now,
-      result,
-    );
+    // The merge is complete, so the force-upload can no longer be lost to a
+    // failed download.
+    if (forceUpload) await deps.consumePendingRebind();
+
+    if (allowUpload) {
+      await uploadLocalSessions(client, derived, summaries, forceUpload, result);
+      await pushLocalTombstones(
+        client,
+        localTombstones,
+        remoteDeletions,
+        now,
+        result,
+      );
+    }
 
     return result;
   }
@@ -595,12 +619,13 @@ export function enqueueUpload(session: Session): Promise<void> {
 
 /**
  * Run a full two-way sync. Returns counters plus per-item error messages.
- * `SyncAuthError` always propagates so the UI can show an auth problem; other
- * whole-run read failures are reported in `errors` and return the partial
- * result instead of throwing.
+ * Pass `{ allowUpload: false }` to merge remote changes without sending any
+ * local navigation or deletions. `SyncAuthError` always propagates so the UI
+ * can show an auth problem; other whole-run read failures are reported in
+ * `errors` and return the partial result instead of throwing.
  */
-export function syncNow(): Promise<SyncResult> {
-  return getDefaultService().syncNow();
+export function syncNow(options?: SyncNowOptions): Promise<SyncResult> {
+  return getDefaultService().syncNow(options);
 }
 
 /** Apply remote tombstones to the local store; returns how many were deleted. */

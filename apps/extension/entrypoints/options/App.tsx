@@ -32,6 +32,7 @@ import {
   type SettingsSearchGroup,
 } from "../../lib/search-settings";
 import type { SettingValue } from "../../lib/settings";
+import { syncNow } from "../../lib/sync/sync-service";
 import { nextThemePreference, normalizeThemePreference } from "../../lib/theme";
 
 const ALL_SETTINGS_GROUPS: readonly SettingsSearchGroup[] = SETTINGS_SCHEMA.map(
@@ -63,8 +64,8 @@ export function App() {
   const themePreference = normalizeThemePreference(settings?.["general.theme"]);
   useTheme(themePreference);
 
-  // Firefox builds have no `tabs.discard`; the memory rows then render
-  // disabled with an explanation instead of offering dead controls.
+  // Browsers without `tabs.discard` cannot use the memory features; the rows
+  // then render disabled with an explanation instead of offering dead controls.
   const discardSupported = isDiscardSupported();
 
   useEffect(() => {
@@ -114,9 +115,17 @@ export function App() {
 
   function confirmSyncEnable(): void {
     setSyncEnableConfirmOpen(false);
-    void updateSetting("sync.enabled", true).catch((error) => {
-      console.error("[savetabs] failed to enable sync", error);
-    });
+    void updateSetting("sync.enabled", true)
+      .then(() => {
+        // Turning sync on is a user decision to reconcile now; failures are
+        // shown by the status panel's next manual run.
+        void syncNow().catch((error) => {
+          console.error("[savetabs] sync after enabling failed", error);
+        });
+      })
+      .catch((error) => {
+        console.error("[savetabs] failed to enable sync", error);
+      });
   }
 
   const ThemeIcon =

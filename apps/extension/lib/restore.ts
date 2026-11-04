@@ -11,6 +11,7 @@
  */
 
 import {
+  isRestorableUrl,
   normalizeUrl,
   type MatchMode,
   type SavedTab,
@@ -20,16 +21,6 @@ import {
 import { browser } from "wxt/browser";
 
 import { loadSettings } from "./settings";
-
-/**
- * Schemes that can be opened as tabs. Sessions are already filtered when they
- * are saved, so anything else is dropped defensively at restore time.
- */
-const RESTORABLE_PROTOCOLS: ReadonlySet<string> = new Set([
-  "http:",
-  "https:",
-  "file:",
-]);
 
 export type RestorePlan = { tabs: SavedTab[] };
 
@@ -42,15 +33,6 @@ function readBoolean(settings: Settings, key: string): boolean {
 function readMatchMode(settings: Settings): MatchMode {
   const value = settings["duplicates.matchMode"];
   return value === "ignore-hash" || value === "ignore-query" ? value : "exact";
-}
-
-/** True when the URL parses and uses a scheme the extension can restore. */
-function isRestorableUrl(url: string): boolean {
-  try {
-    return RESTORABLE_PROTOCOLS.has(new URL(url).protocol.toLowerCase());
-  } catch {
-    return false;
-  }
 }
 
 /**

@@ -17,6 +17,7 @@ import {
   SESSIONS_REVISION_KEY,
   addSession,
   broadcastSessionsChanged,
+  clearAllSessionsLocal,
   deleteSession,
   getSession,
   getTombstones,
@@ -255,6 +256,36 @@ describe("updateSession", () => {
     ).resolves.toBeUndefined();
     await expect(listSessions()).resolves.toEqual([]);
   });
+
+  it("ignores undefined patch values so imports cannot clear local flags", async () => {
+    const session = makeSession({
+      id: "flagged",
+      updatedAt: 100,
+      pendingUpload: true,
+      incognito: true,
+      syncExcluded: true,
+    });
+    await addSession(session);
+
+    const updated = await updateSession("flagged", {
+      title: "Renamed",
+      pendingUpload: undefined,
+      incognito: undefined,
+      syncExcluded: undefined,
+    });
+
+    expect(updated).toMatchObject({
+      title: "Renamed",
+      pendingUpload: true,
+      incognito: true,
+      syncExcluded: true,
+    });
+    await expect(getSession("flagged")).resolves.toMatchObject({
+      pendingUpload: true,
+      incognito: true,
+      syncExcluded: true,
+    });
+  });
 });
 
 describe("deleteSession and getTombstones", () => {
@@ -301,6 +332,32 @@ describe("deleteSession and getTombstones", () => {
     vi.spyOn(Date, "now").mockReturnValue(TOMBSTONE_TTL_MS);
 
     await expect(getTombstones()).resolves.toEqual([]);
+  });
+});
+
+describe("clearAllSessionsLocal", () => {
+  it("deletes every local session without writing tombstones", async () => {
+    await addSession(makeSession({ id: "one" }));
+    await addSession(makeSession({ id: "two" }));
+
+    await clearAllSessionsLocal();
+
+    await expect(listSessions()).resolves.toEqual([]);
+    // A local clear must not tell other devices to delete their copies.
+    await expect(getTombstones()).resolves.toEqual([]);
+    await expect(getUsage()).resolves.toMatchObject({ sessions: 0, tabs: 0 });
+  });
+
+  it("keeps existing tombstones intact", async () => {
+    await deleteSession("already-deleted", 12_345);
+    await addSession(makeSession({ id: "local" }));
+
+    await clearAllSessionsLocal();
+
+    await expect(listSessions()).resolves.toEqual([]);
+    await expect(getTombstones()).resolves.toEqual([
+      { id: "already-deleted", deletedAt: 12_345 },
+    ]);
   });
 });
 

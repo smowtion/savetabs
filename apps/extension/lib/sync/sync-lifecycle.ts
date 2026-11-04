@@ -29,9 +29,9 @@ import {
 import { browser } from "wxt/browser";
 
 import { API_BASE } from "../config";
-import { listSessions } from "../sessions-repo";
-import { loadSettings, saveSetting } from "../settings";
-import { getKey } from "./key-store";
+import { listSessions, updateSession } from "../sessions-repo";
+import { loadSettings, saveSettingNow } from "../settings";
+import { getKey, rotateKey } from "./key-store";
 import {
   applySkipRebindIfPending,
   enqueueUpload,
@@ -92,9 +92,9 @@ export async function applySyncAlarm(settings: Settings): Promise<void> {
 }
 
 /** Run a full sync, recording the timestamp only when it was not rejected. */
-async function runFullSync(): Promise<void> {
+async function runFullSync(allowUpload: boolean): Promise<void> {
   try {
-    await syncNow();
+    await syncNow({ allowUpload });
     await recordSyncCompleted();
   } catch (error) {
     // Auth problems and network failures are reported by the next manual sync;
@@ -105,14 +105,16 @@ async function runFullSync(): Promise<void> {
 
 /**
  * Startup merge: only when sync is enabled and `sync.autoDownload` is on, so
- * a local-only user never touches the network on launch.
+ * a local-only user never touches the network on launch. The upload phase
+ * still follows `sync.autoUpload`: a user who disabled automatic uploads gets
+ * downloaded changes without their own sessions being pushed.
  */
 export async function syncOnStartup(): Promise<void> {
   const settings = await loadSettings();
   if (!isSyncEnabled(settings) || settings["sync.autoDownload"] !== true) {
     return;
   }
-  await runFullSync();
+  await runFullSync(settings["sync.autoUpload"] === true);
 }
 
 /**
@@ -160,8 +162,10 @@ export async function retryPendingUploads(): Promise<void> {
  * from a "skip upload" key import cannot leak through the save path. The
  * guards also cover the case where the caller hands us an old session.
  *
- * Failures are contained because `saveTabs` awaits this hook before closing
- * tabs; a sync problem must not undo a successful local save.
+ * The session is marked `pendingUpload` before the network attempt, so an
+ * interrupted service worker still leaves work for the retry alarm. Failures
+ * are contained: the save flow has already closed the tabs and must not undo a
+ * successful local save.
  */
 export async function syncSavedSession(session: Session): Promise<void> {
   if (session.incognito || session.syncExcluded) return;
@@ -169,7 +173,13 @@ export async function syncSavedSession(session: Session): Promise<void> {
   try {
     const settings = await loadSettings();
     if (!isSyncEnabled(settings) || settings["sync.autoUpload"] !== true) return;
-    await enqueueUpload(session);
+
+    await updateSession(session.id, {
+      pendingUpload: true,
+      updatedAt: session.updatedAt,
+    });
+    // Carry the flag in the passed object too: a successful PUT clears it.
+    await enqueueUpload({ ...session, pendingUpload: true });
   } catch (error) {
     console.error("[savetabs] failed to upload the saved session", error);
   }
@@ -203,7 +213,50 @@ export async function deleteAllCloudData(): Promise<void> {
     if (!(error instanceof SyncHttpError && error.status === 404)) throw error;
   }
 
-  // The settings listener in the background clears the retry alarm when this
-  // change lands.
-  await saveSetting("sync.enabled", false);
+  // The setting must be on disk before success is reported: a crash between
+  // the delete and a debounced write would let the retry alarm recreate the
+  // cloud data. Clearing the alarm here also covers a worker that is about to
+  // be suspended before its settings listener runs.
+  await saveSettingNow("sync.enabled", false);
+  await browser.alarms.clear(SYNC_RETRY_ALARM_NAME);
+}
+
+/** How the previous key's cloud data was handled during rotation. */
+export type OldDataRevocation = "deleted" | "failed" | "none";
+
+export type RotateKeyResult = {
+  /** The new key in canonical form; already persisted. */
+  key: string;
+  revocation: OldDataRevocation;
+};
+
+/**
+ * Rotate the sync key and revoke the old key's cloud data.
+ *
+ * The new key and its "upload" rebind decision are stored first, so a failed
+ * revocation never rolls the rotation back. Deleting the old data is
+ * best-effort: a 404 means it was already gone, and any other failure is
+ * reported in the result instead of thrown. The old key is never logged.
+ */
+export async function rotateSyncKey(): Promise<RotateKeyResult> {
+  const oldKey = await getKey();
+  const key = await rotateKey();
+
+  if (oldKey === undefined) return { key, revocation: "none" };
+
+  try {
+    const derived = await deriveKeys(parseKey(oldKey));
+    const client = new SyncClient(API_BASE, derived.authId, derived.authKey);
+    await client.deleteAll();
+    return { key, revocation: "deleted" };
+  } catch (error) {
+    if (error instanceof SyncHttpError && error.status === 404) {
+      return { key, revocation: "deleted" };
+    }
+    console.error(
+      "[savetabs] failed to delete cloud data for the previous key",
+      error,
+    );
+    return { key, revocation: "failed" };
+  }
 }

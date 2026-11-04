@@ -57,6 +57,7 @@ describe("importSessionsFile", () => {
       title: "Work",
       pendingUpload: true,
       incognito: true,
+      syncExcluded: true,
       tabs: [
         {
           url: "https://example.com/a",
@@ -162,7 +163,7 @@ describe("importSessionsFile", () => {
     }
   });
 
-  it("keeps a session whose tabs were all malformed as an empty session", () => {
+  it("rejects a session whose tabs are all unrestorable", async () => {
     const result = importSessionsFile(
       sessionsFile([
         {
@@ -177,8 +178,58 @@ describe("importSessionsFile", () => {
       NOW,
     );
 
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.errors).toEqual([
+        "sessions[0].tabs: must contain at least one restorable URL",
+      ]);
+    }
+    expect(result).not.toHaveProperty("merged");
+  });
+
+  it("rejects a session with an empty tab list instead of merging it", async () => {
+    const local = makeSession({ id: "local", updatedAt: 1 });
+
+    const result = importSessionsFile(
+      sessionsFile([
+        {
+          id: "local",
+          createdAt: 1,
+          updatedAt: 2,
+          source: "window",
+          tabs: [],
+        },
+      ]),
+      [local],
+      NOW,
+    );
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.errors.join(" ")).toContain("at least one restorable URL");
+    }
+  });
+
+  it("preserves the local-only syncExcluded flag", () => {
+    const imported = makeSession({ id: "excluded", syncExcluded: true });
+    const plain = makeSession({ id: "plain", syncExcluded: false });
+
+    const result = importSessionsFile(
+      sessionsFile([imported, plain]),
+      [],
+      NOW,
+    );
+
     expect(result.ok).toBe(true);
-    if (result.ok) expect(result.merged[0]?.tabs).toEqual([]);
+    if (result.ok) {
+      expect(
+        result.merged.find((session) => session.id === "excluded")
+          ?.syncExcluded,
+      ).toBe(true);
+      expect(
+        result.merged.find((session) => session.id === "plain")?.syncExcluded,
+      ).toBe(false);
+    }
   });
 
   it("rejects malformed JSON and wrong headers", () => {

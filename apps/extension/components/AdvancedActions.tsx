@@ -21,7 +21,7 @@ import { exportSessionsFile, importSessionsFile } from "../lib/sessions-export";
 import {
   LocalQuotaError,
   addSession,
-  deleteSession,
+  clearAllSessionsLocal,
   getUsage,
   listSessions,
   onSessionsChanged,
@@ -29,7 +29,7 @@ import {
   type SessionsUsage,
 } from "../lib/sessions-repo";
 import { exportSettingsFile, importSettingsFile } from "../lib/settings-export";
-import { resetSettings, saveSetting } from "../lib/settings";
+import { loadSettings, resetSettings, saveSetting } from "../lib/settings";
 import { ConfirmDialog } from "./ConfirmDialog";
 
 export const SETTINGS_EXPORT_FILENAME = "savetabs-settings.json";
@@ -155,12 +155,27 @@ export function AdvancedActions({ settings, t }: AdvancedActionsProps) {
       }
 
       // The file was fully validated, so every write below is schema-valid.
-      for (const [key, value] of Object.entries(result.settings)) {
+      // Enabling sync is never applied from a file: that flow confirms the
+      // user saved the key, so the imported value is replaced by the current
+      // one and the UI explains how to turn sync on.
+      const current = await loadSettings();
+      const importedEnabled = result.settings["sync.enabled"] === true;
+      const syncStaysOff =
+        importedEnabled && current["sync.enabled"] !== true;
+      const imported = {
+        ...result.settings,
+        "sync.enabled": current["sync.enabled"] === true,
+      };
+
+      for (const [key, value] of Object.entries(imported)) {
         await saveSetting(key, value);
       }
       setStatus({
         kind: "success",
         message: t("settings.advanced.importSettingsSuccess"),
+        ...(syncStaysOff
+          ? { details: [t("settings.advanced.importSettingsSyncStaysOff")] }
+          : {}),
       });
     } catch (error) {
       setStatus({
@@ -227,6 +242,7 @@ export function AdvancedActions({ settings, t }: AdvancedActionsProps) {
               updatedAt: session.updatedAt,
               pendingUpload: session.pendingUpload,
               incognito: session.incognito,
+              syncExcluded: session.syncExcluded,
             });
             updated += 1;
           }
@@ -286,8 +302,9 @@ export function AdvancedActions({ settings, t }: AdvancedActionsProps) {
   async function confirmClear(): Promise<void> {
     setDialog(null);
     try {
-      const sessions = await listSessions();
-      for (const session of sessions) await deleteSession(session.id);
+      // Local clear only: writing tombstones would delete the cloud copies on
+      // the next sync, which this action must not do silently.
+      await clearAllSessionsLocal();
       await refreshUsage();
       setStatus({
         kind: "success",

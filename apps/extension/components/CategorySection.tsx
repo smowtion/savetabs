@@ -30,6 +30,7 @@ import { copyText } from "../lib/clipboard-write";
 import { EXTENSIONS_PAGE_PATH, isIncognitoAllowed } from "../lib/incognito";
 import type { SettingValue } from "../lib/settings";
 import { AdvancedActions } from "./AdvancedActions";
+import { DiscardNowButton } from "./DiscardNowButton";
 import { NumberInput } from "./NumberInput";
 import { Select } from "./Select";
 import { SettingRow, settingControlId } from "./SettingRow";
@@ -59,7 +60,7 @@ export type CategorySectionProps = {
   onChange: (key: string, value: SettingValue) => void | Promise<void>;
   /** Optional per-setting veto; see {@link SettingChangeGuard}. */
   beforeChange?: SettingChangeGuard;
-  /** False on browsers without `tabs.discard` (Firefox builds). */
+  /** False when the browser does not expose `tabs.discard`. */
   discardSupported: boolean;
 };
 
@@ -411,6 +412,23 @@ export function CategorySection({
 
   const memoryDisabled = categoryId === "memory" && !discardSupported;
 
+  if (categoryId === "memory") {
+    return (
+      <div className="flex flex-col gap-3">
+        <SettingsList
+          settings={settings}
+          values={values}
+          t={t}
+          onChange={onChange}
+          beforeChange={beforeChange}
+          disabled={memoryDisabled}
+          note={memoryDisabled ? t("options.memoryUnsupported") : undefined}
+        />
+        <DiscardNowButton t={t} disabled={!discardSupported} />
+      </div>
+    );
+  }
+
   return (
     <SettingsList
       settings={settings}
@@ -418,8 +436,6 @@ export function CategorySection({
       t={t}
       onChange={onChange}
       beforeChange={beforeChange}
-      disabled={memoryDisabled}
-      note={memoryDisabled ? t("options.memoryUnsupported") : undefined}
     />
   );
 }

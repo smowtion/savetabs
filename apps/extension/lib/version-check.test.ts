@@ -22,6 +22,7 @@ import {
   currentBrowser,
   ensureVersionCheckAlarm,
   readUpdateState,
+  reconcileUpdateState,
   runVersionCheck,
   storeListingUrl,
 } from "./version-check";
@@ -305,7 +306,8 @@ describe("runVersionCheck", () => {
       updateAvailable: true,
       latestVersion: "9.9.9",
     });
-    expect(consoleSpy).toHaveBeenCalled();
+    // The underlying cause is logged, not just a generic failure message.
+    expect(String(consoleSpy.mock.calls[0]?.[1])).toContain("network down");
   });
 
   it("logs a storage failure without throwing", async () => {
@@ -323,6 +325,60 @@ describe("runVersionCheck", () => {
       updateAvailable: true,
     });
     expect(consoleSpy).toHaveBeenCalled();
+  });
+});
+
+describe("reconcileUpdateState", () => {
+  it("clears a flag the installed version already satisfies", async () => {
+    stubVersion("2.0.0");
+    await fakeBrowser.storage.local.set({
+      [UPDATE_AVAILABLE_STORAGE_KEY]: true,
+      [LATEST_VERSION_STORAGE_KEY]: "2.0.0",
+    });
+
+    await expect(reconcileUpdateState()).resolves.toBe(true);
+
+    await expect(readUpdateState()).resolves.toEqual({
+      updateAvailable: false,
+      latestVersion: "2.0.0",
+    });
+  });
+
+  it("keeps a flag for a genuinely newer published version", async () => {
+    stubVersion("2.0.0");
+    await fakeBrowser.storage.local.set({
+      [UPDATE_AVAILABLE_STORAGE_KEY]: true,
+      [LATEST_VERSION_STORAGE_KEY]: "2.1.0",
+    });
+
+    await expect(reconcileUpdateState()).resolves.toBe(false);
+
+    await expect(readUpdateState()).resolves.toEqual({
+      updateAvailable: true,
+      latestVersion: "2.1.0",
+    });
+  });
+
+  it("clears a flag that cannot be verified", async () => {
+    stubVersion("not-a-version");
+    await fakeBrowser.storage.local.set({
+      [UPDATE_AVAILABLE_STORAGE_KEY]: true,
+      [LATEST_VERSION_STORAGE_KEY]: "2.0.0",
+    });
+
+    await expect(reconcileUpdateState()).resolves.toBe(true);
+    await expect(readUpdateState()).resolves.toMatchObject({
+      updateAvailable: false,
+    });
+  });
+
+  it("does nothing when no update is recorded", async () => {
+    stubVersion("1.0.0");
+    const setSpy = vi.spyOn(fakeBrowser.storage.local, "set");
+
+    await expect(reconcileUpdateState()).resolves.toBe(false);
+
+    expect(setSpy).not.toHaveBeenCalled();
   });
 });
 

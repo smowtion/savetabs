@@ -1,5 +1,6 @@
 import {
   DEFAULT_SETTINGS,
+  SyncAuthError,
   type SavedTab,
   type Session,
   type Settings,
@@ -11,7 +12,7 @@ import { handleUiMessage, type UiResponse } from "./messages";
 import type { SaveTabsResult } from "./save-flow";
 import { SESSIONS_DB_NAME, closeSessionsDb } from "./sessions-db";
 import { addSession, getSession, listSessions } from "./sessions-repo";
-import { enqueueUpload } from "./sync/sync-service";
+import { enqueueUpload, syncNow } from "./sync/sync-service";
 
 vi.mock("./sync/sync-service", () => ({
   enqueueUpload: vi.fn(),
@@ -19,6 +20,7 @@ vi.mock("./sync/sync-service", () => ({
 }));
 
 const enqueueUploadMock = vi.mocked(enqueueUpload);
+const syncNowMock = vi.mocked(syncNow);
 
 function settingsWith(overrides: Settings = {}): Settings {
   return { ...DEFAULT_SETTINGS, ...overrides };
@@ -80,6 +82,12 @@ beforeEach(async () => {
   fakeBrowser.reset();
   vi.clearAllMocks();
   enqueueUploadMock.mockResolvedValue(undefined);
+  syncNowMock.mockResolvedValue({
+    uploaded: 0,
+    downloaded: 0,
+    deleted: 0,
+    errors: [],
+  });
   await closeSessionsDb();
   await deleteDatabase();
 });
@@ -131,11 +139,15 @@ describe("handleUiMessage", () => {
     });
     const data = expectOk(response) as SaveTabsResult;
 
-    expect(enqueueUploadMock).toHaveBeenCalledTimes(1);
+    // The upload is fired after the save flow returns, so wait for it.
+    await vi.waitFor(() => {
+      expect(enqueueUploadMock).toHaveBeenCalledTimes(1);
+    });
     const uploaded = enqueueUploadMock.mock.calls[0]?.[0];
     expect(uploaded?.id).toBe(data.session?.id);
     expect(uploaded?.id).not.toBe("excluded");
     expect(uploaded?.syncExcluded).toBeUndefined();
+    expect(uploaded?.pendingUpload).toBe(true);
   });
 
   it("does not upload a save when auto-upload is off", async () => {
@@ -301,10 +313,44 @@ describe("handleUiMessage", () => {
     expect(expectOk(response)).toEqual({ discarded: 0 });
   });
 
-  it("reports SYNC_NOW as not implemented", async () => {
+  it("runs a full sync for SYNC_NOW", async () => {
+    syncNowMock.mockResolvedValue({
+      uploaded: 2,
+      downloaded: 1,
+      deleted: 3,
+      errors: [],
+    });
+
     const response = await handleUiMessage({ type: "SYNC_NOW" });
 
-    expect(response).toEqual({ ok: false, code: "not_implemented" });
+    expect(expectOk(response)).toEqual({
+      uploaded: 2,
+      downloaded: 1,
+      deleted: 3,
+      errors: [],
+    });
+    expect(syncNowMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("reports a rejected sync key as unauthorized", async () => {
+    syncNowMock.mockRejectedValue(new SyncAuthError("The key was rejected."));
+
+    const response = await handleUiMessage({ type: "SYNC_NOW" });
+
+    expect(response).toEqual({
+      ok: false,
+      code: "unauthorized",
+      message: "The key was rejected.",
+    });
+  });
+
+  it("wraps other SYNC_NOW failures in a generic error", async () => {
+    syncNowMock.mockRejectedValue(new Error("network down"));
+
+    const response = await handleUiMessage({ type: "SYNC_NOW" });
+
+    expect(response).toMatchObject({ ok: false, code: "error" });
+    if (!response.ok) expect(response.message).toContain("network down");
   });
 
   it("reports unknown message types as not implemented", async () => {

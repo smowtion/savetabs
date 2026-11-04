@@ -13,7 +13,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { API_BASE } from "../config";
 import { SESSIONS_DB_NAME, closeSessionsDb } from "../sessions-db";
 import { addSession, listSessions } from "../sessions-repo";
-import { loadSettings, resetSettings } from "../settings";
+import {
+  SETTINGS_STORAGE_KEY,
+  loadSettings,
+  resetSettings,
+} from "../settings";
 import { SYNC_KEY_REBIND_STORAGE_KEY, SYNC_KEY_STORAGE_KEY } from "./key-store";
 import {
   SYNC_LAST_AT_STORAGE_KEY,
@@ -23,6 +27,7 @@ import {
   deleteAllCloudData,
   readLastSyncAt,
   retryPendingUploads,
+  rotateSyncKey,
   syncOnStartup,
   syncSavedSession,
 } from "./sync-lifecycle";
@@ -131,7 +136,20 @@ describe("syncOnStartup", () => {
 
     await syncOnStartup();
 
-    expect(syncNowMock).toHaveBeenCalledTimes(1);
+    expect(syncNowMock).toHaveBeenCalledWith({ allowUpload: true });
+    await expect(readLastSyncAt()).resolves.toEqual(expect.any(Number));
+  });
+
+  it("honors sync.autoUpload=false during the startup merge", async () => {
+    await seedSettings({
+      "sync.enabled": true,
+      "sync.autoDownload": true,
+      "sync.autoUpload": false,
+    });
+
+    await syncOnStartup();
+
+    expect(syncNowMock).toHaveBeenCalledWith({ allowUpload: false });
     await expect(readLastSyncAt()).resolves.toEqual(expect.any(Number));
   });
 
@@ -273,7 +291,24 @@ describe("syncSavedSession", () => {
     await syncSavedSession(session);
 
     expect(enqueueUploadMock).toHaveBeenCalledTimes(1);
-    expect(enqueueUploadMock).toHaveBeenCalledWith(session);
+    // The flag is carried into the upload so success clears it afterwards.
+    expect(enqueueUploadMock).toHaveBeenCalledWith({
+      ...session,
+      pendingUpload: true,
+    });
+  });
+
+  it("marks the session for retry before attempting the upload", async () => {
+    await seedSettings({ "sync.enabled": true, "sync.autoUpload": true });
+    const session = makeSession("new-session");
+    await addSession(session);
+
+    await syncSavedSession(session);
+
+    const stored = (await listSessions()).find(
+      (candidate) => candidate.id === "new-session",
+    );
+    expect(stored?.pendingUpload).toBe(true);
   });
 
   it("skips when auto-upload is off", async () => {
@@ -331,6 +366,9 @@ describe("readLastSyncAt", () => {
 describe("deleteAllCloudData", () => {
   it("deletes cloud data, turns sync off and keeps local sessions", async () => {
     await seedSettings({ "sync.enabled": true });
+    await fakeBrowser.alarms.create(SYNC_RETRY_ALARM_NAME, {
+      periodInMinutes: SYNC_RETRY_PERIOD_MINUTES,
+    });
     await addSession(makeSession("local"));
     await addSession(makeSession("excluded", { syncExcluded: true }));
     const key = generateKey();
@@ -353,6 +391,10 @@ describe("deleteAllCloudData", () => {
     await expect(loadSettings()).resolves.toMatchObject({
       "sync.enabled": false,
     });
+    // The write is flushed, not merely staged: a crash right after the success
+    // response must not leave sync enabled on disk.
+    const raw = await fakeBrowser.storage.local.get(SETTINGS_STORAGE_KEY);
+    expect((raw[SETTINGS_STORAGE_KEY] as Settings)["sync.enabled"]).toBe(false);
 
     const stored = await listSessions();
     expect(stored).toHaveLength(2);
@@ -360,6 +402,11 @@ describe("deleteAllCloudData", () => {
     expect(
       stored.find((session) => session.id === "excluded")?.syncExcluded,
     ).toBe(true);
+
+    // The retry alarm must not survive a "delete cloud data" success.
+    await expect(
+      fakeBrowser.alarms.get(SYNC_RETRY_ALARM_NAME),
+    ).resolves.toBeUndefined();
   });
 
   it("treats a 404 as success and still turns sync off", async () => {
@@ -408,5 +455,91 @@ describe("deleteAllCloudData", () => {
 
     await expect(deleteAllCloudData()).rejects.toBeInstanceOf(SyncAuthError);
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("rotateSyncKey", () => {
+  it("stores the new key and deletes the old key's cloud data", async () => {
+    const oldKey = generateKey();
+    await fakeBrowser.storage.local.set({ [SYNC_KEY_STORAGE_KEY]: oldKey });
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await rotateSyncKey();
+
+    const oldDerived = await deriveKeys(parseKey(oldKey));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0]?.[0]).toBe(
+      `${API_BASE}/v1/keys/${oldDerived.authId}`,
+    );
+    expect((fetchMock.mock.calls[0]?.[1] as RequestInit).method).toBe("DELETE");
+    expect(result.revocation).toBe("deleted");
+    expect(result.key).not.toBe(oldKey);
+
+    const stored = await fakeBrowser.storage.local.get([
+      SYNC_KEY_STORAGE_KEY,
+      SYNC_KEY_REBIND_STORAGE_KEY,
+    ]);
+    expect(stored[SYNC_KEY_STORAGE_KEY]).toBe(result.key);
+    expect(stored[SYNC_KEY_REBIND_STORAGE_KEY]).toBe("upload");
+  });
+
+  it("treats a 404 for the old key as already deleted", async () => {
+    await fakeBrowser.storage.local.set({
+      [SYNC_KEY_STORAGE_KEY]: generateKey(),
+    });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>().mockResolvedValue(
+        new Response(JSON.stringify({ error: { code: "not_found" } }), {
+          status: 404,
+        }),
+      ),
+    );
+
+    const result = await rotateSyncKey();
+
+    expect(result.revocation).toBe("deleted");
+  });
+
+  it("keeps the rotation when revoking the old data fails", async () => {
+    const oldKey = generateKey();
+    await fakeBrowser.storage.local.set({ [SYNC_KEY_STORAGE_KEY]: oldKey });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>().mockRejectedValue(new Error("offline")),
+    );
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const result = await rotateSyncKey();
+
+    expect(result.revocation).toBe("failed");
+    const stored = await fakeBrowser.storage.local.get([
+      SYNC_KEY_STORAGE_KEY,
+      SYNC_KEY_REBIND_STORAGE_KEY,
+    ]);
+    expect(stored[SYNC_KEY_STORAGE_KEY]).toBe(result.key);
+    expect(stored[SYNC_KEY_REBIND_STORAGE_KEY]).toBe("upload");
+    // The failure is logged without ever including the key itself.
+    const logged = JSON.stringify(consoleSpy.mock.calls);
+    expect(logged).not.toContain(oldKey);
+    expect(logged).not.toContain(result.key);
+  });
+
+  it("does not contact the server when no key was stored", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await rotateSyncKey();
+
+    expect(result.revocation).toBe("none");
+    expect(fetchMock).not.toHaveBeenCalled();
+    await expect(
+      fakeBrowser.storage.local.get(SYNC_KEY_STORAGE_KEY),
+    ).resolves.toEqual({
+      [SYNC_KEY_STORAGE_KEY]: result.key,
+    });
   });
 });

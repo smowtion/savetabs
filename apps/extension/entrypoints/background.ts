@@ -49,6 +49,7 @@ import {
 import {
   VERSION_CHECK_ALARM_NAME,
   ensureVersionCheckAlarm,
+  reconcileUpdateState,
   runVersionCheck,
 } from "../lib/version-check";
 
@@ -92,12 +93,19 @@ async function refreshUpdateState(): Promise<void> {
  * Install and startup restore settings, drop stale tab activity and make sure
  * a sync key is available. A fresh key never enables sync by itself. Startup
  * additionally runs the auto-download merge, which contains its own failures.
+ *
+ * Install, update and startup all reconcile the recorded update state first:
+ * after a self-update the old version's "update available" badge must not stay
+ * up until the next daily check.
  */
 async function initialize(runStartupSync = false): Promise<void> {
   await applyCurrentSettings();
   await pruneActivity();
   await getOrCreateKey();
   await ensureVersionCheckAlarm();
+  if (await reconcileUpdateState()) {
+    await updateBadge(await loadSettings());
+  }
   if (runStartupSync) await syncOnStartup();
 }
 

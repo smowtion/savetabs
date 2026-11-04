@@ -11,9 +11,10 @@
  * `discardNow` backs the explicit "Discard now" action and skips the idle
  * threshold, but keeps every other guard.
  *
- * Firefox builds without `tabs.discard` report `isDiscardSupported() === false`;
- * every entry point then no-ops so the UI can hide the feature instead of
- * offering a dead control.
+ * Firefox has supported `tabs.discard` since version 47, but the API is still
+ * feature-detected: a browser without it reports
+ * `isDiscardSupported() === false` and every entry point no-ops so the UI can
+ * hide the feature instead of offering a dead control.
  */
 
 import {
@@ -52,8 +53,9 @@ type KeyValueStorage = {
 };
 
 /**
- * True when the browser implements `tabs.discard`. Firefox has no such API,
- * so the rest of the module must treat every discard call as unavailable.
+ * True when the browser implements `tabs.discard` (Firefox has supported it
+ * since version 47). The rest of the module must treat every discard call as
+ * unavailable when this returns false.
  */
 export function isDiscardSupported(): boolean {
   const tabs = browser.tabs as unknown as { discard?: unknown };

@@ -182,7 +182,10 @@
       "keepPinned": {
         "label": "Giữ tab ghim",
         "description": "Không bao giờ giải phóng tab ghim."
-      }
+      },
+      "discardNow": "Giải phóng ngay",
+      "discardNowSuccess": "Đã giải phóng {count} tab.",
+      "discardNowFailed": "Không thể giải phóng tab: {message}"
     },
     "shortcuts": {
       "label": "Phím tắt",
@@ -255,11 +258,13 @@
       "importSkipped": "Đã nhập khóa. Các phiên cục bộ sẽ không được tải lên.",
       "rotateKey": "Xoay khóa",
       "rotateTitle": "Xoay khóa đồng bộ",
-      "rotateWarning": "Xoay khóa sẽ tạo khóa mới. Dữ liệu trên đám mây được mã hóa bằng khóa cũ sẽ không thể đọc được và không thể khôi phục.",
+      "rotateWarning": "Xoay khóa sẽ tạo khóa mới và cố gắng xóa dữ liệu trên đám mây được mã hóa bằng khóa cũ. Các phiên cục bộ sẽ được tải lên dưới khóa mới.",
       "rotateConfirmLabel": "Nhập ROTATE để xác nhận",
       "rotateConfirmPlaceholder": "ROTATE",
       "rotateConfirm": "Tạo khóa mới",
       "rotateSuccess": "Đã tạo khóa mới. Các phiên cục bộ sẽ được tải lên dưới khóa này.",
+      "rotateSuccessRevoked": "Đã tạo khóa mới. Dữ liệu đám mây cũ đã được xóa. Các phiên cục bộ sẽ được tải lên dưới khóa mới.",
+      "rotateSuccessRevokeFailed": "Đã tạo khóa mới nhưng không thể xóa dữ liệu đám mây cũ. Các phiên cục bộ sẽ được tải lên dưới khóa mới.",
       "loseKeyWarning": "Nếu mất khóa này, dữ liệu đã đồng bộ của bạn sẽ không thể khôi phục.",
       "onlyCredentialWarning": "Khóa này là thông tin xác thực duy nhất cho dữ liệu đồng bộ của bạn. Bất kỳ ai có khóa đều có thể đọc, thay đổi hoặc xóa dữ liệu đó.",
       "actionFailed": "Thao tác thất bại: {message}",
@@ -296,6 +301,7 @@
       "sessionsPlaintextWarning": "Tệp xuất phiên chứa tiêu đề và URL dạng văn bản thuần. Hãy lưu tệp ở nơi riêng tư.",
       "exportSuccess": "Đã xuất {filename}.",
       "importSettingsSuccess": "Đã nhập cài đặt.",
+      "importSettingsSyncStaysOff": "Đồng bộ vẫn tắt sau khi nhập cài đặt. Hãy bật từ công tắc; quy trình đó sẽ xác nhận khóa của bạn.",
       "importSettingsFailed": "Nhập cài đặt thất bại:",
       "importSessionsSuccess": "Đã nhập {added} phiên và cập nhật {updated}.",
       "importSessionsPartial": "Đã nhập {added} phiên và cập nhật {updated}. Một số phiên không thể lưu:",
@@ -306,7 +312,7 @@
       "resetConfirm": "Đặt lại cài đặt",
       "resetSuccess": "Đã đặt lại cài đặt về mặc định.",
       "clearTitle": "Xóa tất cả phiên cục bộ?",
-      "clearMessage": "Mọi phiên đã lưu trên thiết bị này sẽ bị xóa vĩnh viễn. Hãy xuất bản sao lưu trước nếu cần.",
+      "clearMessage": "Mọi phiên đã lưu trên thiết bị này sẽ bị xóa vĩnh viễn. Các phiên đã đồng bộ lên đám mây không bị xóa và có thể được tải xuống lại trong lần đồng bộ tiếp theo. Hãy xuất bản sao lưu trước nếu cần.",
       "clearConfirm": "Xóa phiên",
       "clearSuccess": "Đã xóa tất cả phiên cục bộ."
     },
@@ -438,6 +444,7 @@
     "renameSuccess": "Đã đổi tên phiên.",
     "restoreSuccess": "Đã khôi phục {count} tab.",
     "saveSuccess": "Đã lưu {count} tab.",
+    "saveOverflow": "Đã lưu {saved} tab; {overflow} tab được giữ mở (giới hạn phiên).",
     "saveEmpty": "Không có tab nào để lưu.",
     "copySuccess": "Đã sao chép {count} tab vào bộ nhớ tạm.",
     "copyFailed": "Không thể sao chép các tab.",
@@ -501,7 +508,7 @@
         },
         "delete": {
           "title": "Xóa dữ liệu của bạn",
-          "body": "Các phiên cục bộ nằm trong trình duyệt cho đến khi bạn xóa chúng trong tiện ích; xóa dữ liệu của tiện ích hoặc gỡ cài đặt cũng xóa chúng. Để xóa toàn bộ dữ liệu đám mây của một khóa đồng bộ, mở tiện ích, vào Cài đặt → Đồng bộ và chọn Xóa dữ liệu đám mây. Thao tác này xóa các phiên đã mã hóa, đánh dấu xóa và bản ghi khóa của khóa đó, đồng thời tắt đồng bộ để các phiên cục bộ không bị tải lên lại. Xoay khóa đồng bộ không xóa dữ liệu được lưu dưới khóa cũ; hãy nhập lại khóa cũ và dùng Xóa dữ liệu đám mây nếu bạn muốn xóa dữ liệu đó."
+          "body": "Các phiên cục bộ nằm trong trình duyệt cho đến khi bạn xóa chúng trong tiện ích; xóa dữ liệu của tiện ích hoặc gỡ cài đặt cũng xóa chúng. Để xóa toàn bộ dữ liệu đám mây của một khóa đồng bộ, mở tiện ích, vào Cài đặt → Đồng bộ và chọn Xóa dữ liệu đám mây. Thao tác này xóa các phiên đã mã hóa, đánh dấu xóa và bản ghi khóa của khóa đó, đồng thời tắt đồng bộ để các phiên cục bộ không bị tải lên lại. Xoay khóa đồng bộ cũng xóa dữ liệu được lưu dưới khóa cũ; nếu việc xóa thất bại, hãy nhập lại khóa cũ và dùng Xóa dữ liệu đám mây."
         },
         "analytics": {
           "title": "Không phân tích, không bên thứ ba",
@@ -530,7 +537,7 @@
       "copyFailed": "Không thể sao chép các tab.",
       "export": "Xuất JSON",
       "exportSuccess": "Đã xuất {filename}.",
-      "exportFailed": "Không thể xuất phiên.",
+      "exportFailed": "Không thể xuất phiên: {message}",
       "delete": "Xóa",
       "deleteTitle": "Xóa phiên này?",
       "deleteMessage": "Phiên này sẽ bị xóa vĩnh viễn. Không thể hoàn tác.",
@@ -539,6 +546,12 @@
       "deleteFailed": "Không thể xóa phiên: {message}",
       "authError": "Khóa đồng bộ bị từ chối. Hãy nhập lại khóa để tiếp tục.",
       "changeKey": "Đổi khóa",
+      "forgetKey": "Quên khóa",
+      "forgetKeyTitle": "Quên khóa đồng bộ?",
+      "forgetKeyMessage": "Khóa sẽ bị xóa khỏi trình duyệt này. Dữ liệu đã đồng bộ vẫn nằm trên máy chủ và có thể mở lại bằng cách nhập khóa sau.",
+      "forgetKeyConfirm": "Quên khóa",
+      "home": "Trang chủ",
+      "privacy": "Quyền riêng tư",
       "decryptError": "Một số phiên không thể giải mã và đã bị bỏ qua ({count}).",
       "loadFailed": "Không thể tải các phiên đã lưu.",
       "noTabs": "Phiên này không có tab nào."

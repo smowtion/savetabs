@@ -14,6 +14,7 @@ import { browser } from "wxt/browser";
 
 import {
   addSessionRecord,
+  clearSessionRecords,
   deleteSessionRecord,
   getAllSessions,
   getAllTombstones,
@@ -167,6 +168,10 @@ export async function addSession(session: Session): Promise<Session> {
  * unless the patch supplies its own value. Returns undefined when the session
  * does not exist.
  *
+ * `undefined` patch values are ignored instead of clearing stored fields: an
+ * import that omits `incognito`, `pendingUpload` or `syncExcluded` must not
+ * silently drop those local-only flags.
+ *
  * Patches may replace tabs; the update is rejected with `LocalQuotaError` when
  * the resulting total tab count would exceed `LIMITS.maxLocalTabs`, leaving
  * the stored session unchanged.
@@ -175,16 +180,20 @@ export async function updateSession(
   id: string,
   patch: SessionPatch,
 ): Promise<Session | undefined> {
+  const definedPatch = Object.fromEntries(
+    Object.entries(patch).filter(([, value]) => value !== undefined),
+  ) as SessionPatch;
+
   const database = await openSessionsDb();
   const result = await updateSessionRecord(
     database,
     id,
     (current) => ({
       ...current,
-      ...patch,
+      ...definedPatch,
       id: current.id,
       createdAt: current.createdAt,
-      updatedAt: patch.updatedAt ?? Date.now(),
+      updatedAt: definedPatch.updatedAt ?? Date.now(),
     }),
     LIMITS.maxLocalTabs,
   );
@@ -209,6 +218,18 @@ export async function deleteSession(
 ): Promise<void> {
   const database = await openSessionsDb();
   await deleteSessionRecord(database, id, { id, deletedAt: now }, now);
+  await notifySessionsChanged();
+}
+
+/**
+ * Delete every local session without writing tombstones. This is the
+ * "Clear local sessions" path: cloud copies are deliberately kept, so a later
+ * sync can download them again. Use `deleteSession` for a real deletion that
+ * must propagate to other devices.
+ */
+export async function clearAllSessionsLocal(): Promise<void> {
+  const database = await openSessionsDb();
+  await clearSessionRecords(database);
   await notifySessionsChanged();
 }
 

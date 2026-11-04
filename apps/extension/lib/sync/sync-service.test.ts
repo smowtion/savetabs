@@ -269,21 +269,16 @@ describe("enqueueUpload", () => {
     });
   });
 
-  it("strips syncExcluded from the encrypted payload", async () => {
-    const { client, derived, service } = await createHarness();
+  it("never uploads a session excluded by a key import", async () => {
+    const { client, createClient, repo, service } = await createHarness();
     const session = makeSession({ id: "session-1", syncExcluded: true });
+    repo.seed(session);
 
     await service.enqueueUpload(session);
 
-    expect(client.puts).toHaveLength(1);
-    const decrypted = await decryptSession(
-      derived.encKey,
-      derived.authId,
-      "session-1",
-      client.puts[0]!.ciphertext,
-    );
-    expect(decrypted).not.toHaveProperty("syncExcluded");
-    expect(decrypted).toMatchObject({ id: "session-1" });
+    expect(createClient).not.toHaveBeenCalled();
+    expect(client.puts).toEqual([]);
+    expect(repo.patches).toEqual([]);
   });
 
   it("marks a session pendingUpload when the network fails", async () => {
@@ -409,6 +404,57 @@ describe("syncNow", () => {
     });
     expect(result.errors).toEqual(["server error"]);
     expect(client.puts).toEqual([]);
+  });
+
+  it("skips uploads and tombstone pushes when allowUpload is false", async () => {
+    const { client, derived, repo, service } = await createHarness();
+    repo.seed(makeSession({ id: "local", updatedAt: 100 }));
+    repo.tombstones.set("deleted", { id: "deleted", deletedAt: NOW - DAY_MS });
+    const remote = makeSession({ id: "remote", updatedAt: 50 });
+    client.pages = [[await encryptedBlob(remote, derived)]];
+
+    const result = await service.syncNow({ allowUpload: false });
+
+    expect(result).toMatchObject({ uploaded: 0, downloaded: 1, deleted: 0 });
+    expect(result.errors).toEqual([]);
+    expect(client.puts).toEqual([]);
+    expect(client.deletedIds).toEqual([]);
+    // The remote copy still merged into the local store.
+    expect(repo.sessions.get("remote")).toBeDefined();
+    expect(repo.sessions.get("local")).toMatchObject({ updatedAt: 100 });
+  });
+
+  it("keeps an upload rebind pending when the download phase fails", async () => {
+    const { client, repo, service, pendingRebind } = await createHarness({
+      rebind: "upload",
+    });
+    repo.seed(makeSession({ id: "local", updatedAt: 100 }));
+    client.blobsError = new SyncHttpError(500, "internal_error", "server error");
+
+    const first = await service.syncNow();
+
+    expect(first.errors).toHaveLength(1);
+    // The force-upload promise survives for the next successful run.
+    expect(pendingRebind()).toBe("upload");
+
+    client.blobsError = null;
+    const second = await service.syncNow();
+
+    expect(second.uploaded).toBe(1);
+    expect(client.puts.map((put) => put.id)).toEqual(["local"]);
+    expect(pendingRebind()).toBeUndefined();
+  });
+
+  it("leaves an upload rebind pending when uploads are disallowed", async () => {
+    const { client, repo, service, pendingRebind } = await createHarness({
+      rebind: "upload",
+    });
+    repo.seed(makeSession({ id: "local", updatedAt: 100 }));
+
+    await service.syncNow({ allowUpload: false });
+
+    expect(client.puts).toEqual([]);
+    expect(pendingRebind()).toBe("upload");
   });
 
   it("applies remote tombstones newer than the local session", async () => {

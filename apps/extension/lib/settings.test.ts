@@ -195,6 +195,40 @@ describe("saveSetting", () => {
   });
 });
 
+describe("saveSettingNow", () => {
+  it("writes immediately and folds in pending debounced changes", async () => {
+    await settingsStore.saveSetting("general.theme", "dark");
+    const setSpy = vi.spyOn(fakeBrowser.storage.local, "set");
+
+    await settingsStore.saveSettingNow("sync.enabled", true);
+
+    expect(setSpy).toHaveBeenCalledWith({
+      settings: expect.objectContaining({
+        "general.theme": "dark",
+        "sync.enabled": true,
+      }),
+      settingsVersion: 1,
+    });
+    const stored = await readStorage();
+    expect((stored.settings as Record<string, unknown>)["sync.enabled"]).toBe(
+      true,
+    );
+
+    // The cancelled debounce must not overwrite the flushed object.
+    await vi.advanceTimersByTimeAsync(500);
+    const persisted = (await readStorage()).settings as Record<string, unknown>;
+    expect(persisted["general.theme"]).toBe("dark");
+    expect(persisted["sync.enabled"]).toBe(true);
+  });
+
+  it("rejects invalid values without writing", async () => {
+    await expect(
+      settingsStore.saveSettingNow("general.theme", "neon"),
+    ).rejects.toBeInstanceOf(settingsStore.InvalidSettingError);
+    expect((await readStorage()).settings).toBeUndefined();
+  });
+});
+
 describe("resetSettings", () => {
   it("restores defaults immediately, cancels pending writes and keeps sessions", async () => {
     await fakeBrowser.storage.local.set({ sessions: [{ id: "keep-me" }] });

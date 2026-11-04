@@ -8,9 +8,16 @@ import {
   SYNC_KEY_REBIND_STORAGE_KEY,
   SYNC_KEY_STORAGE_KEY,
 } from "../lib/sync/key-store";
+import { syncNow } from "../lib/sync/sync-service";
 import { SyncSection, maskKey } from "./SyncSection";
 
+vi.mock("../lib/sync/sync-service", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../lib/sync/sync-service")>();
+  return { ...actual, syncNow: vi.fn() };
+});
+
 const t = createTranslator("en");
+const syncNowMock = vi.mocked(syncNow);
 
 const originalClipboard = Object.getOwnPropertyDescriptor(
   navigator,
@@ -37,11 +44,24 @@ function stubClipboard(writeText: (text: string) => Promise<void>): void {
 
 beforeEach(() => {
   fakeBrowser.reset();
+  vi.clearAllMocks();
+  syncNowMock.mockResolvedValue({
+    uploaded: 0,
+    downloaded: 0,
+    deleted: 0,
+    errors: [],
+  });
+  // Key rotation revokes the old cloud data; the default is a successful 204.
+  vi.stubGlobal(
+    "fetch",
+    vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 204 })),
+  );
 });
 
 afterEach(() => {
   cleanup();
   fakeBrowser.reset();
+  vi.unstubAllGlobals();
   vi.restoreAllMocks();
   if (originalClipboard === undefined) {
     Reflect.deleteProperty(navigator, "clipboard");
@@ -221,6 +241,9 @@ describe("SyncSection", () => {
     expect(screen.getByTestId("sync-key-value").textContent).toBe(
       maskKey(normalized),
     );
+    // Choosing "upload" starts syncing immediately instead of waiting for the
+    // retry alarm or the next startup.
+    await expect(syncNowMock).toHaveBeenCalledTimes(1);
   });
 
   it("imports the key but skips local upload when the user declines", async () => {
@@ -241,6 +264,7 @@ describe("SyncSection", () => {
     await expect(storedKey()).resolves.toBe(imported);
     const stored = await readStorage();
     expect(stored[SYNC_KEY_REBIND_STORAGE_KEY]).toBe("skip");
+    expect(syncNowMock).not.toHaveBeenCalled();
   });
 
   it("requires typing ROTATE before rotating and stores a fresh key", async () => {
@@ -253,7 +277,7 @@ describe("SyncSection", () => {
 
     expect(
       screen.getByText(
-        "Rotating creates a new key. Cloud data encrypted with the old key becomes unreadable and cannot be recovered.",
+        "Rotating creates a new key and tries to delete the cloud data encrypted with the old key. Local sessions are uploaded under the new key.",
       ),
     ).toBeInTheDocument();
     const confirm = screen.getByRole("button", { name: "Create new key" });
@@ -271,7 +295,7 @@ describe("SyncSection", () => {
 
     expect(
       await screen.findByText(
-        "New key created. Local sessions will be uploaded under it.",
+        "New key created. Old cloud data was deleted. Local sessions will be uploaded under the new key.",
       ),
     ).toBeInTheDocument();
     const rotated = await storedKey();
@@ -281,6 +305,57 @@ describe("SyncSection", () => {
     expect(stored[SYNC_KEY_REBIND_STORAGE_KEY]).toBe("upload");
     expect(screen.getByTestId("sync-key-value").textContent).toBe(
       maskKey(rotated),
+    );
+    // Rotation also triggers the upload promised by the rebind decision.
+    await expect(syncNowMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the new key when revoking the old cloud data fails", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>().mockRejectedValue(new Error("offline")),
+    );
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    render(<SyncSection t={t} />);
+
+    await screen.findByTestId("sync-key-value");
+    const previous = await storedKey();
+
+    await userEvent.click(screen.getByRole("button", { name: "Rotate key" }));
+    await userEvent.type(
+      screen.getByLabelText("Type ROTATE to confirm"),
+      "ROTATE",
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Create new key" }));
+
+    expect(
+      await screen.findByText(
+        "New key created, but the old cloud data could not be deleted. Local sessions will be uploaded under the new key.",
+      ),
+    ).toBeInTheDocument();
+    const rotated = await storedKey();
+    expect(rotated).not.toBe(previous);
+    const stored = await readStorage();
+    expect(stored[SYNC_KEY_REBIND_STORAGE_KEY]).toBe("upload");
+    // The failure is logged without the key material.
+    expect(consoleSpy).toHaveBeenCalled();
+    expect(JSON.stringify(consoleSpy.mock.calls)).not.toContain(rotated);
+    expect(syncNowMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("updates the displayed key when another context changes storage", async () => {
+    render(<SyncSection t={t} />);
+
+    await screen.findByTestId("sync-key-value");
+    const otherKey = generateKey();
+
+    await fakeBrowser.storage.local.set({ [SYNC_KEY_STORAGE_KEY]: otherKey });
+
+    await waitFor(() =>
+      expect(screen.getByTestId("sync-key-value").textContent).toBe(
+        maskKey(otherKey),
+      ),
     );
   });
 

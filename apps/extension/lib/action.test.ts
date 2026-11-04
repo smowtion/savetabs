@@ -80,6 +80,11 @@ function deleteDatabase(): Promise<void> {
   });
 }
 
+/** Let the fire-and-forget post-save hook settle before a negative assert. */
+function flushAsync(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
 beforeEach(async () => {
   fakeBrowser.reset();
   // fake-browser leaves `action.setPopup` unimplemented; replace it with a spy.
@@ -149,7 +154,9 @@ describe("handleToolbarClick", () => {
     await handleToolbarClick();
 
     const sessions = await listSessions();
-    expect(enqueueUploadMock).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => {
+      expect(enqueueUploadMock).toHaveBeenCalledTimes(1);
+    });
     expect(enqueueUploadMock.mock.calls[0]?.[0]?.id).toBe(sessions[0]?.id);
   });
 
@@ -166,6 +173,7 @@ describe("handleToolbarClick", () => {
     await handleToolbarClick();
 
     await expect(listSessions()).resolves.toHaveLength(1);
+    await flushAsync();
     expect(enqueueUploadMock).not.toHaveBeenCalled();
   });
 
@@ -221,7 +229,9 @@ describe("handleCommand", () => {
     await handleCommand("save-tabs");
 
     const sessions = await listSessions();
-    expect(enqueueUploadMock).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => {
+      expect(enqueueUploadMock).toHaveBeenCalledTimes(1);
+    });
     expect(enqueueUploadMock.mock.calls[0]?.[0]?.id).toBe(sessions[0]?.id);
   });
 
@@ -237,6 +247,7 @@ describe("handleCommand", () => {
     await handleCommand("save-tabs");
 
     await expect(listSessions()).resolves.toHaveLength(1);
+    await flushAsync();
     expect(enqueueUploadMock).not.toHaveBeenCalled();
   });
 

@@ -283,8 +283,27 @@ describe("AdvancedActions", () => {
     );
   });
 
-  it("rejects an invalid settings file with field errors", async () => {
+  it("keeps sync off when an imported file tries to enable it", async () => {
     render(<AdvancedActions settings={DEFAULT_SETTINGS} t={t} />);
+
+    importFile(
+      "import-settings-input",
+      settingsFile({ ...DEFAULT_SETTINGS, "sync.enabled": true }),
+    );
+
+    expect(await screen.findByText("Settings imported.")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Sync stays off after importing settings. Enable it from the toggle; that flow confirms your key.",
+      ),
+    ).toBeInTheDocument();
+    await waitFor(async () => {
+      const stored = await fakeBrowser.storage.local.get("settings");
+      expect((stored.settings as Settings)["sync.enabled"]).toBe(false);
+    });
+  });
+
+  it("rejects an invalid settings file with field errors", async () => {    render(<AdvancedActions settings={DEFAULT_SETTINGS} t={t} />);
 
     importFile(
       "import-settings-input",
@@ -353,6 +372,45 @@ describe("AdvancedActions", () => {
     expect(
       screen.getByText("Storage used: 2 sessions, 2 tabs"),
     ).toBeInTheDocument();
+  });
+
+  it("keeps local-only flags when an imported copy omits them", async () => {
+    const existing = makeSession({
+      id: "flagged",
+      createdAt: 1,
+      updatedAt: 10,
+      pendingUpload: true,
+      incognito: true,
+      syncExcluded: true,
+      tabs: [{ url: "https://old.example", title: "Old" }],
+    });
+    await seedSessions([existing]);
+
+    render(<AdvancedActions settings={DEFAULT_SETTINGS} t={t} />);
+
+    importFile(
+      "import-sessions-input",
+      sessionsFile([
+        {
+          id: "flagged",
+          createdAt: 1,
+          updatedAt: 20,
+          source: "window",
+          tabs: [{ url: "https://new.example", title: "New" }],
+        },
+      ]),
+    );
+
+    expect(
+      await screen.findByText("Imported 0 sessions and updated 1."),
+    ).toBeInTheDocument();
+    await expect(getSession("flagged")).resolves.toMatchObject({
+      updatedAt: 20,
+      pendingUpload: true,
+      incognito: true,
+      syncExcluded: true,
+      tabs: [{ url: "https://new.example", title: "New" }],
+    });
   });
 
   it("reports per-session quota failures without aborting the rest", async () => {
@@ -469,7 +527,8 @@ describe("AdvancedActions", () => {
       await screen.findByText("All local sessions deleted."),
     ).toBeInTheDocument();
     await waitFor(async () => expect(await listSessions()).toEqual([]));
-    expect(await getTombstones()).toHaveLength(2);
+    // A local clear must not write tombstones: cloud copies stay untouched.
+    expect(await getTombstones()).toHaveLength(0);
     expect(
       await screen.findByText("Storage used: 0 sessions, 0 tabs"),
     ).toBeInTheDocument();

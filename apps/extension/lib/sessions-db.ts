@@ -366,3 +366,22 @@ export async function getAllTombstones(
     throw error;
   }
 }
+
+/**
+ * Deletes every session in one transaction, leaving the tombstone store
+ * untouched. Callers that must not delete cloud copies use this instead of
+ * `deleteSessionRecord`.
+ */
+export async function clearSessionRecords(
+  database: IDBDatabase,
+): Promise<void> {
+  const transaction = database.transaction(SESSIONS_STORE_NAME, "readwrite");
+  const done = transactionDone(transaction);
+  try {
+    await requestResult(transaction.objectStore(SESSIONS_STORE_NAME).clear());
+    await done;
+  } catch (error) {
+    await done.catch(() => undefined);
+    throw error;
+  }
+}

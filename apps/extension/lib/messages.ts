@@ -8,13 +8,14 @@
  * faking success.
  */
 
-import type { SessionSource } from "@savetabs/shared";
+import { SyncAuthError, type SessionSource } from "@savetabs/shared";
 
 import { discardNow, type DiscardResult } from "./discard";
 import { executeRestore, type RestoreResult } from "./restore";
 import { saveTabs, type SaveTabsResult } from "./save-flow";
 import { deleteSession, getSession } from "./sessions-repo";
 import { syncSavedSession } from "./sync/sync-lifecycle";
+import { syncNow, type SyncResult } from "./sync/sync-service";
 
 /** Every message an extension page may send to the background. */
 export type UiMessage =
@@ -39,6 +40,7 @@ export type UiErrorCode =
   | "not_found"
   | "not_implemented"
   | "error"
+  | "unauthorized"
   | "confirmation_required";
 
 /**
@@ -52,7 +54,12 @@ export type UiErrorCode =
 export type UiResponse =
   | {
       ok: true;
-      data: SaveTabsResult | RestoreResult | DiscardResult | { deleted: string };
+      data:
+        | SaveTabsResult
+        | RestoreResult
+        | DiscardResult
+        | SyncResult
+        | { deleted: string };
     }
   | {
       ok: false;
@@ -176,9 +183,18 @@ export async function handleUiMessage(message: unknown): Promise<UiResponse> {
       }
     }
 
-    // The handler is added with the sync service.
-    case "SYNC_NOW":
-      return notImplemented();
+    case "SYNC_NOW": {
+      try {
+        return { ok: true, data: await syncNow() };
+      } catch (error) {
+        if (error instanceof SyncAuthError) {
+          // A rejected key is an auth problem, not a generic failure: the UI
+          // can point the user at re-importing or rotating the key.
+          return { ok: false, code: "unauthorized", message: error.message };
+        }
+        return failed(error);
+      }
+    }
 
     default:
       return notImplemented();

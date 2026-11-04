@@ -15,14 +15,19 @@
 
 import { formatKey, parseKey, type Translator } from "@savetabs/shared";
 import { useEffect, useId, useState, type FormEvent } from "react";
+import { browser } from "wxt/browser";
 
 import { copyText } from "../lib/clipboard-write";
 import {
+  SYNC_KEY_REBIND_STORAGE_KEY,
+  SYNC_KEY_STORAGE_KEY,
+  getKey,
   getOrCreateKey,
-  rotateKey,
   setKey,
   type RebindMode,
 } from "../lib/sync/key-store";
+import { rotateSyncKey } from "../lib/sync/sync-lifecycle";
+import { syncNow } from "../lib/sync/sync-service";
 import { SyncStatus } from "./SyncStatus";
 
 const ROTATE_CONFIRMATION = "ROTATE";
@@ -52,6 +57,17 @@ export function maskKey(key: string): string {
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+/**
+ * A key change only takes effect on the server at the next sync. Run one in
+ * the background; its problems are reported by the status panel's next manual
+ * run instead of blocking the key UI.
+ */
+function runSyncAfterKeyChange(): void {
+  void syncNow().catch((error) => {
+    console.error("[savetabs] sync after a key change failed", error);
+  });
 }
 
 export function SyncSection({ t, syncEnabled = false }: SyncSectionProps) {
@@ -85,6 +101,53 @@ export function SyncSection({ t, syncEnabled = false }: SyncSectionProps) {
     };
   }, [t]);
 
+  // Another context can create, import or rotate the key while this panel is
+  // open. Follow storage so the displayed value always matches what the sync
+  // service will use.
+  useEffect(() => {
+    let active = true;
+
+    const refresh = async (): Promise<void> => {
+      const stored = await getKey();
+      if (!active) return;
+      if (stored !== undefined) {
+        setKeyValue(stored);
+        return;
+      }
+      // The value was removed elsewhere; recreate one rather than displaying
+      // a key that is no longer stored.
+      const created = await getOrCreateKey();
+      if (active) setKeyValue(created);
+    };
+
+    const handleStorageChange: Parameters<
+      typeof browser.storage.onChanged.addListener
+    >[0] = (changes, areaName) => {
+      if (areaName !== "local") return;
+      if (
+        !(SYNC_KEY_STORAGE_KEY in changes) &&
+        !(SYNC_KEY_REBIND_STORAGE_KEY in changes)
+      ) {
+        return;
+      }
+      void refresh().catch((error) => {
+        if (!active) return;
+        setStatus({
+          kind: "error",
+          message: t("settings.sync.actionFailed", {
+            message: errorMessage(error),
+          }),
+        });
+      });
+    };
+
+    browser.storage.onChanged.addListener(handleStorageChange);
+    return () => {
+      active = false;
+      browser.storage.onChanged.removeListener(handleStorageChange);
+    };
+  }, [t]);
+
   function beginImport(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
     try {
@@ -112,6 +175,7 @@ export function SyncSection({ t, syncEnabled = false }: SyncSectionProps) {
             ? t("settings.sync.importSuccess")
             : t("settings.sync.importSkipped"),
       });
+      if (rebind === "upload") runSyncAfterKeyChange();
     } catch (error) {
       setStatus({
         kind: "error",
@@ -146,15 +210,21 @@ export function SyncSection({ t, syncEnabled = false }: SyncSectionProps) {
   async function confirmRotation(): Promise<void> {
     if (rotateConfirm !== ROTATE_CONFIRMATION) return;
     try {
-      const rotated = await rotateKey();
-      setKeyValue(rotated);
+      const result = await rotateSyncKey();
+      setKeyValue(result.key);
       setRevealed(false);
       setRotating(false);
       setRotateConfirm("");
       setStatus({
         kind: "success",
-        message: t("settings.sync.rotateSuccess"),
+        message:
+          result.revocation === "deleted"
+            ? t("settings.sync.rotateSuccessRevoked")
+            : result.revocation === "failed"
+              ? t("settings.sync.rotateSuccessRevokeFailed")
+              : t("settings.sync.rotateSuccess"),
       });
+      runSyncAfterKeyChange();
     } catch (error) {
       setStatus({
         kind: "error",

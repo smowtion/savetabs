@@ -349,36 +349,46 @@ describe("saveTabs", () => {
     );
   });
 
-  it("awaits the onSaved hook after the session is persisted", async () => {
+  it("fires onSaved after persistence without awaiting it", async () => {
     await seedSettings({
       "open.openSessionsAfterSave": false,
       "tabs.closeAfterSave": false,
     });
     const observed: string[] = [];
+    // A hook that never settles proves saveTabs does not wait for it.
     const onSaved = vi.fn(async (session: Session) => {
       const stored = await getSession(session.id);
       observed.push(stored ? "persisted" : "missing");
+      await new Promise<void>(() => undefined);
     });
 
     const res = await saveTabs("window", { tabs: makeTabs(1), onSaved });
 
+    expect(res.session).toBeDefined();
     expect(onSaved).toHaveBeenCalledTimes(1);
     expect(onSaved.mock.calls[0]?.[0]).toBe(res.session);
-    expect(observed).toEqual(["persisted"]);
+    await vi.waitFor(() => expect(observed).toEqual(["persisted"]));
   });
 
-  it("runs the onSaved hook before closing saved tabs", async () => {
-    await seedSettings({ "open.openSessionsAfterSave": false });
+  it("closes saved tabs and opens the sessions page before onSaved", async () => {
+    await seedSettings({
+      "open.openSessionsAfterSave": true,
+      "open.reuseSessionsTab": false,
+    });
     const removeSpy = vi.spyOn(fakeBrowser.tabs, "remove");
-    let removeCalledDuringHook = false;
+    const createSpy = vi.spyOn(fakeBrowser.tabs, "create");
+    const observed: string[] = [];
     const onSaved = vi.fn(async () => {
-      removeCalledDuringHook = removeSpy.mock.calls.length > 0;
+      observed.push(
+        removeSpy.mock.calls.length > 0 ? "removed" : "not-removed",
+        createSpy.mock.calls.length > 0 ? "opened" : "not-opened",
+      );
     });
 
     await saveTabs("window", { tabs: makeTabs(2, true), onSaved });
 
-    expect(removeCalledDuringHook).toBe(false);
-    expect(removeSpy).toHaveBeenCalled();
+    await vi.waitFor(() => expect(onSaved).toHaveBeenCalledTimes(1));
+    expect(observed).toEqual(["removed", "opened"]);
   });
 
   it("opens the sessions page after a successful save", async () => {

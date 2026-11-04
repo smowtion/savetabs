@@ -1,6 +1,6 @@
 import { formatKey, parseKey } from "@savetabs/shared";
 import { fakeBrowser } from "wxt/testing/fake-browser";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   SYNC_KEY_REBIND_STORAGE_KEY,
@@ -30,6 +30,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.restoreAllMocks();
   fakeBrowser.reset();
 });
 
@@ -71,6 +72,29 @@ describe("getOrCreateKey", () => {
 
     const stored = await storage();
     expect(stored).not.toHaveProperty(SYNC_KEY_REBIND_STORAGE_KEY);
+  });
+
+  it("returns the key another context persisted while creating", async () => {
+    const competing = formatKey(parseKey("st-abcde-fghjk-mnpqr-stvwx-yz012-34567"));
+    const originalSet = fakeBrowser.storage.local.set.bind(
+      fakeBrowser.storage.local,
+    );
+    vi.spyOn(fakeBrowser.storage.local, "set").mockImplementation(
+      async (items: Record<string, unknown>) => {
+        await originalSet(items);
+        // Simulate a second context winning the first-write race.
+        if (SYNC_KEY_STORAGE_KEY in items) {
+          await originalSet({ [SYNC_KEY_STORAGE_KEY]: competing });
+        }
+      },
+    );
+
+    const key = await getOrCreateKey();
+
+    // The returned key must be the one callers can read back later, not the
+    // key this context generated and lost the race with.
+    expect(key).toBe(competing);
+    await expect(storedKey()).resolves.toBe(competing);
   });
 });
 

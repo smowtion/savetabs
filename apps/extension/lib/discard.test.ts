@@ -113,7 +113,7 @@ describe("isDiscardSupported", () => {
     expect(isDiscardSupported()).toBe(true);
   });
 
-  it("is false when the browser lacks tabs.discard (Firefox)", () => {
+  it("is false when the browser lacks tabs.discard", () => {
     removeTabsDiscard();
 
     expect(isDiscardSupported()).toBe(false);

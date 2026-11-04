@@ -4,7 +4,9 @@
  *
  * The flow is intentionally unaware of sync. Callers that need to react to a
  * successful save (for example to enqueue an encrypted upload) pass `onSaved`,
- * which is awaited after persistence and before any tab is closed.
+ * which runs after persistence, tab closing and page opening. It is not
+ * awaited: a slow network must never delay freeing memory, and the hook is
+ * responsible for leaving retry state behind if it is interrupted.
  */
 
 import { type Session, type SessionSource, type Settings } from "@savetabs/shared";
@@ -44,8 +46,9 @@ export type SaveTabsOptions = {
   /** UI confirmation hook; omitted when the caller has no UI to show. */
   confirm?: ConfirmSave;
   /**
-   * Awaited after the session is persisted and before tabs are closed.
-   * Defaults to a no-op; sync wiring uses it to enqueue an upload.
+   * Fired, not awaited, after the session is persisted, the saved tabs are
+   * closed and the sessions page is opened. Sync wiring uses it to enqueue an
+   * upload after the user already got their memory back.
    */
   onSaved?: (session: Session) => Promise<void>;
 };
@@ -95,9 +98,9 @@ async function closeSavedTabs(
  * Save the tabs in scope as a new session.
  *
  * Order of operations: collect, confirm if the close count exceeds the
- * threshold, persist, await `onSaved`, close the saved tabs, open the sessions
- * page. Nothing is closed when persistence fails (`LocalQuotaError` is
- * rethrown to the caller).
+ * threshold, persist, close the saved tabs, open the sessions page, then fire
+ * `onSaved` without waiting for it. Nothing is closed when persistence fails
+ * (`LocalQuotaError` is rethrown to the caller).
  */
 export async function saveTabs(
   source: SessionSource,
@@ -158,11 +161,18 @@ export async function saveTabs(
   if (scope.incognito) session.incognito = true;
 
   await addSession(session);
-  if (opts.onSaved !== undefined) await opts.onSaved(session);
 
   const closed = await closeSavedTabs(entries, closeAfterSave);
   if (readBoolean(settings, "open.openSessionsAfterSave")) {
     await openOrReuseSessionsPage(settings);
+  }
+
+  // The user already got their tabs closed; a slow upload must not hold the
+  // UI. The hook marks the session for retry before its network attempt.
+  if (opts.onSaved !== undefined) {
+    void opts.onSaved(session).catch((error) => {
+      console.error("[savetabs] post-save hook failed", error);
+    });
   }
 
   return { session, skipped, closed, overflow };

@@ -174,6 +174,43 @@ async function stageSettingChange(
 }
 
 /**
+ * Validate and persist one setting immediately, bypassing the debounce.
+ *
+ * Any staged-but-unflushed changes are folded into the same write, so callers
+ * that must observe the new value on disk before reporting success (for
+ * example turning sync off after deleting cloud data) can rely on storage.
+ */
+export function saveSettingNow(
+  key: string,
+  value: SettingValue,
+): Promise<void> {
+  const result = stagingQueue.then(() => stageImmediateSettingChange(key, value));
+  // Keep the queue alive after a rejection so later valid saves still run.
+  stagingQueue = result.catch(() => undefined);
+  return result;
+}
+
+async function stageImmediateSettingChange(
+  key: string,
+  value: SettingValue,
+): Promise<void> {
+  if (!getSettingDef(key)) {
+    throw new InvalidSettingError(key, "unknown setting");
+  }
+
+  const validated = validateSettings({ [key]: value });
+  if (!validated.ok) {
+    throw new InvalidSettingError(key, validated.errors.join("; "));
+  }
+
+  // `loadSettings` prefers pending state, so the immediate write includes it.
+  const next = await loadSettings();
+  next[key] = cloneSettingValue(validated.value[key]);
+  cancelPendingWrite();
+  await writeSettings(next);
+}
+
+/**
  * Restore every setting to its default immediately. Sessions and other
  * storage keys are left untouched.
  */

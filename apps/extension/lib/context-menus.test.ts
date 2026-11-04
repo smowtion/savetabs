@@ -278,9 +278,10 @@ describe("handleContextMenuClick", () => {
       });
 
       expect(enqueueUploadMock).toHaveBeenCalledTimes(1);
-      expect(enqueueUploadMock).toHaveBeenCalledWith(
-        freshSessionRef.current,
-      );
+      expect(enqueueUploadMock).toHaveBeenCalledWith({
+        ...freshSessionRef.current,
+        pendingUpload: true,
+      });
     },
   );
 

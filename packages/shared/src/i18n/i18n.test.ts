@@ -78,6 +78,7 @@ describe("i18n", () => {
       "settings.advanced.sessionsPlaintextWarning",
       "settings.advanced.exportSuccess",
       "settings.advanced.importSettingsSuccess",
+      "settings.advanced.importSettingsSyncStaysOff",
       "settings.advanced.importSettingsFailed",
       "settings.advanced.importSessionsSuccess",
       "settings.advanced.importSessionsPartial",
@@ -123,6 +124,8 @@ describe("i18n", () => {
       "settings.sync.rotateConfirmPlaceholder",
       "settings.sync.rotateConfirm",
       "settings.sync.rotateSuccess",
+      "settings.sync.rotateSuccessRevoked",
+      "settings.sync.rotateSuccessRevokeFailed",
       "settings.sync.loseKeyWarning",
       "settings.sync.onlyCredentialWarning",
       "settings.sync.actionFailed",
@@ -238,6 +241,7 @@ describe("i18n", () => {
       "sessions.renameSuccess",
       "sessions.restoreSuccess",
       "sessions.saveSuccess",
+      "sessions.saveOverflow",
       "sessions.saveEmpty",
       "sessions.copySuccess",
       "sessions.copyFailed",
@@ -273,6 +277,9 @@ describe("i18n", () => {
       "options.validation.maxItems",
       "options.validation.duplicateEntry",
       "options.validation.emptyEntry",
+      "settings.memory.discardNow",
+      "settings.memory.discardNowSuccess",
+      "settings.memory.discardNowFailed",
     ];
 
     expect(missingKeys("en", controlKeys)).toEqual([]);

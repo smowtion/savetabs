@@ -104,6 +104,74 @@ function readPublishedVersion(
     : null;
 }
 
+type CheckOutcome = {
+  result: VersionCheckResult | null;
+  /** Populated when `result` is null so callers can log the real reason. */
+  error?: unknown;
+};
+
+/**
+ * Read and compare the published version, keeping the failure reason so the
+ * background check can log it. Every failure resolves to a null result.
+ */
+async function checkForUpdateOutcome(
+  fetchImpl: typeof fetch,
+): Promise<CheckOutcome> {
+  const current = readInstalledVersion();
+  if (current === null || parseVersion(current) === null) {
+    return {
+      result: null,
+      error: new Error(
+        `the installed extension version "${current ?? "<missing>"}" is not comparable`,
+      ),
+    };
+  }
+
+  let response: Response;
+  try {
+    // Native fetch rejects non-global receivers with "Illegal invocation".
+    response = await fetchImpl.call(globalThis, `${API_BASE}/v1/version`, {
+      headers: { Accept: "application/json" },
+    });
+  } catch (error) {
+    return { result: null, error };
+  }
+
+  if (!response.ok) {
+    return {
+      result: null,
+      error: new Error(`the version endpoint returned HTTP ${response.status}`),
+    };
+  }
+
+  let body: unknown;
+  try {
+    body = await response.json();
+  } catch (error) {
+    return { result: null, error };
+  }
+
+  const latest = readPublishedVersion(body, currentBrowser());
+  if (latest === null) {
+    return {
+      result: null,
+      error: new Error(
+        "the version endpoint did not return a version for this browser",
+      ),
+    };
+  }
+
+  const comparison = compareVersions(latest, current);
+  if (comparison === null) {
+    return {
+      result: null,
+      error: new Error(`published version "${latest}" is not comparable`),
+    };
+  }
+
+  return { result: { latest, current, updateAvailable: comparison > 0 } };
+}
+
 /**
  * Read and compare the published version.
  *
@@ -113,35 +181,7 @@ function readPublishedVersion(
 export async function checkForUpdate(
   fetchImpl: typeof fetch = fetch,
 ): Promise<VersionCheckResult | null> {
-  const current = readInstalledVersion();
-  if (current === null || parseVersion(current) === null) return null;
-
-  let response: Response;
-  try {
-    // Native fetch rejects non-global receivers with "Illegal invocation".
-    response = await fetchImpl.call(globalThis, `${API_BASE}/v1/version`, {
-      headers: { Accept: "application/json" },
-    });
-  } catch {
-    return null;
-  }
-
-  if (!response.ok) return null;
-
-  let body: unknown;
-  try {
-    body = await response.json();
-  } catch {
-    return null;
-  }
-
-  const latest = readPublishedVersion(body, currentBrowser());
-  if (latest === null) return null;
-
-  const comparison = compareVersions(latest, current);
-  if (comparison === null) return null;
-
-  return { latest, current, updateAvailable: comparison > 0 };
+  return (await checkForUpdateOutcome(fetchImpl)).result;
 }
 
 /** Persisted update state; malformed or unreadable storage means no update. */
@@ -169,19 +209,59 @@ export async function isUpdateAvailable(): Promise<boolean> {
   return (await readUpdateState()).updateAvailable;
 }
 
+/** Clear the stored "update available" flag; storage failures are non-fatal. */
+async function clearUpdateAvailable(): Promise<void> {
+  try {
+    await browser.storage.local.set({
+      [UPDATE_AVAILABLE_STORAGE_KEY]: false,
+    });
+  } catch (error) {
+    console.error("[savetabs] failed to clear the update state", error);
+  }
+}
+
+/**
+ * Drop an "update available" flag that the running version already satisfies.
+ *
+ * Called on install, update and startup. Without this, a self-update can leave
+ * the toolbar `↑` badge and the banner visible until the next daily check.
+ * Returns true when the flag was cleared so the caller can repaint the badge.
+ * A flag for a genuinely newer published version is left untouched.
+ */
+export async function reconcileUpdateState(): Promise<boolean> {
+  const state = await readUpdateState();
+  if (!state.updateAvailable) return false;
+
+  const current = readInstalledVersion();
+  const latest = state.latestVersion;
+  if (current === null || latest === null) {
+    // Without both versions the flag cannot be verified; drop it rather than
+    // keep a badge that may be stale.
+    await clearUpdateAvailable();
+    return true;
+  }
+
+  const comparison = compareVersions(latest, current);
+  if (comparison !== null && comparison > 0) return false;
+
+  await clearUpdateAvailable();
+  return true;
+}
+
 /**
  * Run the check and persist its result.
  *
- * Failures are logged and swallowed, and storage errors never surface either:
- * the update check must never crash the service worker. A successful check
- * that finds no update clears the stored flag.
+ * Failures are logged with their underlying cause and swallowed, and storage
+ * errors never surface either: the update check must never crash the service
+ * worker. A successful check that finds no update clears the stored flag.
  */
 export async function runVersionCheck(
   fetchImpl: typeof fetch = fetch,
 ): Promise<VersionCheckResult | null> {
-  const result = await checkForUpdate(fetchImpl);
+  const outcome = await checkForUpdateOutcome(fetchImpl);
+  const result = outcome.result;
   if (result === null) {
-    console.error("[savetabs] update check failed");
+    console.error("[savetabs] update check failed", outcome.error);
     return null;
   }
 

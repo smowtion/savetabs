@@ -185,11 +185,15 @@ export function App() {
         "session" in data
           ? (data as SaveTabsResult).session?.tabs.length ?? 0
           : 0;
+      const overflow =
+        "overflow" in data ? (data as SaveTabsResult).overflow : 0;
       setStatus({
         kind: "success",
         message:
           savedTabs > 0
-            ? t("sessions.saveSuccess", { count: savedTabs })
+            ? overflow > 0
+              ? t("sessions.saveOverflow", { saved: savedTabs, overflow })
+              : t("sessions.saveSuccess", { count: savedTabs })
             : t("sessions.saveEmpty"),
       });
     } catch (error) {

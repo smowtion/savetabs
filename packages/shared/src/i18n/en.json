@@ -182,7 +182,10 @@
       "keepPinned": {
         "label": "Keep pinned tabs",
         "description": "Never discard pinned tabs."
-      }
+      },
+      "discardNow": "Discard now",
+      "discardNowSuccess": "Discarded {count} tabs.",
+      "discardNowFailed": "Could not discard tabs: {message}"
     },
     "shortcuts": {
       "label": "Shortcuts",
@@ -255,11 +258,13 @@
       "importSkipped": "Key imported. Local sessions will not be uploaded.",
       "rotateKey": "Rotate key",
       "rotateTitle": "Rotate the sync key",
-      "rotateWarning": "Rotating creates a new key. Cloud data encrypted with the old key becomes unreadable and cannot be recovered.",
+      "rotateWarning": "Rotating creates a new key and tries to delete the cloud data encrypted with the old key. Local sessions are uploaded under the new key.",
       "rotateConfirmLabel": "Type ROTATE to confirm",
       "rotateConfirmPlaceholder": "ROTATE",
       "rotateConfirm": "Create new key",
       "rotateSuccess": "New key created. Local sessions will be uploaded under it.",
+      "rotateSuccessRevoked": "New key created. Old cloud data was deleted. Local sessions will be uploaded under the new key.",
+      "rotateSuccessRevokeFailed": "New key created, but the old cloud data could not be deleted. Local sessions will be uploaded under the new key.",
       "loseKeyWarning": "If you lose this key, your synced data cannot be recovered.",
       "onlyCredentialWarning": "This key is the only credential for your synced data. Anyone with it can read, change, or delete that data.",
       "actionFailed": "The action failed: {message}",
@@ -296,6 +301,7 @@
       "sessionsPlaintextWarning": "Session exports contain plaintext titles and URLs. Store the file somewhere private.",
       "exportSuccess": "Exported {filename}.",
       "importSettingsSuccess": "Settings imported.",
+      "importSettingsSyncStaysOff": "Sync stays off after importing settings. Enable it from the toggle; that flow confirms your key.",
       "importSettingsFailed": "Settings import failed:",
       "importSessionsSuccess": "Imported {added} sessions and updated {updated}.",
       "importSessionsPartial": "Imported {added} sessions and updated {updated}. Some sessions could not be saved:",
@@ -306,7 +312,7 @@
       "resetConfirm": "Reset settings",
       "resetSuccess": "Settings reset to defaults.",
       "clearTitle": "Delete all local sessions?",
-      "clearMessage": "All sessions saved on this device will be deleted permanently. Export a backup first if you need one.",
+      "clearMessage": "All sessions saved on this device will be deleted permanently. Sessions synced to the cloud are not deleted and may be downloaded again on the next sync. Export a backup first if you need one.",
       "clearConfirm": "Delete sessions",
       "clearSuccess": "All local sessions deleted."
     },
@@ -438,6 +444,7 @@
     "renameSuccess": "Session renamed.",
     "restoreSuccess": "Restored {count} tabs.",
     "saveSuccess": "Saved {count} tabs.",
+    "saveOverflow": "Saved {saved} tabs; {overflow} left open (session limit).",
     "saveEmpty": "No tabs to save.",
     "copySuccess": "Copied {count} tabs to the clipboard.",
     "copyFailed": "Could not copy the tabs.",
@@ -501,7 +508,7 @@
         },
         "delete": {
           "title": "Deleting your data",
-          "body": "Local sessions stay in your browser until you delete them in the extension; clearing the extension's data or uninstalling it also removes them. To delete all cloud data for a sync key, open the extension, go to Settings → Sync and choose Delete cloud data. This removes the encrypted sessions, deletion tombstones and the key record for that sync key, and turns sync off so local sessions are not uploaded again. Rotating the sync key does not delete data stored under the old key; import the old key and use Delete cloud data if you want that data removed."
+          "body": "Local sessions stay in your browser until you delete them in the extension; clearing the extension's data or uninstalling it also removes them. To delete all cloud data for a sync key, open the extension, go to Settings → Sync and choose Delete cloud data. This removes the encrypted sessions, deletion tombstones and the key record for that sync key, and turns sync off so local sessions are not uploaded again. Rotating the sync key also deletes the data stored under the old key; if that deletion fails, import the old key and use Delete cloud data."
         },
         "analytics": {
           "title": "No analytics or third parties",
@@ -530,7 +537,7 @@
       "copyFailed": "Could not copy the tabs.",
       "export": "Export JSON",
       "exportSuccess": "Exported {filename}.",
-      "exportFailed": "Could not export the session.",
+      "exportFailed": "Could not export the session: {message}",
       "delete": "Delete",
       "deleteTitle": "Delete this session?",
       "deleteMessage": "This session will be deleted permanently. This cannot be undone.",
@@ -539,6 +546,12 @@
       "deleteFailed": "Could not delete the session: {message}",
       "authError": "Your sync key was rejected. Enter your key again to continue.",
       "changeKey": "Change key",
+      "forgetKey": "Forget key",
+      "forgetKeyTitle": "Forget the sync key?",
+      "forgetKeyMessage": "The key is removed from this browser. Your synced data stays on the server and can be opened again by entering the key later.",
+      "forgetKeyConfirm": "Forget key",
+      "home": "Home",
+      "privacy": "Privacy",
       "decryptError": "Some sessions could not be decrypted and were skipped ({count}).",
       "loadFailed": "Could not load your saved sessions.",
       "noTabs": "This session has no tabs."

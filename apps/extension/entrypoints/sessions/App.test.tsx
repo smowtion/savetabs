@@ -198,6 +198,35 @@ describe("sessions page", () => {
     expect(await screen.findByText("Saved 1 tabs.")).toBeInTheDocument();
   });
 
+  it("reports tabs left open when the session limit is reached", async () => {
+    stubSendMessage({
+      ok: true,
+      data: {
+        session: makeSession({
+          tabs: Array.from({ length: 500 }, (_, index) => ({
+            url: `https://full-${index}.example`,
+            title: `Tab ${index}`,
+          })),
+        }),
+        skipped: 2,
+        closed: 500,
+        overflow: 2,
+      },
+    });
+    await addSession(makeSession({ title: "A session" }));
+
+    render(<App />);
+
+    await screen.findByRole("region", { name: "A session" });
+    await userEvent.click(screen.getByRole("button", { name: "Save window" }));
+
+    expect(
+      await screen.findByText(
+        "Saved 500 tabs; 2 left open (session limit).",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("asks for confirmation and resends the save with confirmed true", async () => {
     const sendMessage = stubSendMessage(
       { ok: false, code: "confirmation_required", data: { count: 21 } },

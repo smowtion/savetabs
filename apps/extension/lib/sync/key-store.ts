@@ -49,6 +49,15 @@ async function readStoredKey(): Promise<unknown> {
 }
 
 /**
+ * Read back whatever another context may have persisted. Creation races are
+ * resolved by storage itself: the last write wins, and every context must
+ * return that same value or it would show a key nobody else can read.
+ */
+async function readPersistedKey(): Promise<string | undefined> {
+  return normalizeStoredKey(await readStoredKey());
+}
+
+/**
  * Return the stored key, or undefined when none is stored or the stored value
  * is not a valid key. The returned value is canonical.
  */
@@ -74,13 +83,17 @@ async function createKey(): Promise<string> {
       await browser.storage.local.set({
         [SYNC_KEY_STORAGE_KEY]: normalized,
       });
+      return (await readPersistedKey()) ?? normalized;
     }
     return normalized;
   }
 
   const generated = generateKey();
   await browser.storage.local.set({ [SYNC_KEY_STORAGE_KEY]: generated });
-  return generated;
+  // A concurrent context may have written another key while this one was
+  // creating. Return whatever storage holds, so the displayed key is the one
+  // that will actually be used.
+  return (await readPersistedKey()) ?? generated;
 }
 
 /**

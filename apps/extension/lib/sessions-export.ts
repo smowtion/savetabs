@@ -4,12 +4,13 @@
  * Bulk export is the recovery path when the sync key is lost, so sessions are
  * written without encryption. Import validates the envelope and every session,
  * silently drops tabs whose URL cannot be restored (only http, https and file
- * URLs are kept), and merges with the local sessions using the shared
- * last-write-wins rules. This module is pure: persisting the merged list is the
- * caller's responsibility.
+ * URLs are kept), rejects a session that ends with no restorable tabs, and
+ * merges with the local sessions using the shared last-write-wins rules. This
+ * module is pure: persisting the merged list is the caller's responsibility.
  */
 
 import {
+  isRestorableUrl,
   mergeSessions,
   type SavedTab,
   type Session,
@@ -26,12 +27,6 @@ const SESSION_SOURCES: readonly SessionSource[] = [
   "tab",
   "selection",
 ];
-
-const RESTORABLE_PROTOCOLS: ReadonlySet<string> = new Set([
-  "http:",
-  "https:",
-  "file:",
-]);
 
 export type SessionsFile = {
   app: typeof SESSIONS_FILE_APP;
@@ -79,14 +74,7 @@ export function exportSessionsFile(sessions: readonly Session[]): string {
  */
 function sanitizeTab(raw: unknown): SavedTab | undefined {
   if (!isRecord(raw) || typeof raw.url !== "string") return undefined;
-
-  let parsedUrl: URL;
-  try {
-    parsedUrl = new URL(raw.url);
-  } catch {
-    return undefined;
-  }
-  if (!RESTORABLE_PROTOCOLS.has(parsedUrl.protocol)) return undefined;
+  if (!isRestorableUrl(raw.url)) return undefined;
 
   const tab: SavedTab = {
     url: raw.url,
@@ -155,12 +143,22 @@ function sanitizeSession(
     .map(sanitizeTab)
     .filter((tab): tab is SavedTab => tab !== undefined);
 
+  // A session with no restorable tabs would overwrite a local session with an
+  // empty list, so it is rejected as a field error instead of merged.
+  if (tabs.length === 0) {
+    errors.push(`${prefix}.tabs: must contain at least one restorable URL`);
+    return undefined;
+  }
+
   const session: Session = { id, createdAt, updatedAt, source, tabs };
   if (typeof raw.title === "string") session.title = raw.title;
   if (typeof raw.pendingUpload === "boolean") {
     session.pendingUpload = raw.pendingUpload;
   }
   if (typeof raw.incognito === "boolean") session.incognito = raw.incognito;
+  if (typeof raw.syncExcluded === "boolean") {
+    session.syncExcluded = raw.syncExcluded;
+  }
   return session;
 }
 
