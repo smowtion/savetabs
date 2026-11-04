@@ -28,7 +28,7 @@ SaveTabs turns the tabs in a window into a saved session you can restore later. 
 - Private/incognito sessions are marked local-only and never uploaded.
 - Optional end-to-end encrypted sync across devices using a generated sync key. URLs and titles are encrypted in your browser with AES-GCM 256; the server stores only ciphertext.
 - English and Vietnamese interface; light, dark, and system themes.
-- No content scripts, no analytics, no ads, and no third-party code.
+- No content scripts, no third-party analytics, trackers, or remote code.
 
 ### Privacy summary
 
@@ -60,7 +60,7 @@ SaveTabs lưu các tab đang mở thành một phiên để bạn khôi phục s
 - Phiên từ cửa sổ riêng tư/ẩn danh được đánh dấu chỉ lưu cục bộ và không bao giờ tải lên.
 - Đồng bộ mã hoá đầu-cuối tuỳ chọn giữa các thiết bị bằng khoá đồng bộ được tạo tự động. URL và tiêu đề được mã hoá ngay trong trình duyệt bằng AES-GCM 256; máy chủ chỉ lưu bản mã.
 - Giao diện tiếng Anh và tiếng Việt; giao diện sáng, tối và theo hệ thống.
-- Không content script, không analytics, không quảng cáo, không mã bên thứ ba.
+- Không content script, không công cụ phân tích, trình theo dõi hay mã từ xa của bên thứ ba.
 
 ### Tóm tắt quyền riêng tư
 

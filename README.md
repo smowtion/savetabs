@@ -55,6 +55,7 @@ Run from the repository root.
 | `pnpm db:migrate:local` | Apply D1 migrations to the local Miniflare database. |
 | `pnpm typecheck` | Typecheck every workspace package (`tsc --noEmit`). |
 | `pnpm test` | Run all unit and Worker test suites (Vitest). |
+| `pnpm test:scripts` | Run the release-script tests (`node --test scripts/verify-csp.test.mjs`). |
 | `pnpm build` | Build every package that has a build script (extension + web). |
 | `pnpm build:ext` | Build the extension only. |
 | `pnpm icons` | Regenerate the 16/32/48/128 px PNG icons from `apps/extension/assets/icon.svg`. Commit the regenerated files. |
@@ -62,6 +63,7 @@ Run from the repository root.
 | `pnpm verify:build` | Verify both built manifests, icons, and ZIPs. Run after the `zip:*` commands. |
 | `node scripts/update-versions.mjs` | Regenerate `versions.json` from the package versions. |
 | `node scripts/update-versions.mjs --check` | Verify that the packages agree and `versions.json` is current. Performs no network access and writes no files. |
+| `node scripts/verify-csp.mjs` | Release guard: assert the built `apps/web/dist/_headers` CSP allows `VITE_API_BASE` and that both build origins agree. Run after `pnpm build`. |
 
 Build outputs:
 
@@ -82,7 +84,7 @@ shell. Vite and WXT can also load `.env` files from their own app directories
 | --- | --- | --- | --- |
 | `WXT_SAVETABS_API_BASE` | Extension build (WXT) | `https://api.savetabs.example` | Sync API origin. Also becomes the manifest `host_permissions` entry. |
 | `SAVETABS_API_BASE` | Extension build (WXT) | — | Legacy alias for `WXT_SAVETABS_API_BASE`; empty values count as unset. |
-| `VITE_API_BASE` | Web build (Vite) | `https://api.savetabs.example` | Sync API origin used by the web app. Keep it aligned with the extension. |
+| `VITE_API_BASE` | Web build (Vite) | `https://api.savetabs.example` | Sync API origin used by the web app. Must share its origin with `WXT_SAVETABS_API_BASE`; the release guard also requires that origin in `apps/web/public/_headers` (`connect-src`). |
 | `SAVETABS_NOTES_URL` | `scripts/update-versions.mjs` | `https://savetabs.pages.dev/releases/<version>` | Release-notes URL written into `versions.json`. |
 | `WEB_ORIGIN` | Worker runtime | `https://savetabs.pages.dev` | CORS allowlist. Defined in `apps/worker/wrangler.toml` `[vars]`. |
 | `GLOBAL_DAILY_REQUESTS` | Worker runtime | `100000` | Daily request cap. Defined in `wrangler.toml`. |
@@ -93,19 +95,23 @@ repository secrets, never in the repository:
 
 - `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
 - `CHROME_EXTENSION_ID`, `CHROME_CLIENT_ID`, `CHROME_CLIENT_SECRET`,
-  `CHROME_REFRESH_TOKEN`
-- `FIREFOX_JWT_ISSUER`, `FIREFOX_JWT_SECRET`
+  `CHROME_REFRESH_TOKEN` (all four are required together)
+- `FIREFOX_EXTENSION_ID` (must equal the gecko id in
+  `apps/extension/wxt.config.ts`), `FIREFOX_JWT_ISSUER`, `FIREFOX_JWT_SECRET`
+  (all three are required together)
 
 `.env.example` lists every name with placeholder values. `.env*` files are
 gitignored except `.env.example`; never commit real credentials.
 
 ## CI
 
-`.github/workflows/ci.yml` runs on every push and pull request:
+`.github/workflows/ci.yml` runs on every branch push and pull request; version
+tag pushes are handled by Release:
 
 1. pnpm and Node 22 setup with pnpm store caching.
 2. Frozen-lockfile install and `wxt prepare`.
-3. `versions.json` sync check.
+3. `versions.json` sync check (with the same optional `SAVETABS_NOTES_URL`
+   repository variable Release uses) and the release-script tests.
 4. Typecheck, all tests (including the Worker suite), and builds.
 5. Extension ZIP packaging, `verify:build`, and artifact upload.
 
@@ -127,14 +133,23 @@ Expected flow:
    ```
 3. Configure the repository variables `WXT_SAVETABS_API_BASE` and
    `VITE_API_BASE` with the deployed HTTPS origins (the workflow refuses to
-   publish while either is empty or contains `.example`). Optionally set
-   `SAVETABS_NOTES_URL`.
+   publish while either is empty or contains `.example`). Both must share one
+   origin, and `apps/web/public/_headers` must list that origin in
+   `connect-src`; `node scripts/verify-csp.mjs` fails the release otherwise.
+   Optionally set `SAVETABS_NOTES_URL`.
 4. Configure the Cloudflare secrets and, if store submission is wanted, the
-   Chrome/Firefox secrets.
+   complete Chrome tuple (`CHROME_EXTENSION_ID`, `CHROME_CLIENT_ID`,
+   `CHROME_CLIENT_SECRET`, `CHROME_REFRESH_TOKEN`) and/or the complete Firefox
+   tuple (`FIREFOX_EXTENSION_ID`, `FIREFOX_JWT_ISSUER`, `FIREFOX_JWT_SECRET`).
+   A partially configured store fails the release; a fully absent one is
+   skipped.
 5. Tag the commit as `v<version>` and push the tag, or run the workflow
    manually. The tag must match the package version.
 
 The workflow builds and verifies the artifacts, then:
+
+- Verifies the built web CSP allows the configured API origin and that the
+  extension and web builds agree on it (`scripts/verify-csp.mjs`).
 
 - Uploads `chrome/savetabs-<version>.zip` and `firefox/savetabs-<version>.zip`
   to the `savetabs-releases` R2 bucket.

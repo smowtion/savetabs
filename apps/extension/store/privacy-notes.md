@@ -67,12 +67,15 @@ can run there at all.
 ## Deletion
 
 - Local sessions: delete individual sessions in the Sessions page, or clear the
-  extension's data / uninstall it.
+  extension's data / uninstall it. Settings → Advanced → Clear local sessions
+  removes local rows without writing deletion tombstones, so cloud copies stay
+  on the server and may be downloaded again on the next sync.
 - Cloud data: Settings → Sync → Delete cloud data calls `DELETE
   /v1/keys/{authId}`. It removes every encrypted session, every tombstone, and
   the key record, then turns sync off so local sessions are not uploaded again.
-  Rotating the key does not delete data encrypted under the old key; import the
-  old key and use Delete cloud data to remove it.
+  Rotating the key also calls the same delete endpoint for the old key, so the
+  previous key's cloud data is removed; if that call fails, import the old key
+  and use Delete cloud data to remove it.
 - Uninstalling the extension does not delete cloud data; the user must use
   Delete cloud data (or the web app's delete action) first.
 

@@ -103,6 +103,12 @@ jobs:
       - name: Verify extension build
         run: pnpm verify:build
 
+      # The Pages _headers file is static: fail the release when its CSP does
+      # not allow the configured Worker origin, or when the extension and web
+      # builds point at different origins.
+      - name: Verify web CSP allows the API origin
+        run: node scripts/verify-csp.mjs
+
       # Upload the ZIPs first so versions.json never points at missing objects.
       - name: Upload extension ZIPs to R2
         env:
@@ -158,9 +164,10 @@ jobs:
             versions.json
           if-no-files-found: error
 
-      # Store submission is optional. Each step skips itself when its
-      # credentials are absent, so the workflow stays usable for Cloudflare-
-      # only releases. Secrets are scoped to the step that needs them.
+      # Store submission is optional. Each step skips itself only when its
+      # complete credential tuple is absent, so a partially configured store
+      # fails loudly instead of silently publishing nothing. Secrets are
+      # scoped to the step that needs them.
       - name: Submit to Chrome Web Store
         env:
           CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
@@ -168,23 +175,48 @@ jobs:
           CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
           CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
         run: |
-          if [ -z "${CHROME_CLIENT_ID}" ]; then
-            echo "CHROME_CLIENT_ID is not configured; skipping Chrome Web Store submission."
+          if [ -z "$CHROME_EXTENSION_ID$CHROME_CLIENT_ID$CHROME_CLIENT_SECRET$CHROME_REFRESH_TOKEN" ]; then
+            echo "Chrome Web Store credentials are not configured; skipping submission."
             exit 0
+          fi
+          missing=""
+          for name in CHROME_EXTENSION_ID CHROME_CLIENT_ID CHROME_CLIENT_SECRET CHROME_REFRESH_TOKEN; do
+            if [ -z "${!name}" ]; then missing="$missing $name"; fi
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Chrome Web Store submission requires all of CHROME_EXTENSION_ID, CHROME_CLIENT_ID, CHROME_CLIENT_SECRET and CHROME_REFRESH_TOKEN; missing:$missing"
+            exit 1
           fi
           pnpm --filter @savetabs/extension exec wxt submit \
             --chrome-api-version v1.1 \
+            --chrome-extension-id "$CHROME_EXTENSION_ID" \
             --chrome-zip "$GITHUB_WORKSPACE/apps/extension/.output/savetabs-${SAVETABS_VERSION}-chrome.zip"
 
       - name: Submit to Firefox Add-ons
         env:
+          FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXTENSION_ID }}
           FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
           FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
         run: |
-          if [ -z "${FIREFOX_JWT_ISSUER}" ]; then
-            echo "FIREFOX_JWT_ISSUER is not configured; skipping Firefox Add-ons submission."
+          if [ -z "$FIREFOX_EXTENSION_ID$FIREFOX_JWT_ISSUER$FIREFOX_JWT_SECRET" ]; then
+            echo "Firefox Add-ons credentials are not configured; skipping submission."
             exit 0
           fi
+          missing=""
+          for name in FIREFOX_EXTENSION_ID FIREFOX_JWT_ISSUER FIREFOX_JWT_SECRET; do
+            if [ -z "${!name}" ]; then missing="$missing $name"; fi
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Firefox Add-ons submission requires all of FIREFOX_EXTENSION_ID, FIREFOX_JWT_ISSUER and FIREFOX_JWT_SECRET; missing:$missing"
+            exit 1
+          fi
+          # The submitted id must match the gecko id baked into the manifest.
+          gecko_id="$(node -p "require('./apps/extension/.output/firefox-mv3/manifest.json').browser_specific_settings.gecko.id")"
+          if [ "$FIREFOX_EXTENSION_ID" != "$gecko_id" ]; then
+            echo "::error::FIREFOX_EXTENSION_ID ($FIREFOX_EXTENSION_ID) does not match the manifest gecko id ($gecko_id)."
+            exit 1
+          fi
           pnpm --filter @savetabs/extension exec wxt submit \
+            --firefox-extension-id "$FIREFOX_EXTENSION_ID" \
             --firefox-zip "$GITHUB_WORKSPACE/apps/extension/.output/savetabs-${SAVETABS_VERSION}-firefox.zip" \
             --firefox-sources-zip "$GITHUB_WORKSPACE/apps/extension/.output/savetabs-${SAVETABS_VERSION}-sources.zip"

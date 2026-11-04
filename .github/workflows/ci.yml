@@ -13,6 +13,11 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  # Keep versions.json check results identical to Release, which sets the same
+  # repository variable. Empty values fall back to the default notes URL.
+  SAVETABS_NOTES_URL: ${{ vars.SAVETABS_NOTES_URL }}
+
 jobs:
   verify:
     name: Typecheck, test, and build
@@ -41,6 +46,9 @@ jobs:
 
       - name: Check release versions are in sync
         run: node scripts/update-versions.mjs --check
+
+      - name: Test release scripts
+        run: node --test scripts/verify-csp.test.mjs
 
       - name: Typecheck
         run: pnpm typecheck
