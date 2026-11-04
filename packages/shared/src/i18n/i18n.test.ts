@@ -97,6 +97,41 @@ describe("i18n", () => {
     expect(missingKeys("vi", advancedKeys)).toEqual([]);
   });
 
+  it("covers the sync key management strings in both languages", () => {
+    const syncKeys = [
+      "settings.sync.keyTitle",
+      "settings.sync.keyLabel",
+      "settings.sync.keyMaskedHint",
+      "settings.sync.revealKey",
+      "settings.sync.hideKey",
+      "settings.sync.copyKey",
+      "settings.sync.copied",
+      "settings.sync.copyFailed",
+      "settings.sync.importLabel",
+      "settings.sync.importPlaceholder",
+      "settings.sync.invalidKey",
+      "settings.sync.importPrompt",
+      "settings.sync.importPromptHint",
+      "settings.sync.importUpload",
+      "settings.sync.importSkip",
+      "settings.sync.importSuccess",
+      "settings.sync.importSkipped",
+      "settings.sync.rotateKey",
+      "settings.sync.rotateTitle",
+      "settings.sync.rotateWarning",
+      "settings.sync.rotateConfirmLabel",
+      "settings.sync.rotateConfirmPlaceholder",
+      "settings.sync.rotateConfirm",
+      "settings.sync.rotateSuccess",
+      "settings.sync.loseKeyWarning",
+      "settings.sync.onlyCredentialWarning",
+      "settings.sync.actionFailed",
+    ];
+
+    expect(missingKeys("en", syncKeys)).toEqual([]);
+    expect(missingKeys("vi", syncKeys)).toEqual([]);
+  });
+
   it("covers the setting control strings in both languages", () => {
     const controlKeys = [
       "options.tooltip",

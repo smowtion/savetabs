@@ -5,7 +5,8 @@
  * toolbar action mode, context menus, badge count, keyboard commands,
  * auto-discard and the typed runtime message router.
  *
- * Sync key generation is intentionally not wired here.
+ * Install and startup also ensure a sync key exists. Sync itself stays
+ * disabled until the user turns it on in the options page.
  */
 
 import type { Settings } from "@savetabs/shared";
@@ -33,6 +34,7 @@ import {
 import { handleUiMessage } from "../lib/messages";
 import { loadSettings, onSettingsChanged } from "../lib/settings";
 import { onSessionsChanged } from "../lib/sessions-repo";
+import { getOrCreateKey } from "../lib/sync/key-store";
 
 /**
  * Background work is fire-and-forget from event listeners: log failures so a
@@ -59,10 +61,14 @@ async function applyCurrentSettings(): Promise<void> {
   await applySettings(await loadSettings());
 }
 
-/** Install and startup both restore settings and drop stale tab activity. */
+/**
+ * Install and startup restore settings, drop stale tab activity and make sure
+ * a sync key is available. A fresh key never enables sync by itself.
+ */
 async function initialize(): Promise<void> {
   await applyCurrentSettings();
   await pruneActivity();
+  await getOrCreateKey();
 }
 
 export default defineBackground(() => {

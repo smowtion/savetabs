@@ -222,6 +222,27 @@ describe("options shell", () => {
     ).toBeInTheDocument();
   });
 
+  it("renders the sync key management inside the Sync section", async () => {
+    render(<App />);
+
+    await userEvent.click(
+      within(main()).getByRole("button", { name: /^Sync/ }),
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "Your sync key" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Reveal key" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Copy key" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Rotate key" }),
+    ).toBeInTheDocument();
+  });
+
   it("disables memory settings when the browser cannot discard tabs", async () => {
     const originalDiscard = fakeBrowser.tabs.discard;
     Object.defineProperty(fakeBrowser.tabs, "discard", {

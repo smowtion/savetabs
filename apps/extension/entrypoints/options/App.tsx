@@ -19,6 +19,7 @@ import { Accordion } from "../../components/Accordion";
 import { CategorySection } from "../../components/CategorySection";
 import { SearchBar } from "../../components/SearchBar";
 import { SettingsSidebar } from "../../components/SettingsSidebar";
+import { SyncSection } from "../../components/SyncSection";
 import { useI18n } from "../../hooks/useI18n";
 import { useOpenSections } from "../../hooks/useOpenSections";
 import { useSettings } from "../../hooks/useSettings";
@@ -176,6 +177,7 @@ export function App() {
                   open={isSearching || openSections.has(group.category)}
                   onToggle={(next) => setSectionOpen(group.category, next)}
                 >
+                  {group.category === "sync" && <SyncSection t={t} />}
                   <CategorySection
                     categoryId={group.category}
                     settings={group.settings}
