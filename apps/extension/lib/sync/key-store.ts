@@ -127,6 +127,20 @@ export async function rotateKey(): Promise<string> {
 }
 
 /**
+ * Read the pending rebind decision without clearing it.
+ *
+ * The retry alarm uses this to apply a staged "skip" before any upload; only
+ * after the exclusions are persisted does it consume the marker. An "upload"
+ * marker is deliberately left untouched so the next full sync still performs
+ * its force-upload.
+ */
+export async function peekPendingRebind(): Promise<RebindMode | undefined> {
+  const stored = await browser.storage.local.get(SYNC_KEY_REBIND_STORAGE_KEY);
+  const value = stored[SYNC_KEY_REBIND_STORAGE_KEY];
+  return value === "upload" || value === "skip" ? value : undefined;
+}
+
+/**
  * Read and clear the pending rebind decision. The sync service calls this
  * exactly once after a key change; a second call returns undefined.
  */

@@ -8,6 +8,7 @@ import {
   consumePendingRebind,
   getKey,
   getOrCreateKey,
+  peekPendingRebind,
   rotateKey,
   setKey,
 } from "./key-store";
@@ -130,6 +131,29 @@ describe("rotateKey", () => {
     const stored = await storage();
     expect(stored[SYNC_KEY_STORAGE_KEY]).toBe(rotated);
     expect(stored[SYNC_KEY_REBIND_STORAGE_KEY]).toBe("upload");
+  });
+});
+
+describe("peekPendingRebind", () => {
+  it("reads a decision without consuming it", async () => {
+    await setKey(LOOSE_KEY, "skip");
+
+    await expect(peekPendingRebind()).resolves.toBe("skip");
+    await expect(peekPendingRebind()).resolves.toBe("skip");
+    // The marker is still there for the consumer.
+    await expect(consumePendingRebind()).resolves.toBe("skip");
+    await expect(peekPendingRebind()).resolves.toBeUndefined();
+  });
+
+  it("returns undefined for an absent or unknown decision", async () => {
+    await expect(peekPendingRebind()).resolves.toBeUndefined();
+
+    await fakeBrowser.storage.local.set({
+      [SYNC_KEY_REBIND_STORAGE_KEY]: "later",
+    });
+    await expect(peekPendingRebind()).resolves.toBeUndefined();
+    // Peeking never clears a malformed value either.
+    expect(await storage()).toHaveProperty(SYNC_KEY_REBIND_STORAGE_KEY);
   });
 });
 

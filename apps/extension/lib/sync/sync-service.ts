@@ -58,6 +58,7 @@ import {
 import {
   consumePendingRebind,
   getKey,
+  peekPendingRebind,
   type RebindMode,
 } from "./key-store";
 
@@ -97,6 +98,7 @@ export type SyncServiceDeps = {
   repo: SyncRepository;
   getKey(): Promise<string | undefined>;
   consumePendingRebind(): Promise<RebindMode | undefined>;
+  peekPendingRebind(): Promise<RebindMode | undefined>;
   loadSettings(): Promise<Settings>;
   createClient(authId: string, authKey: string): SyncClientApi;
   now(): number;
@@ -106,12 +108,14 @@ export type SyncService = {
   enqueueUpload(session: Session): Promise<void>;
   syncNow(): Promise<SyncResult>;
   applyRemoteDeletions(deletions: readonly RemoteDeletion[]): Promise<number>;
+  applySkipRebindIfPending(): Promise<void>;
 };
 
 const defaultDeps: SyncServiceDeps = {
   repo: { listSessions, getTombstones, addSession, updateSession, deleteSession },
   getKey,
   consumePendingRebind,
+  peekPendingRebind,
   loadSettings,
   createClient: (authId, authKey) => new SyncClient(API_BASE, authId, authKey),
   now: () => Date.now(),
@@ -407,6 +411,24 @@ export function createSyncService(
     }
   }
 
+  /**
+   * Apply a staged "skip upload" key import before anything is uploaded.
+   *
+   * `syncNow` normally consumes the rebind marker while merging. The retry
+   * alarm can run before any full sync, so it peeks first: on "skip" it marks
+   * the current non-incognito sessions before consuming the marker, which
+   * preserves the import promise that local sessions stay off the server. An
+   * "upload" marker is left in place so the next full sync still force-uploads
+   * every local session.
+   */
+  async function applySkipRebindIfPending(): Promise<void> {
+    const rebind = await deps.peekPendingRebind();
+    if (rebind !== "skip") return;
+
+    await markLocalSessionsSyncExcluded();
+    await deps.consumePendingRebind();
+  }
+
   async function enqueueUpload(session: Session): Promise<void> {
     if (session.incognito) return;
 
@@ -547,7 +569,12 @@ export function createSyncService(
     return applyDeletions(deletions);
   }
 
-  return { enqueueUpload, syncNow, applyRemoteDeletions };
+  return {
+    enqueueUpload,
+    syncNow,
+    applyRemoteDeletions,
+    applySkipRebindIfPending,
+  };
 }
 
 let defaultService: SyncService | null = null;
@@ -581,4 +608,12 @@ export function applyRemoteDeletions(
   deletions: readonly RemoteDeletion[],
 ): Promise<number> {
   return getDefaultService().applyRemoteDeletions(deletions);
+}
+
+/**
+ * Apply a staged "skip upload" key import before the retry alarm uploads
+ * pending sessions. A pending "upload" marker is left for the next full sync.
+ */
+export function applySkipRebindIfPending(): Promise<void> {
+  return getDefaultService().applySkipRebindIfPending();
 }

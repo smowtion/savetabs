@@ -14,7 +14,7 @@ import { API_BASE } from "../config";
 import { SESSIONS_DB_NAME, closeSessionsDb } from "../sessions-db";
 import { addSession, listSessions } from "../sessions-repo";
 import { loadSettings, resetSettings } from "../settings";
-import { SYNC_KEY_STORAGE_KEY } from "./key-store";
+import { SYNC_KEY_REBIND_STORAGE_KEY, SYNC_KEY_STORAGE_KEY } from "./key-store";
 import {
   SYNC_LAST_AT_STORAGE_KEY,
   SYNC_RETRY_ALARM_NAME,
@@ -28,10 +28,14 @@ import {
 } from "./sync-lifecycle";
 import { enqueueUpload, syncNow } from "./sync-service";
 
-vi.mock("./sync-service", () => ({
-  enqueueUpload: vi.fn(),
-  syncNow: vi.fn(),
-}));
+vi.mock("./sync-service", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("./sync-service")>();
+  return {
+    ...actual,
+    enqueueUpload: vi.fn(),
+    syncNow: vi.fn(),
+  };
+});
 
 const syncNowMock = vi.mocked(syncNow);
 const enqueueUploadMock = vi.mocked(enqueueUpload);
@@ -189,6 +193,44 @@ describe("retryPendingUploads", () => {
     expect(
       stored.find((session) => session.id === "excluded")?.syncExcluded,
     ).toBe(true);
+  });
+
+  it("applies a staged skip rebind before uploading pending sessions", async () => {
+    await seedSettings({ "sync.enabled": true, "sync.autoUpload": true });
+    await fakeBrowser.storage.local.set({
+      [SYNC_KEY_REBIND_STORAGE_KEY]: "skip",
+    });
+    await addSession(makeSession("pending", { pendingUpload: true }));
+
+    await retryPendingUploads();
+
+    // The import promise ("local sessions will not be uploaded") wins even
+    // though no full sync has consumed the marker yet.
+    expect(enqueueUploadMock).not.toHaveBeenCalled();
+    const stored = await listSessions();
+    expect(
+      stored.find((session) => session.id === "pending")?.syncExcluded,
+    ).toBe(true);
+    const raw = await fakeBrowser.storage.local.get(
+      SYNC_KEY_REBIND_STORAGE_KEY,
+    );
+    expect(raw[SYNC_KEY_REBIND_STORAGE_KEY]).toBeUndefined();
+  });
+
+  it("leaves a staged upload rebind for the next full sync", async () => {
+    await seedSettings({ "sync.enabled": true, "sync.autoUpload": true });
+    await fakeBrowser.storage.local.set({
+      [SYNC_KEY_REBIND_STORAGE_KEY]: "upload",
+    });
+    await addSession(makeSession("pending", { pendingUpload: true }));
+
+    await retryPendingUploads();
+
+    expect(enqueueUploadMock).toHaveBeenCalledTimes(1);
+    const raw = await fakeBrowser.storage.local.get(
+      SYNC_KEY_REBIND_STORAGE_KEY,
+    );
+    expect(raw[SYNC_KEY_REBIND_STORAGE_KEY]).toBe("upload");
   });
 
   it("does nothing when auto-upload is off", async () => {

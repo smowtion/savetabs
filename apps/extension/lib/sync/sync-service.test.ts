@@ -183,14 +183,17 @@ async function createHarness(options: HarnessOptions = {}) {
   );
   // Like the real key store, a pending rebind decision is consumed once.
   let rebind = options.rebind;
+  const consumePendingRebind = vi.fn(async () => {
+    const pending = rebind;
+    rebind = undefined;
+    return pending;
+  });
+  const peekPendingRebind = vi.fn(async () => rebind);
   const service = createSyncService({
     repo,
     getKey: async () => ("key" in options ? options.key : KEY),
-    consumePendingRebind: async () => {
-      const pending = rebind;
-      rebind = undefined;
-      return pending;
-    },
+    consumePendingRebind,
+    peekPendingRebind,
     loadSettings: async () =>
       ({ "sync.enabled": options.enabled ?? true }) as Settings,
     createClient,
@@ -202,6 +205,9 @@ async function createHarness(options: HarnessOptions = {}) {
     client,
     createClient,
     service,
+    consumePendingRebind,
+    peekPendingRebind,
+    pendingRebind: () => rebind,
     derived: await deriveTestKeys(),
   };
 }
@@ -674,6 +680,52 @@ describe("syncNow", () => {
 
     expect(result.uploaded).toBe(1);
     expect(client.puts.map((put) => put.id)).toEqual(["new"]);
+  });
+});
+
+describe("applySkipRebindIfPending", () => {
+  it("marks current non-incognito sessions and consumes a skip marker", async () => {
+    const { repo, service, consumePendingRebind, peekPendingRebind, pendingRebind } =
+      await createHarness({ rebind: "skip" });
+    repo.seed(
+      makeSession({ id: "local-1", updatedAt: 100 }),
+      makeSession({ id: "private", updatedAt: 200, incognito: true }),
+      makeSession({ id: "already", updatedAt: 300, syncExcluded: true }),
+    );
+
+    await service.applySkipRebindIfPending();
+
+    expect(repo.sessions.get("local-1")).toMatchObject({
+      syncExcluded: true,
+      updatedAt: 100,
+    });
+    expect(repo.sessions.get("private")?.syncExcluded).toBeUndefined();
+    expect(repo.sessions.get("already")?.syncExcluded).toBe(true);
+    expect(peekPendingRebind).toHaveBeenCalledTimes(1);
+    expect(consumePendingRebind).toHaveBeenCalledTimes(1);
+    expect(pendingRebind()).toBeUndefined();
+  });
+
+  it("leaves an upload marker untouched for the next full sync", async () => {
+    const { repo, service, consumePendingRebind, pendingRebind } =
+      await createHarness({ rebind: "upload" });
+    repo.seed(makeSession({ id: "local-1" }));
+
+    await service.applySkipRebindIfPending();
+
+    expect(repo.patches).toEqual([]);
+    expect(consumePendingRebind).not.toHaveBeenCalled();
+    expect(pendingRebind()).toBe("upload");
+  });
+
+  it("does nothing when no marker is pending", async () => {
+    const { repo, service, consumePendingRebind } = await createHarness();
+    repo.seed(makeSession({ id: "local-1" }));
+
+    await service.applySkipRebindIfPending();
+
+    expect(repo.patches).toEqual([]);
+    expect(consumePendingRebind).not.toHaveBeenCalled();
   });
 });
 

@@ -32,7 +32,11 @@ import { API_BASE } from "../config";
 import { listSessions } from "../sessions-repo";
 import { loadSettings, saveSetting } from "../settings";
 import { getKey } from "./key-store";
-import { enqueueUpload, syncNow } from "./sync-service";
+import {
+  applySkipRebindIfPending,
+  enqueueUpload,
+  syncNow,
+} from "./sync-service";
 
 /** Alarm that retries pending uploads while sync is enabled. */
 export const SYNC_RETRY_ALARM_NAME = "sync-retry";
@@ -123,6 +127,11 @@ export async function syncOnStartup(): Promise<void> {
 export async function retryPendingUploads(): Promise<void> {
   const settings = await loadSettings();
   if (!isSyncEnabled(settings) || settings["sync.autoUpload"] !== true) return;
+
+  // A "skip upload" key import stages its marker until a full sync consumes
+  // it. The alarm can fire first, so persist the exclusions now; an "upload"
+  // marker is left for the next full sync's force-upload.
+  await applySkipRebindIfPending();
 
   const pending = (await listSessions()).filter(
     (session) =>
