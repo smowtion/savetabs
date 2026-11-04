@@ -243,7 +243,10 @@ describe("executeRestore", () => {
     const result = await executeRestore(session);
 
     expect(result).toEqual({ opened: 3 });
-    expect(createWindow).toHaveBeenCalledWith({ url: "https://one.example" });
+    expect(createWindow).toHaveBeenCalledWith({
+      url: "https://one.example",
+      focused: false,
+    });
     expect(createTab).toHaveBeenNthCalledWith(1, {
       windowId: 77,
       url: "https://two.example",
@@ -253,6 +256,33 @@ describe("executeRestore", () => {
       windowId: 77,
       url: "https://three.example",
       active: false,
+    });
+  });
+
+  it("focuses the new window when openInBackground is disabled", async () => {
+    await seedSettings({
+      "restore.targetWindow": "new",
+      "restore.openInBackground": false,
+    });
+    const createWindow = vi
+      .spyOn(fakeBrowser.windows, "create")
+      .mockResolvedValue({ id: 77 } as unknown as FakeWindow);
+    const createTab = vi.spyOn(fakeBrowser.tabs, "create");
+    const session = makeSession([
+      makeTab("https://one.example"),
+      makeTab("https://two.example"),
+    ]);
+
+    await executeRestore(session);
+
+    expect(createWindow).toHaveBeenCalledWith({
+      url: "https://one.example",
+      focused: true,
+    });
+    expect(createTab).toHaveBeenNthCalledWith(1, {
+      windowId: 77,
+      url: "https://two.example",
+      active: true,
     });
   });
 

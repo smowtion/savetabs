@@ -128,9 +128,10 @@ async function pinFirstTab(
  *
  * `restore.targetWindow = "new"` creates a window from the first tab and adds
  * the remaining tabs to it; otherwise every tab is created in the current
- * window. `restore.openInBackground` becomes the tabs' `active` flag (the first
- * tab of a new window is active by construction). `pinned.restoreAsPinned`
- * recreates originally pinned tabs as pinned.
+ * window. `restore.openInBackground` becomes the tabs' `active` flag and the
+ * new window's `focused` flag (the first tab of a new window is active by
+ * construction). `pinned.restoreAsPinned` recreates originally pinned tabs as
+ * pinned.
  *
  * Returns the number of tabs the restore opened; a session with nothing
  * restorable opens nothing and returns `{ opened: 0 }`.
@@ -144,6 +145,7 @@ export async function executeRestore(session: Session): Promise<RestoreResult> {
   if (tabs.length === 0) return { opened: 0 };
 
   const active = !readBoolean(settings, "restore.openInBackground");
+  const focused = !readBoolean(settings, "restore.openInBackground");
   const restorePinned = readBoolean(settings, "pinned.restoreAsPinned");
 
   if (settings["restore.targetWindow"] !== "new") {
@@ -156,7 +158,7 @@ export async function executeRestore(session: Session): Promise<RestoreResult> {
   const [first, ...rest] = tabs;
   if (first === undefined) return { opened: 0 };
 
-  const created = await browser.windows.create({ url: first.url });
+  const created = await browser.windows.create({ url: first.url, focused });
   const windowId = created?.id;
   if (windowId === undefined) {
     throw new Error("Cannot restore tabs: the new window was not created");
