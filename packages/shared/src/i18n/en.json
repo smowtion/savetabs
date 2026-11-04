@@ -18,6 +18,7 @@
   "settings": {
     "general": {
       "label": "General",
+      "description": "Appearance, language and tab-count preferences.",
       "theme": {
         "label": "Theme",
         "description": "Choose light, dark, or follow the system appearance."
@@ -37,6 +38,7 @@
     },
     "tabs": {
       "label": "Tabs",
+      "description": "Choose which tabs are saved and what happens after saving.",
       "saveAllWindows": {
         "label": "Save all windows",
         "description": "Include tabs from every browser window, not only the current one."
@@ -60,6 +62,7 @@
     },
     "duplicates": {
       "label": "Duplicates",
+      "description": "Control how repeated tabs and URLs are handled.",
       "removeOnSave": {
         "label": "Remove duplicate tabs",
         "description": "Close repeated tabs and keep only one copy of each URL in the session."
@@ -75,6 +78,7 @@
     },
     "pinned": {
       "label": "Pinned tabs",
+      "description": "Decide whether pinned tabs are saved or restored.",
       "skipOnSave": {
         "label": "Skip pinned tabs when saving",
         "description": "Leave pinned tabs open and out of new sessions."
@@ -86,6 +90,7 @@
     },
     "open": {
       "label": "Opening sessions",
+      "description": "Configure what happens when you open the extension and sessions.",
       "toolbarAction": {
         "label": "Toolbar button action",
         "description": "What happens when the toolbar icon is clicked: open the popup, save tabs immediately, or open the sessions page."
@@ -101,6 +106,7 @@
     },
     "urlDisplay": {
       "label": "URL display",
+      "description": "Choose how saved tabs and sessions are shown.",
       "mode": {
         "label": "URL display mode",
         "description": "Show saved tabs by title, by domain, or as the full URL."
@@ -116,6 +122,7 @@
     },
     "restore": {
       "label": "Restoring",
+      "description": "Set how restored sessions open in your browser.",
       "targetWindow": {
         "label": "Restore target window",
         "description": "Open restored tabs in the current window or in a new window."
@@ -131,6 +138,7 @@
     },
     "clipboard": {
       "label": "Clipboard",
+      "description": "Choose the format used when copying tabs.",
       "format": {
         "label": "Copy format",
         "description": "Format used when copying session tabs: plain URLs, Markdown links, or titles with URLs."
@@ -138,6 +146,7 @@
     },
     "contextMenu": {
       "label": "Context menu",
+      "description": "Choose which actions appear in the right-click menu.",
       "enabled": {
         "label": "Enable context menu items",
         "description": "Show SaveTabs actions in the browser context menu."
@@ -157,6 +166,7 @@
     },
     "memory": {
       "label": "Memory saver",
+      "description": "Free memory by discarding inactive tabs automatically.",
       "autoDiscard": {
         "label": "Automatically discard inactive tabs",
         "description": "Free memory by discarding tabs that have been inactive for the timeout below."
@@ -175,10 +185,12 @@
       }
     },
     "shortcuts": {
-      "label": "Shortcuts"
+      "label": "Shortcuts",
+      "description": "View the keyboard shortcuts assigned to SaveTabs."
     },
     "incognito": {
       "label": "Incognito",
+      "description": "Control how private windows are handled.",
       "includeInSaveAll": {
         "label": "Include incognito windows",
         "description": "Include private windows when saving all windows. Requires incognito access permission."
@@ -186,6 +198,7 @@
     },
     "sync": {
       "label": "Sync",
+      "description": "Back up and restore sessions with end-to-end encryption.",
       "enabled": {
         "label": "Enable end-to-end encrypted sync",
         "description": "Back up sessions to your sync account with end-to-end encryption."
@@ -200,7 +213,24 @@
       }
     },
     "advanced": {
-      "label": "Advanced"
+      "label": "Advanced",
+      "description": "Import, export, reset and maintenance actions."
+    }
+  },
+  "options": {
+    "search": "Search settings",
+    "searchPlaceholder": "Search settings…",
+    "expandAll": "Expand all",
+    "collapseAll": "Collapse all",
+    "categories": "Settings categories",
+    "settingCount": "{count} settings",
+    "saved": "Saved",
+    "noResults": "No settings match your search.",
+    "theme": {
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark",
+      "toggle": "Theme: {theme}"
     }
   },
   "contextMenu": {

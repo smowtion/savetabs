@@ -1,1 +1,17 @@
 @import "tailwindcss";
+
+/*
+ * Explicit light/dark preferences are applied as data-theme="light|dark" on
+ * <html>. The custom dark variant lets utilities follow that attribute
+ * instead of the operating system media query, so the user's choice always
+ * wins while "system" is resolved to a concrete attribute by useTheme.
+ */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}

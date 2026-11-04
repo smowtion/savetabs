@@ -18,6 +18,7 @@
   "settings": {
     "general": {
       "label": "Chung",
+      "description": "Giao diện, ngôn ngữ và cách hiển thị số lượng tab.",
       "theme": {
         "label": "Giao diện",
         "description": "Chọn giao diện sáng, tối hoặc theo hệ thống."
@@ -37,6 +38,7 @@
     },
     "tabs": {
       "label": "Tab",
+      "description": "Chọn tab nào được lưu và điều gì xảy ra sau khi lưu.",
       "saveAllWindows": {
         "label": "Lưu tất cả cửa sổ",
         "description": "Bao gồm tab từ mọi cửa sổ trình duyệt, không chỉ cửa sổ hiện tại."
@@ -60,6 +62,7 @@
     },
     "duplicates": {
       "label": "Tab trùng lặp",
+      "description": "Kiểm soát cách xử lý tab và URL trùng lặp.",
       "removeOnSave": {
         "label": "Xóa tab trùng lặp",
         "description": "Đóng các tab trùng và chỉ giữ một bản của mỗi URL trong phiên."
@@ -75,6 +78,7 @@
     },
     "pinned": {
       "label": "Tab ghim",
+      "description": "Quyết định tab ghim có được lưu hoặc khôi phục hay không.",
       "skipOnSave": {
         "label": "Bỏ qua tab ghim khi lưu",
         "description": "Giữ mở tab ghim và không đưa vào phiên mới."
@@ -86,6 +90,7 @@
     },
     "open": {
       "label": "Mở phiên",
+      "description": "Cấu hình điều xảy ra khi mở tiện ích và các phiên.",
       "toolbarAction": {
         "label": "Hành động của nút trên thanh công cụ",
         "description": "Điều xảy ra khi nhấn biểu tượng thanh công cụ: mở cửa sổ bật lên, lưu tab ngay hoặc mở trang phiên."
@@ -101,6 +106,7 @@
     },
     "urlDisplay": {
       "label": "Hiển thị URL",
+      "description": "Chọn cách hiển thị tab và phiên đã lưu.",
       "mode": {
         "label": "Chế độ hiển thị URL",
         "description": "Hiển thị tab đã lưu theo tiêu đề, theo tên miền hoặc theo URL đầy đủ."
@@ -116,6 +122,7 @@
     },
     "restore": {
       "label": "Khôi phục",
+      "description": "Đặt cách phiên được khôi phục mở trong trình duyệt.",
       "targetWindow": {
         "label": "Cửa sổ khôi phục",
         "description": "Mở tab khôi phục trong cửa sổ hiện tại hoặc cửa sổ mới."
@@ -131,6 +138,7 @@
     },
     "clipboard": {
       "label": "Bộ nhớ tạm",
+      "description": "Chọn định dạng dùng khi sao chép tab.",
       "format": {
         "label": "Định dạng sao chép",
         "description": "Định dạng khi sao chép tab của phiên: URL thuần, liên kết Markdown hoặc tiêu đề kèm URL."
@@ -138,6 +146,7 @@
     },
     "contextMenu": {
       "label": "Menu chuột phải",
+      "description": "Chọn các hành động xuất hiện trong menu chuột phải.",
       "enabled": {
         "label": "Bật các mục menu chuột phải",
         "description": "Hiển thị các hành động của SaveTabs trong menu chuột phải."
@@ -157,6 +166,7 @@
     },
     "memory": {
       "label": "Tiết kiệm bộ nhớ",
+      "description": "Giải phóng bộ nhớ bằng cách tự động đóng tab không hoạt động.",
       "autoDiscard": {
         "label": "Tự động giải phóng tab không hoạt động",
         "description": "Giải phóng bộ nhớ bằng cách đóng các tab không hoạt động quá thời gian chờ bên dưới."
@@ -175,10 +185,12 @@
       }
     },
     "shortcuts": {
-      "label": "Phím tắt"
+      "label": "Phím tắt",
+      "description": "Xem các phím tắt được gán cho SaveTabs."
     },
     "incognito": {
       "label": "Ẩn danh",
+      "description": "Kiểm soát cách xử lý cửa sổ riêng tư.",
       "includeInSaveAll": {
         "label": "Bao gồm cửa sổ ẩn danh",
         "description": "Bao gồm cửa sổ riêng tư khi lưu tất cả cửa sổ. Cần quyền truy cập ẩn danh."
@@ -186,6 +198,7 @@
     },
     "sync": {
       "label": "Đồng bộ",
+      "description": "Sao lưu và khôi phục phiên với mã hóa đầu cuối.",
       "enabled": {
         "label": "Bật đồng bộ mã hóa đầu cuối",
         "description": "Sao lưu phiên lên tài khoản đồng bộ với mã hóa đầu cuối."
@@ -200,7 +213,24 @@
       }
     },
     "advanced": {
-      "label": "Nâng cao"
+      "label": "Nâng cao",
+      "description": "Nhập, xuất, đặt lại và các thao tác bảo trì."
+    }
+  },
+  "options": {
+    "search": "Tìm kiếm cài đặt",
+    "searchPlaceholder": "Tìm kiếm cài đặt…",
+    "expandAll": "Mở rộng tất cả",
+    "collapseAll": "Thu gọn tất cả",
+    "categories": "Danh mục cài đặt",
+    "settingCount": "{count} cài đặt",
+    "saved": "Đã lưu",
+    "noResults": "Không có cài đặt nào khớp với tìm kiếm.",
+    "theme": {
+      "system": "Hệ thống",
+      "light": "Sáng",
+      "dark": "Tối",
+      "toggle": "Giao diện: {theme}"
     }
   },
   "contextMenu": {

@@ -27,4 +27,25 @@ describe("i18n", () => {
   it("reports only the keys missing from a dictionary", () => {
     expect(missingKeys("vi", ["common.restore", "nope.missing"])).toEqual(["nope.missing"]);
   });
+
+  it("covers the options shell strings in both languages", () => {
+    const shellKeys = [
+      "options.search",
+      "options.searchPlaceholder",
+      "options.expandAll",
+      "options.collapseAll",
+      "options.categories",
+      "options.settingCount",
+      "options.saved",
+      "options.noResults",
+      "options.theme.system",
+      "options.theme.light",
+      "options.theme.dark",
+      "options.theme.toggle",
+      ...SETTINGS_SCHEMA.map((category) => `settings.${category.id}.description`),
+    ];
+
+    expect(missingKeys("en", shellKeys)).toEqual([]);
+    expect(missingKeys("vi", shellKeys)).toEqual([]);
+  });
 });
