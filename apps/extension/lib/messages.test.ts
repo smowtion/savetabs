@@ -11,6 +11,14 @@ import { handleUiMessage, type UiResponse } from "./messages";
 import type { SaveTabsResult } from "./save-flow";
 import { SESSIONS_DB_NAME, closeSessionsDb } from "./sessions-db";
 import { addSession, getSession, listSessions } from "./sessions-repo";
+import { enqueueUpload } from "./sync/sync-service";
+
+vi.mock("./sync/sync-service", () => ({
+  enqueueUpload: vi.fn(),
+  syncNow: vi.fn(),
+}));
+
+const enqueueUploadMock = vi.mocked(enqueueUpload);
 
 function settingsWith(overrides: Settings = {}): Settings {
   return { ...DEFAULT_SETTINGS, ...overrides };
@@ -70,6 +78,8 @@ function expectOk(response: UiResponse): unknown {
 
 beforeEach(async () => {
   fakeBrowser.reset();
+  vi.clearAllMocks();
+  enqueueUploadMock.mockResolvedValue(undefined);
   await closeSessionsDb();
   await deleteDatabase();
 });
@@ -98,6 +108,52 @@ describe("handleUiMessage", () => {
       "https://example.com/saved",
     ]);
     await expect(listSessions()).resolves.toHaveLength(1);
+  });
+
+  it("uploads only the freshly saved session when auto-upload is on", async () => {
+    await seedSettings({
+      "sync.enabled": true,
+      "sync.autoUpload": true,
+      "open.openSessionsAfterSave": false,
+      "tabs.closeAfterSave": false,
+    });
+    await seedWindowWithTab("https://example.com/fresh");
+    await addSession({
+      ...makeSession("excluded", [
+        { url: "https://example.com/old", title: "Old" },
+      ]),
+      syncExcluded: true,
+    });
+
+    const response = await handleUiMessage({
+      type: "SAVE_TABS",
+      source: "window",
+    });
+    const data = expectOk(response) as SaveTabsResult;
+
+    expect(enqueueUploadMock).toHaveBeenCalledTimes(1);
+    const uploaded = enqueueUploadMock.mock.calls[0]?.[0];
+    expect(uploaded?.id).toBe(data.session?.id);
+    expect(uploaded?.id).not.toBe("excluded");
+    expect(uploaded?.syncExcluded).toBeUndefined();
+  });
+
+  it("does not upload a save when auto-upload is off", async () => {
+    await seedSettings({
+      "sync.enabled": true,
+      "sync.autoUpload": false,
+      "open.openSessionsAfterSave": false,
+      "tabs.closeAfterSave": false,
+    });
+    await seedWindowWithTab("https://example.com/fresh");
+
+    const response = await handleUiMessage({
+      type: "SAVE_TABS",
+      source: "window",
+    });
+
+    expectOk(response);
+    expect(enqueueUploadMock).not.toHaveBeenCalled();
   });
 
   it("rejects SAVE_TABS with an unknown source", async () => {

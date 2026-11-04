@@ -1,5 +1,5 @@
 /**
- * Sync & Backup key management.
+ * Sync & Backup section: status panel plus key management.
  *
  * The key is the only credential for the encrypted cloud data, so it is shown
  * masked by default, copying is explicit, and rotation demands typing ROTATE
@@ -7,8 +7,10 @@
  * asks whether local sessions should be uploaded under it; the answer is
  * recorded as a pending rebind decision that the sync service consumes.
  *
- * This component only manages key material. It never enables sync, contacts
- * the network, or changes sync settings.
+ * Key material stays in this component. Network actions (manual sync and
+ * deleting cloud data) live in the {@link SyncStatus} panel it renders first.
+ * Enabling sync itself is guarded by the options shell, which asks the user to
+ * confirm the key was saved before flipping `sync.enabled`.
  */
 
 import { formatKey, parseKey, type Translator } from "@savetabs/shared";
@@ -21,6 +23,7 @@ import {
   setKey,
   type RebindMode,
 } from "../lib/sync/key-store";
+import { SyncStatus } from "./SyncStatus";
 
 const ROTATE_CONFIRMATION = "ROTATE";
 
@@ -33,6 +36,8 @@ const DANGER_BUTTON_CLASS =
 
 export type SyncSectionProps = {
   t: Translator;
+  /** Whether `sync.enabled` is on; forwarded to the status panel. */
+  syncEnabled?: boolean;
 };
 
 type Status = {
@@ -49,7 +54,7 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-export function SyncSection({ t }: SyncSectionProps) {
+export function SyncSection({ t, syncEnabled = false }: SyncSectionProps) {
   const [key, setKeyValue] = useState<string | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [status, setStatus] = useState<Status | null>(null);
@@ -162,6 +167,7 @@ export function SyncSection({ t }: SyncSectionProps) {
 
   return (
     <div className="mb-4 flex flex-col gap-3 border-b border-neutral-200 pb-4 dark:border-neutral-800">
+      <SyncStatus t={t} enabled={syncEnabled} />
       <div>
         <h3 className="text-sm font-semibold">{t("settings.sync.keyTitle")}</h3>
         <div className="mt-2 flex flex-wrap items-center gap-2">

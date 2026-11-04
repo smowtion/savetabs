@@ -515,4 +515,36 @@ describe("CategorySection", () => {
     ).toBeInTheDocument();
     expect(within(table).getByText("Alt+Shift+S")).toBeInTheDocument();
   });
+
+  it("consults the before-change guard and skips a declined write", async () => {
+    const beforeChange = vi.fn(() => false);
+    const onChange = vi.fn(async () => undefined);
+
+    render(
+      <CategorySection
+        categoryId="sync"
+        settings={category("sync").settings}
+        values={{ ...DEFAULT_SETTINGS, "sync.enabled": false }}
+        t={t}
+        onChange={onChange}
+        beforeChange={beforeChange}
+        discardSupported
+      />,
+    );
+
+    await userEvent.click(
+      screen.getByRole("switch", {
+        name: "Enable end-to-end encrypted sync",
+      }),
+    );
+
+    await waitFor(() =>
+      expect(beforeChange).toHaveBeenCalledWith(
+        "sync.enabled",
+        true,
+        false,
+      ),
+    );
+    expect(onChange).not.toHaveBeenCalled();
+  });
 });

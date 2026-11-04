@@ -11,7 +11,7 @@ import { fakeBrowser } from "wxt/testing/fake-browser";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { OPEN_SECTIONS_STORAGE_KEY } from "../../lib/open-sections";
-import { resetSettings } from "../../lib/settings";
+import { loadSettings, resetSettings } from "../../lib/settings";
 import { App } from "./App";
 
 function stubMatchMedia(matches = false): void {
@@ -241,6 +241,66 @@ describe("options shell", () => {
     expect(
       screen.getByRole("button", { name: "Rotate key" }),
     ).toBeInTheDocument();
+  });
+
+  it("keeps sync off when the key confirmation is cancelled", async () => {
+    render(<App />);
+    await userEvent.click(
+      within(main()).getByRole("button", { name: /^Sync/ }),
+    );
+
+    const toggle = screen.getByRole("switch", {
+      name: "Enable end-to-end encrypted sync",
+    });
+    expect(toggle).toHaveAttribute("aria-checked", "false");
+
+    await userEvent.click(toggle);
+
+    const dialog = await screen.findByRole("dialog", {
+      name: "Enable encrypted sync?",
+    });
+    expect(
+      within(dialog).getByText(/Make sure you saved your sync key/),
+    ).toBeInTheDocument();
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "Cancel" }),
+    );
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(toggle).toHaveAttribute("aria-checked", "false");
+    await expect(loadSettings()).resolves.toMatchObject({
+      "sync.enabled": false,
+    });
+  });
+
+  it("enables sync after the key confirmation", async () => {
+    render(<App />);
+    await userEvent.click(
+      within(main()).getByRole("button", { name: /^Sync/ }),
+    );
+
+    await userEvent.click(
+      screen.getByRole("switch", {
+        name: "Enable end-to-end encrypted sync",
+      }),
+    );
+    const dialog = await screen.findByRole("dialog", {
+      name: "Enable encrypted sync?",
+    });
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "Enable sync" }),
+    );
+
+    await waitFor(async () => {
+      expect((await loadSettings())["sync.enabled"]).toBe(true);
+    });
+    await waitFor(() =>
+      expect(
+        screen.getByRole("switch", {
+          name: "Enable end-to-end encrypted sync",
+        }),
+      ).toHaveAttribute("aria-checked", "true"),
+    );
   });
 
   it("disables memory settings when the browser cannot discard tabs", async () => {

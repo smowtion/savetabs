@@ -14,6 +14,7 @@ import { discardNow, type DiscardResult } from "./discard";
 import { executeRestore, type RestoreResult } from "./restore";
 import { saveTabs, type SaveTabsResult } from "./save-flow";
 import { deleteSession, getSession } from "./sessions-repo";
+import { syncSavedSession } from "./sync/sync-lifecycle";
 
 /** Every message an extension page may send to the background. */
 export type UiMessage =
@@ -129,6 +130,9 @@ export async function handleUiMessage(message: unknown): Promise<UiResponse> {
             requiredCount = count;
             return false;
           },
+          // Only this newly persisted session reaches the sync service; the
+          // hook checks `sync.enabled`/`sync.autoUpload` and contains failures.
+          onSaved: syncSavedSession,
         });
         if (requiredCount !== undefined) {
           return {

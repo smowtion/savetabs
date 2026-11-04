@@ -17,6 +17,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Accordion } from "../../components/Accordion";
 import { CategorySection } from "../../components/CategorySection";
+import { ConfirmDialog } from "../../components/ConfirmDialog";
 import { SearchBar } from "../../components/SearchBar";
 import { SettingsSidebar } from "../../components/SettingsSidebar";
 import { SyncSection } from "../../components/SyncSection";
@@ -29,6 +30,7 @@ import {
   filterSettings,
   type SettingsSearchGroup,
 } from "../../lib/search-settings";
+import type { SettingValue } from "../../lib/settings";
 import { nextThemePreference, normalizeThemePreference } from "../../lib/theme";
 
 const ALL_SETTINGS_GROUPS: readonly SettingsSearchGroup[] = SETTINGS_SCHEMA.map(
@@ -51,6 +53,9 @@ export function App() {
   const { lang, t } = useI18n(settings?.["general.language"]);
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<CategoryId>("general");
+  // Enabling sync is gated on the user confirming they saved the only key
+  // that can ever decrypt their cloud data.
+  const [syncEnableConfirmOpen, setSyncEnableConfirmOpen] = useState(false);
   const { openSections, setSectionOpen, expandAll, collapseAll } =
     useOpenSections();
 
@@ -87,6 +92,29 @@ export function App() {
       nextThemePreference(themePreference),
     ).catch((error) => {
       console.error("[savetabs] failed to save theme", error);
+    });
+  }
+
+  /**
+   * Turning sync on (false -> true) never writes directly: it opens the
+   * key-saved confirmation first. Everything else proceeds untouched.
+   */
+  function beforeSettingChange(
+    key: string,
+    next: SettingValue,
+    current: SettingValue | undefined,
+  ): boolean {
+    if (key === "sync.enabled" && next === true && current !== true) {
+      setSyncEnableConfirmOpen(true);
+      return false;
+    }
+    return true;
+  }
+
+  function confirmSyncEnable(): void {
+    setSyncEnableConfirmOpen(false);
+    void updateSetting("sync.enabled", true).catch((error) => {
+      console.error("[savetabs] failed to enable sync", error);
     });
   }
 
@@ -177,13 +205,19 @@ export function App() {
                   open={isSearching || openSections.has(group.category)}
                   onToggle={(next) => setSectionOpen(group.category, next)}
                 >
-                  {group.category === "sync" && <SyncSection t={t} />}
+                  {group.category === "sync" && (
+                    <SyncSection
+                      t={t}
+                      syncEnabled={settings?.["sync.enabled"] === true}
+                    />
+                  )}
                   <CategorySection
                     categoryId={group.category}
                     settings={group.settings}
                     values={settings}
                     t={t}
                     onChange={updateSetting}
+                    beforeChange={beforeSettingChange}
                     discardSupported={discardSupported}
                   />
                 </Accordion>
@@ -192,6 +226,17 @@ export function App() {
           </div>
         )}
       </main>
+
+      {syncEnableConfirmOpen && (
+        <ConfirmDialog
+          title={t("settings.sync.enableConfirmTitle")}
+          message={t("settings.sync.enableConfirmMessage")}
+          confirmLabel={t("settings.sync.enableConfirm")}
+          cancelLabel={t("common.cancel")}
+          onConfirm={confirmSyncEnable}
+          onCancel={() => setSyncEnableConfirmOpen(false)}
+        />
+      )}
     </div>
   );
 }

@@ -11,6 +11,11 @@
  * `incognito` reports whether the extension may run in private windows and
  * disables `incognito.includeInSaveAll` while access is missing, and
  * `shortcuts` lists the bindings the browser currently has assigned.
+ *
+ * A page may pass `beforeChange` to veto or defer a write for a specific
+ * setting. The options shell uses it to require a key-saved confirmation
+ * before `sync.enabled` turns on; a declined guard leaves the stored value
+ * untouched instead of silently flipping the control twice.
  */
 
 import type {
@@ -35,6 +40,16 @@ import { Toggle } from "./Toggle";
 const BUTTON_CLASS =
   "rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800";
 
+/**
+ * Consulted before a control writes a value. Returning false aborts the write
+ * so the caller can render a confirmation and perform the write itself later.
+ */
+export type SettingChangeGuard = (
+  key: string,
+  next: SettingValue,
+  current: SettingValue | undefined,
+) => boolean | Promise<boolean>;
+
 export type CategorySectionProps = {
   categoryId: CategoryId;
   settings: readonly SettingDef[];
@@ -42,6 +57,8 @@ export type CategorySectionProps = {
   values: Settings | null;
   t: Translator;
   onChange: (key: string, value: SettingValue) => void | Promise<void>;
+  /** Optional per-setting veto; see {@link SettingChangeGuard}. */
+  beforeChange?: SettingChangeGuard;
   /** False on browsers without `tabs.discard` (Firefox builds). */
   discardSupported: boolean;
 };
@@ -58,7 +75,7 @@ function enumOptionLabel(
 
 type SettingsListProps = Pick<
   CategorySectionProps,
-  "settings" | "values" | "t" | "onChange"
+  "settings" | "values" | "t" | "onChange" | "beforeChange"
 > & {
   /** Disables every control, e.g. when the browser lacks the feature. */
   disabled?: boolean;
@@ -72,11 +89,16 @@ function SettingsList({
   values,
   t,
   onChange,
+  beforeChange,
   disabled = false,
   note,
 }: SettingsListProps) {
   async function write(key: string, value: SettingValue): Promise<void> {
     try {
+      if (beforeChange !== undefined) {
+        const allowed = await beforeChange(key, value, values?.[key]);
+        if (!allowed) return;
+      }
       await onChange(key, value);
     } catch (error) {
       // The settings store validates every write; a rejection here means the
@@ -217,7 +239,7 @@ function SettingsList({
 
 type IncognitoSectionProps = Pick<
   CategorySectionProps,
-  "settings" | "values" | "t" | "onChange"
+  "settings" | "values" | "t" | "onChange" | "beforeChange"
 >;
 
 type CopyStatus = "success" | "error";
@@ -237,6 +259,7 @@ function IncognitoSection({
   values,
   t,
   onChange,
+  beforeChange,
 }: IncognitoSectionProps) {
   const [allowed, setAllowed] = useState<boolean | null>(null);
   const [copyStatus, setCopyStatus] = useState<CopyStatus | null>(null);
@@ -344,6 +367,7 @@ function IncognitoSection({
         values={values}
         t={t}
         onChange={onChange}
+        beforeChange={beforeChange}
         disabled={denied}
         note={denied ? t("settings.incognito.deniedNote") : undefined}
       />
@@ -357,6 +381,7 @@ export function CategorySection({
   values,
   t,
   onChange,
+  beforeChange,
   discardSupported,
 }: CategorySectionProps) {
   // The Advanced category holds actions instead of schema settings; it owns
@@ -379,6 +404,7 @@ export function CategorySection({
         values={values}
         t={t}
         onChange={onChange}
+        beforeChange={beforeChange}
       />
     );
   }
@@ -391,6 +417,7 @@ export function CategorySection({
       values={values}
       t={t}
       onChange={onChange}
+      beforeChange={beforeChange}
       disabled={memoryDisabled}
       note={memoryDisabled ? t("options.memoryUnsupported") : undefined}
     />

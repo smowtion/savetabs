@@ -6,7 +6,9 @@
  * auto-discard and the typed runtime message router.
  *
  * Install and startup also ensure a sync key exists. Sync itself stays
- * disabled until the user turns it on in the options page.
+ * disabled until the user turns it on in the options page; while it is on,
+ * startup runs an auto-download merge, a save queues its new session for
+ * upload, and a five-minute alarm retries pending uploads.
  */
 
 import type { Settings } from "@savetabs/shared";
@@ -35,6 +37,12 @@ import { handleUiMessage } from "../lib/messages";
 import { loadSettings, onSettingsChanged } from "../lib/settings";
 import { onSessionsChanged } from "../lib/sessions-repo";
 import { getOrCreateKey } from "../lib/sync/key-store";
+import {
+  SYNC_RETRY_ALARM_NAME,
+  applySyncAlarm,
+  retryPendingSync,
+  syncOnStartup,
+} from "../lib/sync/sync-lifecycle";
 
 /**
  * Background work is fire-and-forget from event listeners: log failures so a
@@ -54,6 +62,7 @@ async function applySettings(settings: Settings): Promise<void> {
     rebuildContextMenus(settings),
     updateBadge(settings),
     applyDiscardAlarm(settings),
+    applySyncAlarm(settings),
   ]);
 }
 
@@ -63,12 +72,14 @@ async function applyCurrentSettings(): Promise<void> {
 
 /**
  * Install and startup restore settings, drop stale tab activity and make sure
- * a sync key is available. A fresh key never enables sync by itself.
+ * a sync key is available. A fresh key never enables sync by itself. Startup
+ * additionally runs the auto-download merge, which contains its own failures.
  */
-async function initialize(): Promise<void> {
+async function initialize(runStartupSync = false): Promise<void> {
   await applyCurrentSettings();
   await pruneActivity();
   await getOrCreateKey();
+  if (runStartupSync) await syncOnStartup();
 }
 
 export default defineBackground(() => {
@@ -76,7 +87,7 @@ export default defineBackground(() => {
     run(initialize());
   });
   browser.runtime.onStartup.addListener(() => {
-    run(initialize());
+    run(initialize(true));
   });
 
   // `sendResponse` + `return true` keeps the response channel open on every
@@ -100,6 +111,7 @@ export default defineBackground(() => {
 
   browser.alarms.onAlarm.addListener((alarm) => {
     if (alarm.name === DISCARD_ALARM_NAME) run(evaluateAndDiscard());
+    if (alarm.name === SYNC_RETRY_ALARM_NAME) run(retryPendingSync());
   });
 
   // Activity tracking feeds the idle threshold. URL changes cover in-page

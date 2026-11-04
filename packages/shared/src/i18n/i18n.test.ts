@@ -132,6 +132,32 @@ describe("i18n", () => {
     expect(missingKeys("vi", syncKeys)).toEqual([]);
   });
 
+  it("covers the sync status and cloud data strings in both languages", () => {
+    const syncStatusKeys = [
+      "settings.sync.statusTitle",
+      "settings.sync.statusOn",
+      "settings.sync.statusOff",
+      "settings.sync.lastSyncLabel",
+      "settings.sync.neverSynced",
+      "settings.sync.pendingLabel",
+      "settings.sync.syncing",
+      "settings.sync.syncResult",
+      "settings.sync.syncErrorsTitle",
+      "settings.sync.authError",
+      "settings.sync.deleteCloud",
+      "settings.sync.deleteCloudTitle",
+      "settings.sync.deleteCloudMessage",
+      "settings.sync.deleteCloudConfirm",
+      "settings.sync.deleteCloudSuccess",
+      "settings.sync.enableConfirmTitle",
+      "settings.sync.enableConfirmMessage",
+      "settings.sync.enableConfirm",
+    ];
+
+    expect(missingKeys("en", syncStatusKeys)).toEqual([]);
+    expect(missingKeys("vi", syncStatusKeys)).toEqual([]);
+  });
+
   it("covers the incognito and shortcuts strings in both languages", () => {
     const categoryKeys = [
       "settings.incognito.status.label",
