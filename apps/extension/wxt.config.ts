@@ -11,9 +11,25 @@ const apiBase = (
   "https://api.savetabs.example"
 ).replace(/\/+$/, "");
 
+// One raster set shared by the extension listing and the toolbar button. The
+// files are generated from `assets/icon.svg` and committed under `public/`.
+const ICON_PATHS = {
+  16: "icon/icon-16.png",
+  32: "icon/icon-32.png",
+  48: "icon/icon-48.png",
+  128: "icon/icon-128.png",
+};
+
 export default defineConfig({
   manifestVersion: 3,
   modules: ["@wxt-dev/module-react"],
+  // Store artifacts are named savetabs-<version>-<browser>.zip. Without the
+  // explicit template WXT derives the prefix from the scoped package name and
+  // produces "savetabsextension-...".
+  zip: {
+    name: "savetabs",
+    artifactTemplate: "savetabs-{{version}}-{{browser}}{{modeSuffix}}.zip",
+  },
   vite: () => ({
     plugins: [tailwindcss()],
     define: {
@@ -24,10 +40,13 @@ export default defineConfig({
     name: "SaveTabs",
     description: "Save and restore browser tab sessions.",
     permissions: ["tabs", "storage", "alarms", "contextMenus"],
+    icons: ICON_PATHS,
     // The background configures the toolbar action at runtime (popup vs click
-    // handler), so the manifest must declare it even before a popup entrypoint
-    // exists. The popup entrypoint later merges `default_popup` into this key.
-    action: {},
+    // handler), so the manifest must declare it. The popup entrypoint later
+    // merges `default_popup` into this key.
+    action: {
+      default_icon: ICON_PATHS,
+    },
     host_permissions: [`${apiBase}/*`],
     commands: {
       "save-tabs": {

@@ -12,10 +12,15 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "build": "pnpm -r --if-present build",
     "build:ext": "pnpm --filter @savetabs/extension build",
+    "icons": "pnpm --filter @savetabs/extension icons",
+    "zip:chrome": "pnpm --filter @savetabs/extension zip:chrome",
+    "zip:firefox": "pnpm --filter @savetabs/extension zip:firefox",
+    "verify:build": "pnpm --filter @savetabs/extension verify:build",
     "dev:worker": "pnpm --filter @savetabs/worker dev",
     "db:migrate:local": "pnpm --filter @savetabs/worker db:migrate:local"
   },
   "devDependencies": {
+    "sharp": "^0.35.5",
     "typescript": "^5.9.3",
     "vitest": "^4.1.12"
   }

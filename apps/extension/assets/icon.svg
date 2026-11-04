@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="SaveTabs">
+  <rect width="128" height="128" rx="28" fill="#4f46e5"/>
+  <rect x="42" y="28" width="54" height="18" rx="9" fill="#ffffff" fill-opacity="0.5"/>
+  <rect x="31" y="52" width="64" height="20" rx="10" fill="#ffffff" fill-opacity="0.75"/>
+  <rect x="20" y="76" width="74" height="24" rx="12" fill="#ffffff"/>
+</svg>
