@@ -36,6 +36,18 @@ function getSessionsPageUrl(): string {
 }
 
 /**
+ * Thrown when a save cannot determine which window it is scoped to. The flow
+ * fails closed: it never widens the scope to every window, because that could
+ * close tabs the user did not select.
+ */
+export class WindowUnavailableError extends Error {
+  constructor() {
+    super("Cannot resolve the target browser window for this save");
+    this.name = "WindowUnavailableError";
+  }
+}
+
+/**
  * Asked before a save closes more tabs than `general.confirmThreshold`.
  * Receives the number of tabs that will be closed; resolve false to abort.
  */
@@ -131,10 +143,9 @@ async function queryTabsInWindow(
   const window =
     windowId === undefined ? await getCurrentWindow() : await getWindow(windowId);
   const targetId = windowId ?? window?.id;
+  if (targetId === undefined) throw new WindowUnavailableError();
 
-  const query: Parameters<typeof browser.tabs.query>[0] = { ...filter };
-  if (targetId !== undefined) query.windowId = targetId;
-  const tabs = await browser.tabs.query(query);
+  const tabs = await browser.tabs.query({ ...filter, windowId: targetId });
 
   return {
     tabs,
@@ -155,6 +166,9 @@ async function queryAllWindows(settings: Settings): Promise<TabScope> {
   let incognito = false;
 
   for (const window of windows) {
+    // Save-all covers normal browser windows only; popup and app windows are
+    // not part of the user's browsing session.
+    if (window.type !== "normal") continue;
     if (window.incognito === true) {
       if (!includeIncognito) continue;
       incognito = true;

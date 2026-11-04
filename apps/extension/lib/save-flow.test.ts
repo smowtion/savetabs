@@ -15,7 +15,7 @@ import {
   openSessionsDb,
 } from "./sessions-db";
 import { LocalQuotaError, getSession, listSessions } from "./sessions-repo";
-import { saveTabs } from "./save-flow";
+import { WindowUnavailableError, saveTabs } from "./save-flow";
 import type { TabLike } from "./tab-collector";
 
 const SESSIONS_PAGE_URL = "/sessions.html";
@@ -55,7 +55,11 @@ async function createWindow(
   incognito = false,
   focused = false,
 ): Promise<{ id: number }> {
-  const created = await fakeBrowser.windows.create({ incognito, focused });
+  const created = await fakeBrowser.windows.create({
+    incognito,
+    focused,
+    type: "normal",
+  });
   if (created?.id === undefined) {
     throw new Error("fakeBrowser.windows.create returned no window id");
   }
@@ -480,6 +484,65 @@ describe("saveTabs", () => {
       "https://one.example",
       "https://two.example",
     ]);
+  });
+
+  it("excludes popup and app windows from all-windows saves", async () => {
+    await seedSettings({
+      "tabs.saveAllWindows": true,
+      "open.openSessionsAfterSave": false,
+      "tabs.closeAfterSave": false,
+    });
+    vi.spyOn(fakeBrowser.windows, "getAll").mockResolvedValue([
+      {
+        id: 1,
+        type: "normal",
+        incognito: false,
+        tabs: [{ url: "https://normal.example", title: "Normal" }],
+      },
+      {
+        id: 2,
+        type: "popup",
+        incognito: false,
+        tabs: [{ url: "https://popup.example", title: "Popup" }],
+      },
+      {
+        id: 3,
+        type: "app",
+        incognito: false,
+        tabs: [{ url: "https://app.example", title: "App" }],
+      },
+    ] as unknown as Awaited<ReturnType<typeof fakeBrowser.windows.getAll>>);
+
+    const res = await saveTabs("all-windows");
+
+    expect(res.session?.tabs.map((tab) => tab.url)).toEqual([
+      "https://normal.example",
+    ]);
+  });
+
+  it("fails closed when the target window cannot be resolved", async () => {
+    await seedSettings({
+      "tabs.saveAllWindows": false,
+      "open.openSessionsAfterSave": true,
+    });
+    vi.spyOn(fakeBrowser.windows, "getCurrent").mockRejectedValue(
+      new Error("no current window"),
+    );
+    vi.spyOn(fakeBrowser.windows, "getLastFocused").mockRejectedValue(
+      new Error("no focused window"),
+    );
+    const querySpy = vi.spyOn(fakeBrowser.tabs, "query");
+    const removeSpy = vi.spyOn(fakeBrowser.tabs, "remove");
+    const createSpy = vi.spyOn(fakeBrowser.tabs, "create");
+
+    await expect(saveTabs("window")).rejects.toBeInstanceOf(
+      WindowUnavailableError,
+    );
+
+    expect(querySpy).not.toHaveBeenCalled();
+    expect(removeSpy).not.toHaveBeenCalled();
+    expect(createSpy).not.toHaveBeenCalled();
+    await expect(listSessions()).resolves.toEqual([]);
   });
 
   it("falls back to the current window when all-windows saving is disabled", async () => {
