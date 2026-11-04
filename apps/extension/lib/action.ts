@@ -11,6 +11,7 @@
 import type { Settings } from "@savetabs/shared";
 import { browser } from "wxt/browser";
 
+import { discardNow } from "./discard";
 import { saveTabs } from "./save-flow";
 import { getUsage } from "./sessions-repo";
 import { openOrReuseSessionsPage } from "./sessions-page";
@@ -66,8 +67,8 @@ export async function handleToolbarClick(): Promise<void> {
 /**
  * Route a keyboard command.
  *
- * `discard-now` is owned by the auto-discard service and is added with it, so
- * unknown commands are ignored here instead of being faked.
+ * `discard-now` delegates to the auto-discard service; unknown commands are
+ * ignored instead of being faked.
  */
 export async function handleCommand(command: string): Promise<void> {
   if (command === "save-tabs") {
@@ -77,6 +78,9 @@ export async function handleCommand(command: string): Promise<void> {
   if (command === "open-sessions") {
     await openOrReuseSessionsPage(await loadSettings());
     return;
+  }
+  if (command === "discard-now") {
+    await discardNow();
   }
 }
 

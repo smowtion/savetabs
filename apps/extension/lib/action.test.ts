@@ -53,6 +53,14 @@ async function seedWindowWithTab(url: string): Promise<void> {
   await fakeBrowser.tabs.create({ url, windowId: window.id, active: true });
 }
 
+/**
+ * `wxt/testing` types `tabs.discard` with the callback overload while its
+ * implementation returns promises, so the test describes the promise surface.
+ */
+type DiscardApi = { discard(tabId: number): Promise<unknown> };
+
+const discardApi = fakeBrowser.tabs as unknown as DiscardApi;
+
 function deleteDatabase(): Promise<void> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.deleteDatabase(SESSIONS_DB_NAME);
@@ -166,11 +174,33 @@ describe("handleCommand", () => {
     expect(createSpy).toHaveBeenCalledWith({ url: getSessionsPageUrl() });
   });
 
-  it("ignores commands owned by other modules", async () => {
+  it("discards inactive tabs for discard-now", async () => {
+    const window = await fakeBrowser.windows.create({
+      type: "normal",
+      focused: true,
+    });
+    if (window?.id === undefined) {
+      throw new Error("fakeBrowser.windows.create returned no window id");
+    }
+    const tab = await fakeBrowser.tabs.create({
+      url: "https://example.com/discard",
+      windowId: window.id,
+      active: false,
+    });
+    if (tab.id === undefined) throw new Error("fakeBrowser.tabs.create returned no id");
+    const discardSpy = vi
+      .spyOn(discardApi, "discard")
+      .mockResolvedValue(undefined);
+
+    await handleCommand("discard-now");
+
+    expect(discardSpy).toHaveBeenCalledWith(tab.id);
+  });
+
+  it("ignores unknown commands", async () => {
     await seedSettings({ "open.openSessionsAfterSave": false });
     const createSpy = vi.spyOn(fakeBrowser.tabs, "create");
 
-    await handleCommand("discard-now");
     await handleCommand("something-else");
 
     expect(createSpy).not.toHaveBeenCalled();
