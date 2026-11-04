@@ -9,6 +9,8 @@
     ".": "./src/index.ts",
     "./base64url": "./src/base64url.ts",
     "./constants": "./src/constants.ts",
+    "./crypto/key": "./src/crypto/key.ts",
+    "./crypto/session-cipher": "./src/crypto/session-cipher.ts",
     "./types": "./src/types.ts"
   },
   "scripts": {

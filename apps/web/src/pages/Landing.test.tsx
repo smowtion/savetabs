@@ -25,8 +25,6 @@ const WEB_TRANSLATION_KEYS = [
   "web.landing.rememberLabel",
   "web.landing.rememberWarning",
   "web.landing.privacyLink",
-  "web.landing.sessionsPlaceholder",
-  "web.landing.privacyPlaceholder",
   "web.language.toggle",
   "web.theme.toggle",
   "web.theme.system",

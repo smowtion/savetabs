@@ -1,3 +1,4 @@
+import { missingKeys } from "@savetabs/shared";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
@@ -8,6 +9,32 @@ import { saveKeyForSession } from "./lib/key-session";
 
 /** A syntactically valid key: ST- prefix plus 26 Crockford symbols. */
 const VALID_KEY = "ST-00000-00000-00000-00000-00000-0";
+
+const PRIVACY_TRANSLATION_KEYS = [
+  "web.privacy.back",
+  "web.privacy.title",
+  "web.privacy.intro",
+  "web.privacy.sections.data.title",
+  "web.privacy.sections.data.lead",
+  "web.privacy.sections.data.authId",
+  "web.privacy.sections.data.authKeyHash",
+  "web.privacy.sections.data.blobs",
+  "web.privacy.sections.data.tombstones",
+  "web.privacy.sections.data.timestamps",
+  "web.privacy.sections.data.footer",
+  "web.privacy.sections.e2ee.title",
+  "web.privacy.sections.e2ee.body",
+  "web.privacy.sections.incognito.title",
+  "web.privacy.sections.incognito.body",
+  "web.privacy.sections.keyLoss.title",
+  "web.privacy.sections.keyLoss.body",
+  "web.privacy.sections.delete.title",
+  "web.privacy.sections.delete.body",
+  "web.privacy.sections.analytics.title",
+  "web.privacy.sections.analytics.body",
+  "web.privacy.sections.contact.title",
+  "web.privacy.sections.contact.body",
+];
 
 function renderApp(path: string) {
   return render(
@@ -76,11 +103,20 @@ describe("App routing", () => {
     expect(localStorage.getItem("web-theme")).toBe("dark");
   });
 
-  it("allows the privacy page without a key", () => {
+  it("serves the privacy policy without a key", () => {
     renderApp("/privacy");
 
     expect(
-      screen.getByText("The privacy policy is coming soon."),
+      screen.getByRole("heading", { level: 1, name: "Privacy policy" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "What the sync server stores" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/contact@savetabs\.example/)).toBeInTheDocument();
+  });
+
+  it("has every privacy translation in both languages", () => {
+    expect(missingKeys("en", PRIVACY_TRANSLATION_KEYS)).toEqual([]);
+    expect(missingKeys("vi", PRIVACY_TRANSLATION_KEYS)).toEqual([]);
   });
 });

@@ -4,6 +4,8 @@ dist/
 .output/
 .wxt/
 .wrangler/
+test-results/
+playwright-report/
 .superpowers/
 .env*
 !.env.example

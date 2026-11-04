@@ -1,0 +1,8 @@
+# Cloudflare Pages response headers for the SaveTabs web app.
+# The API origin is a placeholder until the production domain is registered;
+# keep it in sync with VITE_API_BASE when the Worker is deployed.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api.savetabs.example; frame-ancestors 'none'; base-uri 'self'; form-action 'self';
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()

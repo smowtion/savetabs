@@ -465,9 +465,48 @@
       "loseKeyWarning": "Key đồng bộ là cách duy nhất để giải mã các phiên của bạn. Nếu mất key, dữ liệu đã lưu không thể khôi phục.",
       "rememberLabel": "Ghi nhớ trên thiết bị này",
       "rememberWarning": "Chỉ dùng trên thiết bị bạn tin cậy. Key sẽ được lưu trong trình duyệt này cho đến khi bạn xoá.",
-      "privacyLink": "Chính sách riêng tư",
-      "sessionsPlaceholder": "Các phiên của bạn sẽ xuất hiện ở đây.",
-      "privacyPlaceholder": "Chính sách riêng tư sẽ có trong thời gian tới."
+      "privacyLink": "Chính sách riêng tư"
+    },
+    "privacy": {
+      "back": "Quay lại SaveTabs",
+      "title": "Chính sách riêng tư",
+      "intro": "SaveTabs lưu các phiên tab trên thiết bị của bạn. Nếu bạn bật đồng bộ mã hóa đầu cuối, một bản sao đã mã hóa sẽ được lưu trên máy chủ đồng bộ. Trang này liệt kê chính xác bản sao đó chứa gì và những gì không bao giờ rời khỏi trình duyệt của bạn.",
+      "sections": {
+        "data": {
+          "title": "Máy chủ đồng bộ lưu gì",
+          "lead": "Máy chủ đồng bộ chỉ lưu những gì cần thiết để đồng bộ các phiên đã mã hóa:",
+          "authId": "Mã tài khoản công khai được tạo từ khóa đồng bộ của bạn. Mã này xuất hiện trong URL API và không thể chuyển ngược lại thành khóa.",
+          "authKeyHash": "Mã băm SHA-256 của thông tin xác thực bearer được tạo từ khóa đồng bộ. Mã băm dùng để xác minh yêu cầu và không thể đảo ngược thành thông tin xác thực.",
+          "blobs": "Các khối phiên đã mã hóa: bản mã AES-GCM 256 dạng base64url, kèm mã phiên, thời điểm cập nhật và kích thước.",
+          "tombstones": "Đánh dấu xóa: mã phiên đã xóa và thời điểm xóa. Đánh dấu xóa giúp đồng bộ việc xóa sang các thiết bị khác và được dọn trong các lần xóa sau khi đã quá 30 ngày.",
+          "timestamps": "Thời điểm khóa đồng bộ được thấy lần đầu và dùng lần cuối.",
+          "footer": "URL, tiêu đề trang, biểu tượng trang và mọi dữ liệu phiên khác chỉ nằm trong các khối đã mã hóa. Máy chủ không thể đọc chúng, và chúng tôi không bao giờ nhận được khóa đồng bộ của bạn."
+        },
+        "e2ee": {
+          "title": "Mã hóa đầu cuối",
+          "body": "Việc mã hóa và giải mã diễn ra trong trình duyệt bằng Web Crypto API. Khối phiên dùng AES-GCM 256, khóa mã hóa được tạo từ khóa đồng bộ bằng HKDF-SHA256. Khóa ở lại trong trình duyệt; ứng dụng web giữ khóa trong session storage của tab hiện tại, hoặc trong local storage khi bạn chọn Ghi nhớ trên thiết bị này. Chỉ bản mã được tải lên. Nếu không có khóa, máy chủ và bất kỳ ai có được khối mã hóa đều không thể đọc nội dung."
+        },
+        "incognito": {
+          "title": "Phiên riêng tư và ẩn danh",
+          "body": "Các phiên được lưu từ cửa sổ riêng tư hoặc ẩn danh được tiện ích đánh dấu là chỉ lưu cục bộ. Chúng không bao giờ được tải lên máy chủ đồng bộ và không xuất hiện trong ứng dụng web."
+        },
+        "keyLoss": {
+          "title": "Nếu bạn mất khóa đồng bộ",
+          "body": "Không có tài khoản, địa chỉ email hay mật khẩu để khôi phục. Khóa đồng bộ là thông tin xác thực duy nhất có thể giải mã các phiên đã đồng bộ. Nếu mất khóa, dữ liệu đã mã hóa trên máy chủ không thể khôi phục. Hãy giữ một bản sao an toàn; bạn có thể hiện và sao chép khóa trong tiện ích tại Cài đặt → Đồng bộ."
+        },
+        "delete": {
+          "title": "Xóa dữ liệu của bạn",
+          "body": "Các phiên cục bộ nằm trong trình duyệt cho đến khi bạn xóa chúng trong tiện ích; xóa dữ liệu của tiện ích hoặc gỡ cài đặt cũng xóa chúng. Để xóa toàn bộ dữ liệu đám mây của một khóa đồng bộ, mở tiện ích, vào Cài đặt → Đồng bộ và chọn Xóa dữ liệu đám mây. Thao tác này xóa các phiên đã mã hóa, đánh dấu xóa và bản ghi khóa của khóa đó, đồng thời tắt đồng bộ để các phiên cục bộ không bị tải lên lại. Xoay khóa đồng bộ không xóa dữ liệu được lưu dưới khóa cũ; hãy nhập lại khóa cũ và dùng Xóa dữ liệu đám mây nếu bạn muốn xóa dữ liệu đó."
+        },
+        "analytics": {
+          "title": "Không phân tích, không bên thứ ba",
+          "body": "Ứng dụng web và tiện ích không có công cụ phân tích, pixel theo dõi, quảng cáo hay mã bên thứ ba. Ứng dụng web chỉ tải mã và kiểu dáng của chính nó, không dùng phông chữ bên ngoài."
+        },
+        "contact": {
+          "title": "Liên hệ",
+          "body": "Mọi câu hỏi về chính sách này có thể gửi tới contact@savetabs.example. Địa chỉ này là tạm thời cho đến khi tên miền của dự án được đăng ký."
+        }
+      }
     },
     "sessions": {
       "title": "Phiên đã lưu",
