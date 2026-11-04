@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- Node >= 20, pnpm >= 9; TypeScript `strict: true` toàn repo.
+- Node >= 22.12, pnpm >= 9; TypeScript `strict: true` toàn repo.
 - Plan giả định **SaveTabs là git repo riêng** (`git init` trong thư mục này) để CI/release tách khỏi workspace repo hiện tại; nếu chủ dự án muốn giữ trong workspace repo, đổi path trong workflow tương ứng.
 - Không content script; `host_permissions` chỉ chứa domain API lấy từ `SAVETABS_API_BASE`.
 - Mọi chuỗi UI đi qua i18n en/vi; không hardcode text trong component.

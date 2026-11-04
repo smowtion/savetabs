@@ -580,7 +580,7 @@ apps/extension/
 
 ## 13. Build & release
 
-- Node 20+, pnpm 9+.
+- Node 22.12+, pnpm 9+.
 - Scripts gốc: `pnpm dev:ext`, `pnpm dev:web`, `pnpm dev:worker`, `pnpm test`, `pnpm lint`, `pnpm typecheck`, `pnpm build`.
 - Version: semver trong `apps/extension/package.json` + `apps/worker/package.json`; release script đồng bộ `versions.json`.
 - Chrome zip: `wxt zip -b chrome`; Firefox zip: `wxt zip -b firefox`. Artifact đặt tên `savetabs-<version>-<browser>.zip`.
