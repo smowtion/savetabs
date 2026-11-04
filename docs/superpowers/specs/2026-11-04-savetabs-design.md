@@ -308,6 +308,7 @@ const encKey  = await crypto.subtle.deriveKey(
 - Lỗi chuẩn: `{ error: { code, message } }`; codes: `unauthorized`, `not_found`, `quota_exceeded`, `payload_too_large`, `invalid_request`, `rate_limited`.
 - CORS: chỉ cho origin của web app (env `WEB_ORIGIN`) + extension (origin `chrome-extension://<id>` không gửi Origin ổn định — dùng `*` cho GET/PUT với auth bearer, không cookie; ghi rõ trong code).
 - Rate limit: theo IP 120 req/phút; theo authId 240 req/phút; global caps theo ngày (env `GLOBAL_DAILY_REQUESTS`, `GLOBAL_MAX_KEYS`) → 429 `capacity_exceeded` khi vượt.
+- Key chưa tồn tại: GET/DELETE trả 404 `not_found`. Vì authId là hàm của key, key gõ sai tạo ra một authId khác và không thể phân biệt với key mới; client hiển thị trạng thái "no data for this key" kèm gợi ý kiểm tra key, không hiển thị empty-success chung chung.
 
 ### 6.4 Merge & conflict
 
@@ -550,6 +551,7 @@ apps/extension/
 - Dữ liệu gửi server: authId, hash(authKey), blob mã hoá, timestamp, kích thước. Không có URL/title dạng đọc được.
 - Không analytics, không tracking, không quảng cáo.
 - Incognito: session đánh dấu Private, chỉ lưu local, không upload; khai báo rõ trong privacy policy và store listing.
+- Server còn lưu counter tổng hợp theo ngày và rate-limit key theo IP/authId; các bản ghi này không chứa URL/title và phải được khai báo trong privacy policy.
 - Trang `/privacy` mô tả: dữ liệu nào lưu, ở đâu, E2EE, mất key mất dữ liệu, cách xoá toàn bộ (DELETE key).
 - Quyền extension và lý do (dùng cho phần khai báo store):
   - `tabs`: đọc URL/title để lưu và discard tab;

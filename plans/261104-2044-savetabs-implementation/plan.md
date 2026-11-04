@@ -32,7 +32,7 @@
 Năm failure mode dễ gây hậu quả nhất, mỗi dòng có test ở task tương ứng:
 
 1. Tab `chrome://`/`file://` bị lưu rồi restore thất bại → collector phải lọc theo scheme (Task 11).
-2. Nhập sai sync key phải hiện lỗi auth, tuyệt đối không hiện "chưa có session" (Task 25, Task 28).
+2. Key không có dữ liệu (kể cả gõ sai) phải hiện trạng thái "no data for this key" kèm gợi ý kiểm tra key, không hiển thị empty-success chung chung (Task 28, Task 29).
 3. Session đã xoá bị sync kéo về lại → tombstone server + local chặn resurrection (Task 7, Task 23, Task 25).
 4. Session incognito bị upload → sync service phải loại `incognito: true` trước khi mã hoá/gửi (Task 25).
 5. Firefox thiếu `tabs.discard`/`storage.session` phải ẩn tính năng, không hiện control chết (Task 14).
