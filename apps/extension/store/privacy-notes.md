@@ -89,9 +89,21 @@ content scripts, remote scripts, telemetry endpoints, or advertising SDKs.
 ## Store-form answers
 
 - Chrome Web Store, single purpose: "Save and restore browser tab sessions."
-- Chrome Web Store, data usage: tab URLs/titles are handled locally; with sync
-  enabled they are stored encrypted on the sync server. No sale of data, no use
-  for advertising, no human reading of encrypted content.
+- Chrome Web Store, remote code: **No**. Every line of code ships inside the
+  package; the update check fetches a JSON manifest (`versions.json`), never
+  executable code, and nothing is evaluated at runtime.
+- Chrome Web Store, data usage — check these three:
+  - **Web history**: with sync enabled, tab URLs, page titles and visit times
+    are uploaded, encrypted with the sync key before they leave the browser.
+  - **Authentication information**: the derived bearer auth key authenticates
+    sync requests; the server stores only its SHA-256 hash and never the sync
+    key. There is no account, email address or password.
+  - **Location**: short-lived rate-limit buckets are keyed by client IP address.
+    They contain no URLs or titles and expire within the rate-limit window.
+  - Everything else (PII, health, financial, personal communications, user
+    activity, website content) is **No**: not collected.
+- Chrome Web Store, certifications: all three (no sale/transfer outside
+  approved use, no unrelated purposes, no creditworthiness/lending use).
 - Firefox Add-ons: no data collection beyond the encrypted sync service the
   user explicitly enables; request data is not sold or transferred.
 - Contact: the support contact on the Chrome Web Store listing; the public
