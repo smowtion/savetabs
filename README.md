@@ -214,11 +214,13 @@ v0.1.0 is live on Cloudflare:
 - Extension packages: `apps/extension/.output/savetabs-0.1.0-{chrome,firefox}.zip`,
   built with `WXT_SAVETABS_API_BASE=https://savetabs-api.azcom.dev`.
 
-Chrome Web Store and Firefox Add-ons listings are not created yet. Store
-listing copy lives in `apps/extension/store/description.md`, permission
-justifications in `apps/extension/store/permissions.md`, and the privacy
-answers in `apps/extension/store/privacy-notes.md`. Screenshots for the
-Chrome listing are generated from the built extension:
+Chrome Web Store listing is submitted and pending review
+(`https://chromewebstore.google.com/detail/ajejilnkhplcpgcjfkidkdepjipmocfi`);
+the Firefox Add-ons listing is not created yet. Store listing copy lives in
+`apps/extension/store/description.md`, permission justifications in
+`apps/extension/store/permissions.md`, and the privacy answers in
+`apps/extension/store/privacy-notes.md`. Screenshots for the Chrome listing are
+generated from the built extension:
 
 ```bash
 WXT_SAVETABS_API_BASE=https://savetabs-api.azcom.dev pnpm --filter @savetabs/extension build
@@ -231,8 +233,9 @@ pnpm --filter @savetabs/extension screenshots
   (set before AMO submission).
 - Support contact in the store listing; the `/privacy` page points readers to
   that listing.
-- Store listing URLs in `apps/extension/store/description.md` once the items
-  exist.
+- Firefox Add-ons listing URL in `apps/extension/lib/store-urls.ts` and the
+  Firefox link in `apps/extension/store/description.md` once AMO submission
+  exists.
 - Build-time defaults (`https://api.savetabs.example` in
   `apps/extension/lib/config.ts` and `apps/web/src/lib/config.ts`) stay as
   guards for builds that forget to set the API origin.
