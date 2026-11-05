@@ -230,8 +230,6 @@ pnpm --filter @savetabs/extension screenshots
 
 ## Remaining placeholders
 
-- Support contact in the store listing; the `/privacy` page points readers to
-  that listing.
 - Firefox Add-ons listing URL in `apps/extension/lib/store-urls.ts` and the
   Firefox link in `apps/extension/store/description.md` once AMO submission
   exists. The add-on id is `savetabs@azcom.dev`; the AMO data-collection

@@ -112,7 +112,7 @@ describe("App routing", () => {
     expect(
       screen.getByRole("heading", { name: "What the sync server stores" }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/support contact listed on the SaveTabs Chrome Web Store listing/i)).toBeInTheDocument();
+    expect(screen.getByText(/support@azcom\.dev/)).toBeInTheDocument();
   });
 
   it("has every privacy translation in both languages", () => {

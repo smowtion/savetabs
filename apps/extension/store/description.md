@@ -38,7 +38,7 @@ The sync server stores a public account id derived from your sync key, a SHA-256
 
 - Website: https://savetabs.azcom.dev/
 - Privacy policy: https://savetabs.azcom.dev/privacy
-- Support: contact@savetabs.example (placeholder — replace before submitting)
+- Support: support@azcom.dev
 - Chrome Web Store: https://chromewebstore.google.com/detail/ajejilnkhplcpgcjfkidkdepjipmocfi
 - Firefox Add-ons: (added after AMO submission)
 
@@ -70,6 +70,6 @@ Máy chủ đồng bộ chỉ lưu id tài khoản công khai dẫn xuất từ 
 
 - Trang web: https://savetabs.azcom.dev/
 - Chính sách riêng tư: https://savetabs.azcom.dev/privacy
-- Hỗ trợ: contact@savetabs.example (placeholder — thay trước khi submit)
+- Hỗ trợ: support@azcom.dev
 - Chrome Web Store: https://chromewebstore.google.com/detail/ajejilnkhplcpgcjfkidkdepjipmocfi
 - Firefox Add-ons: (thêm sau khi nộp AMO)

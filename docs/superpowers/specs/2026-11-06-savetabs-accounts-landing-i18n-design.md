@@ -376,6 +376,8 @@ Billing, OAuth, and account-token-based sync remain out of scope.
 
 ## Open items
 
-- Support email address for the landing footer and store listings (owner).
-- Resend sending domain and API key (owner, dashboard action).
+- Support email: **support@azcom.dev** (resolved; used in the privacy page and
+  store copy).
+- Resend: **azcom.dev verified with sending enabled**; `RESEND_API_KEY` is set
+  as a Worker secret and must never be committed.
 - Native review for the ten translations before calling them final.

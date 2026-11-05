@@ -109,8 +109,8 @@ content scripts, remote scripts, telemetry endpoints, or advertising SDKs.
   the user enables sync) and `technicalAndInteraction` (request metadata such as
   the client IP used for rate limiting, and the daily version check). Sync is
   opt-in, so nothing is required; data is not sold or transferred.
-- Contact: the support contact on the Chrome Web Store listing; the public
-  policy lives at https://savetabs.azcom.dev/privacy.
+- Contact: support@azcom.dev; the public policy lives at
+  https://savetabs.azcom.dev/privacy.
 
 ## AMO submission answers
 
