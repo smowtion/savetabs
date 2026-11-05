@@ -84,6 +84,28 @@ describe("sendEmail", () => {
     expect(from).toBe("SaveTabs <noreply@azcom.dev>");
   });
 
+  it("logs and resolves when Resend reports an error status", async () => {
+    const logged: unknown[][] = [];
+    const originalError = console.error;
+    console.error = (...args: unknown[]) => {
+      logged.push(args);
+    };
+
+    try {
+      await expect(
+        sendEmail(
+          { RESEND_API_KEY: "re_test", RESEND_FROM: "x" } as Env,
+          { to: "a@b.c", subject: "s", html: "h", text: "t" },
+          async () => new Response("{}", { status: 500 }),
+        ),
+      ).resolves.toBeUndefined();
+    } finally {
+      console.error = originalError;
+    }
+
+    expect(logged).toEqual([["resend_send_failed", { status: 500 }]]);
+  });
+
   it("skips sending when the key is absent", async () => {
     await expect(
       sendEmail(

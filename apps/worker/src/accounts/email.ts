@@ -42,7 +42,7 @@ export async function sendEmail(
   const apiKey = env.RESEND_API_KEY;
   if (apiKey === undefined || apiKey === "") return;
 
-  await fetchImpl(RESEND_ENDPOINT, {
+  const response = await fetchImpl(RESEND_ENDPOINT, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -56,6 +56,12 @@ export async function sendEmail(
       text: message.text,
     }),
   });
+
+  // Account routes keep their generic responses even when delivery fails, so
+  // surface provider errors in the log instead of failing the request.
+  if (!response.ok) {
+    console.error("resend_send_failed", { status: response.status });
+  }
 }
 
 /**
