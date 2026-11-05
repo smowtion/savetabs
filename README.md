@@ -60,6 +60,7 @@ Run from the repository root.
 | `pnpm build:ext` | Build the extension only. |
 | `pnpm icons` | Regenerate the 16/32/48/128 px PNG icons from `apps/extension/assets/icon.svg`. Commit the regenerated files. |
 | `pnpm zip:chrome` / `pnpm zip:firefox` | Build and package the store ZIPs. |
+| `pnpm zip:sources` | Write the AMO source archive (`savetabs-<version>-sources.zip`) from the tracked monorepo tree; run it after the WXT zip steps because WXT's own sources ZIP only contains `apps/extension`. |
 | `pnpm verify:build` | Verify both built manifests, icons, and ZIPs. Run after the `zip:*` commands. |
 | `node scripts/update-versions.mjs` | Regenerate `versions.json` from the package versions. |
 | `node scripts/update-versions.mjs --check` | Verify that the packages agree and `versions.json` is current. Performs no network access and writes no files. |
