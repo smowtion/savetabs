@@ -43,10 +43,10 @@ keyboard shortcuts.
 ## Host permission: the sync API origin only
 
 `host_permissions` contains exactly one origin, the configured sync API base
-(`https://api.savetabs.example/*` in development; set at build time through
-`WXT_SAVETABS_API_BASE`). It is used only for optional end-to-end encrypted sync
-requests. When sync is off, the extension makes no requests to that origin.
-There is no broad host access and no access to browsing content.
+(set at build time through `WXT_SAVETABS_API_BASE`; the production build uses
+`https://savetabs-api.azcom.dev/*`). It is used only for optional end-to-end
+encrypted sync requests. When sync is off, the extension makes no requests to
+that origin. There is no broad host access and no access to browsing content.
 
 ## Not requested
 

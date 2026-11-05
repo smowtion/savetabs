@@ -231,7 +231,7 @@ test("serves the privacy policy with its data-handling details", async ({
   await expect(
     page.getByText(/rate-limit records keyed by client IP address and authId/i),
   ).toBeVisible();
-  await expect(page.getByText("contact@savetabs.example")).toBeVisible();
+  await expect(page.getByText(/support contact listed on the SaveTabs Chrome Web Store listing/i)).toBeVisible();
 });
 
 test("ships the Cloudflare Pages security headers", async () => {

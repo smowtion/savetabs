@@ -3,6 +3,9 @@ compatibility_date = "2026-08-01"
 
 [assets]
 directory = "./dist"
+# The app is a client-side router: serve index.html for deep links such as
+# /privacy so the store's privacy-policy URL and bookmarks resolve.
+not_found_handling = "single-page-application"
 
 [[routes]]
 pattern = "savetabs.azcom.dev"

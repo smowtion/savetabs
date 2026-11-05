@@ -94,5 +94,5 @@ content scripts, remote scripts, telemetry endpoints, or advertising SDKs.
   for advertising, no human reading of encrypted content.
 - Firefox Add-ons: no data collection beyond the encrypted sync service the
   user explicitly enables; request data is not sold or transferred.
-- Contact: contact@savetabs.example (placeholder until the project domain is
-  registered).
+- Contact: the support contact on the Chrome Web Store listing; the public
+  policy lives at https://savetabs.azcom.dev/privacy.

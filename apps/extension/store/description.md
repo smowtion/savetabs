@@ -1,9 +1,9 @@
 # SaveTabs — store listing copy
 
 Listing copy for the Chrome Web Store and Firefox Add-ons. English is the
-primary locale; Vietnamese follows the English text. Every link is a
-placeholder until the project domain and store listings exist — replace the
-`*.example` URLs before submitting. No ratings, install counts, or user
+primary locale; Vietnamese follows the English text. The website and privacy
+policy point at the live deployment; the support email and store listing URLs
+still need real values before submitting. No ratings, install counts, or user
 testimonials are claimed here.
 
 ## Name
@@ -34,13 +34,13 @@ SaveTabs turns the tabs in a window into a saved session you can restore later. 
 
 The sync server stores a public account id derived from your sync key, a SHA-256 hash of the derived auth key, encrypted session blobs, timestamps, deletion tombstones, and short-lived rate-limit counters. It never receives your sync key, or readable URLs, page titles, or favicons. If you lose your sync key, synced data cannot be recovered. Delete all cloud data from Settings → Sync → Delete cloud data. Sessions saved from private windows stay on the device.
 
-### Links (placeholders)
+### Links
 
-- Website: https://savetabs.example/
-- Privacy policy: https://savetabs.example/privacy
-- Support: contact@savetabs.example
-- Chrome Web Store: https://chromewebstore.google.com/detail/savetabs-placeholder
-- Firefox Add-ons: https://addons.mozilla.org/firefox/addon/savetabs-placeholder/
+- Website: https://savetabs.azcom.dev/
+- Privacy policy: https://savetabs.azcom.dev/privacy
+- Support: contact@savetabs.example (placeholder — replace before submitting)
+- Chrome Web Store: (added after the first listing is created)
+- Firefox Add-ons: (added after AMO submission)
 
 ## Short description (Vietnamese, 102/132 characters)
 
@@ -66,10 +66,10 @@ SaveTabs lưu các tab đang mở thành một phiên để bạn khôi phục s
 
 Máy chủ đồng bộ chỉ lưu id tài khoản công khai dẫn xuất từ khoá đồng bộ, hash SHA-256 của auth key dẫn xuất, các blob phiên đã mã hoá, dấu thời gian, tombstone xoá và bộ đếm giới hạn tần suất ngắn hạn. Máy chủ không nhận khoá đồng bộ, URL, tiêu đề hay favicon ở dạng đọc được. Nếu mất khoá đồng bộ, dữ liệu đã đồng bộ không thể khôi phục. Xoá toàn bộ dữ liệu đám mây tại Cài đặt → Đồng bộ → Xoá dữ liệu đám mây. Phiên từ cửa sổ riêng tư chỉ nằm trên máy.
 
-### Liên kết (placeholder)
+### Liên kết
 
-- Trang web: https://savetabs.example/
-- Chính sách riêng tư: https://savetabs.example/privacy
-- Hỗ trợ: contact@savetabs.example
-- Chrome Web Store: https://chromewebstore.google.com/detail/savetabs-placeholder
-- Firefox Add-ons: https://addons.mozilla.org/firefox/addon/savetabs-placeholder/
+- Trang web: https://savetabs.azcom.dev/
+- Chính sách riêng tư: https://savetabs.azcom.dev/privacy
+- Hỗ trợ: contact@savetabs.example (placeholder — thay trước khi submit)
+- Chrome Web Store: (thêm sau khi tạo listing)
+- Firefox Add-ons: (thêm sau khi nộp AMO)

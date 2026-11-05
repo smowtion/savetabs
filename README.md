@@ -202,20 +202,37 @@ savetabs-releases/
 Details: `apps/extension/store/privacy-notes.md` and the web app's `/privacy`
 page.
 
-## Status and placeholders
+## Deployment status
 
-SaveTabs is **not published** and has no live deployment yet. These values are
-placeholders and must be replaced before release:
+v0.1.0 is live on Cloudflare:
 
-- API origin: `https://api.savetabs.example` — the extension and web build
-  defaults, and the `connect-src` entry in `apps/web/public/_headers`.
-- Web/Pages origin: `https://savetabs.pages.dev` (`WEB_ORIGIN` in
-  `apps/worker/wrangler.toml`); the Pages project is not deployed.
-- D1 `database_id` in `apps/worker/wrangler.toml`.
-- Store listings in `apps/extension/lib/store-urls.ts` and the links in
-  `apps/extension/store/description.md`.
-- Firefox add-on id `savetabs@example.com` in `apps/extension/wxt.config.ts`.
+- API: `https://savetabs-api.azcom.dev` — Worker `savetabs`, D1 database
+  `savetabs`, R2 bucket `savetabs-releases` (`versions.json` for the update
+  check).
+- Web: `https://savetabs.azcom.dev` — static-assets Worker `savetabs-web` with
+  SPA fallback, so `/privacy` and `/sessions` resolve on first load.
+- Extension packages: `apps/extension/.output/savetabs-0.1.0-{chrome,firefox}.zip`,
+  built with `WXT_SAVETABS_API_BASE=https://savetabs-api.azcom.dev`.
 
-Live deployment requires Cloudflare account/domain credentials, and store
-submission requires Chrome Web Store and Firefox Add-ons credentials. Those are
-owner-supplied and out of scope for the source tree.
+Chrome Web Store and Firefox Add-ons listings are not created yet. Store
+listing copy lives in `apps/extension/store/description.md`, permission
+justifications in `apps/extension/store/permissions.md`, and the privacy
+answers in `apps/extension/store/privacy-notes.md`. Screenshots for the
+Chrome listing are generated from the built extension:
+
+```bash
+WXT_SAVETABS_API_BASE=https://savetabs-api.azcom.dev pnpm --filter @savetabs/extension build
+pnpm --filter @savetabs/extension screenshots
+```
+
+## Remaining placeholders
+
+- Firefox add-on id `savetabs@example.com` in `apps/extension/wxt.config.ts`
+  (set before AMO submission).
+- Support contact in the store listing; the `/privacy` page points readers to
+  that listing.
+- Store listing URLs in `apps/extension/store/description.md` once the items
+  exist.
+- Build-time defaults (`https://api.savetabs.example` in
+  `apps/extension/lib/config.ts` and `apps/web/src/lib/config.ts`) stay as
+  guards for builds that forget to set the API origin.

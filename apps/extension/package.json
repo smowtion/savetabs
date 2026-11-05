@@ -11,6 +11,7 @@
     "zip:chrome": "wxt zip -b chrome",
     "zip:firefox": "wxt zip -b firefox",
     "verify:build": "node ../../scripts/verify-build.mjs",
+    "screenshots": "node scripts/store-screenshots.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "postinstall": "wxt prepare"
@@ -23,6 +24,7 @@
     "zustand": "^5.0.16"
   },
   "devDependencies": {
+    "@playwright/test": "1.62.0",
     "@tailwindcss/vite": "^4.3.4",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
