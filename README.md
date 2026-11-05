@@ -229,13 +229,13 @@ pnpm --filter @savetabs/extension screenshots
 
 ## Remaining placeholders
 
-- Firefox add-on id `savetabs@example.com` in `apps/extension/wxt.config.ts`
-  (set before AMO submission).
 - Support contact in the store listing; the `/privacy` page points readers to
   that listing.
 - Firefox Add-ons listing URL in `apps/extension/lib/store-urls.ts` and the
   Firefox link in `apps/extension/store/description.md` once AMO submission
-  exists.
+  exists. The add-on id is `savetabs@azcom.dev`; the AMO data-collection
+  declaration is `required: ["none"]`, optional `browsingActivity` and
+  `technicalAndInteraction`.
 - Build-time defaults (`https://api.savetabs.example` in
   `apps/extension/lib/config.ts` and `apps/web/src/lib/config.ts`) stay as
   guards for builds that forget to set the API origin.

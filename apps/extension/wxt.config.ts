@@ -66,8 +66,16 @@ export default defineConfig({
       browser === "firefox"
         ? {
             gecko: {
-              id: "savetabs@example.com",
+              id: "savetabs@azcom.dev",
               strict_min_version: "121.0",
+              // AMO requires this declaration for every new extension. Sync is
+              // opt-in, so nothing is required: visited URLs upload only after
+              // the user creates a sync key, and request metadata (IP, version
+              // check) is technical data. Both are declared optional.
+              data_collection_permissions: {
+                required: ["none"],
+                optional: ["browsingActivity", "technicalAndInteraction"],
+              },
             },
           }
         : undefined,

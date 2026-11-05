@@ -156,6 +156,14 @@ for (const browser of BROWSERS) {
       typeof gecko?.id === "string" && gecko.id.length > 0,
       `${label}: browser_specific_settings.gecko.id is missing`,
     );
+    // AMO rejects new Firefox extensions without this declaration.
+    check(
+      gecko?.data_collection_permissions !== null &&
+        typeof gecko?.data_collection_permissions === "object" &&
+        Array.isArray(gecko.data_collection_permissions?.required) &&
+        gecko.data_collection_permissions.required.length > 0,
+      `${label}: browser_specific_settings.gecko.data_collection_permissions.required is missing`,
+    );
   }
 }
 

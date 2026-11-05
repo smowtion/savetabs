@@ -104,7 +104,10 @@ content scripts, remote scripts, telemetry endpoints, or advertising SDKs.
     activity, website content) is **No**: not collected.
 - Chrome Web Store, certifications: all three (no sale/transfer outside
   approved use, no unrelated purposes, no creditworthiness/lending use).
-- Firefox Add-ons: no data collection beyond the encrypted sync service the
-  user explicitly enables; request data is not sold or transferred.
+- Firefox Add-ons, data collection: `data_collection_permissions.required =
+  ["none"]` with optional `browsingActivity` (synced URLs and titles, only after
+  the user enables sync) and `technicalAndInteraction` (request metadata such as
+  the client IP used for rate limiting, and the daily version check). Sync is
+  opt-in, so nothing is required; data is not sold or transferred.
 - Contact: the support contact on the Chrome Web Store listing; the public
   policy lives at https://savetabs.azcom.dev/privacy.
