@@ -85,8 +85,8 @@ shell. Vite and WXT can also load `.env` files from their own app directories
 | `WXT_SAVETABS_API_BASE` | Extension build (WXT) | `https://api.savetabs.example` | Sync API origin. Also becomes the manifest `host_permissions` entry. |
 | `SAVETABS_API_BASE` | Extension build (WXT) | — | Legacy alias for `WXT_SAVETABS_API_BASE`; empty values count as unset. |
 | `VITE_API_BASE` | Web build (Vite) | `https://api.savetabs.example` | Sync API origin used by the web app. Must share its origin with `WXT_SAVETABS_API_BASE`; the release guard also requires that origin in `apps/web/public/_headers` (`connect-src`). |
-| `SAVETABS_NOTES_URL` | `scripts/update-versions.mjs` | `https://savetabs.pages.dev/releases/<version>` | Release-notes URL written into `versions.json`. |
-| `WEB_ORIGIN` | Worker runtime | `https://savetabs.pages.dev` | CORS allowlist. Defined in `apps/worker/wrangler.toml` `[vars]`. |
+| `SAVETABS_NOTES_URL` | `scripts/update-versions.mjs`, CI | Script fallback: `https://savetabs.pages.dev/releases/<version>`; CI and Release read the repository variable, currently `https://savetabs.azcom.dev` | Release-notes URL written into `versions.json`. |
+| `WEB_ORIGIN` | Worker runtime | `https://savetabs.azcom.dev` | CORS allowlist. Defined in `apps/worker/wrangler.toml` `[vars]`. |
 | `GLOBAL_DAILY_REQUESTS` | Worker runtime | `100000` | Daily request cap. Defined in `wrangler.toml`. |
 | `GLOBAL_MAX_KEYS` | Worker runtime | `10000` | Daily cap on newly registered sync keys. Defined in `wrangler.toml`. |
 
