@@ -71,6 +71,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: savetabs-extension
+          # The build output lives under a dot-directory, which the action
+          # skips unless hidden files are explicitly included.
+          include-hidden-files: true
           path: |
             apps/extension/.output/savetabs-*-chrome.zip
             apps/extension/.output/savetabs-*-firefox.zip

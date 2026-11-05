@@ -159,6 +159,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: savetabs-${{ steps.version.outputs.version }}
+          # The build output lives under a dot-directory, which the action
+          # skips unless hidden files are explicitly included.
+          include-hidden-files: true
           path: |
             apps/extension/.output/savetabs-*.zip
             versions.json
