@@ -21,7 +21,7 @@ binding = "RELEASES"
 bucket_name = "savetabs-releases"
 
 # Abuse controls (spec §6.3): one binding per threshold because Cloudflare
-# configures a single limit per namespace. Both are optional in Env, so a
+# configures a single limit per namespace. Each is optional in Env, so a
 # deployment without them simply skips that bucket.
 [[ratelimits]]
 name = "RATE_LIMITER_IP"
@@ -33,9 +33,18 @@ name = "RATE_LIMITER_AUTH"
 namespace_id = "1002"
 simple = { limit = 240, period = 60 }
 
+# Account signup and reset requests, keyed by normalized email address.
+[[ratelimits]]
+name = "RATE_LIMITER_EMAIL"
+namespace_id = "1003"
+simple = { limit = 5, period = 60 }
+
 [vars]
 # Only this origin (the web app) may call the API from a browser; the
 # extension sends a bearer token and no cookies.
 WEB_ORIGIN = "https://savetabs.azcom.dev"
 GLOBAL_DAILY_REQUESTS = "100000"
 GLOBAL_MAX_KEYS = "10000"
+# Sender for account verification and reset emails. RESEND_API_KEY is a secret
+# set with `wrangler secret put`.
+RESEND_FROM = "SaveTabs <noreply@azcom.dev>"

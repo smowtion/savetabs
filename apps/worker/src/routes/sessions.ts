@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { fromBase64Url, toBase64Url } from "@savetabs/shared/base64url";
-import { sha256Hex, timingSafeEqual } from "../auth";
+import { parseBearer, sha256Hex, timingSafeEqual } from "../auth";
 import {
   DEFAULT_MAX_KEYS,
   enforceAuthRateLimit,
@@ -378,13 +378,6 @@ function isStaleWrite(state: WriteState, updatedAt: number): boolean {
   return (
     state.sessionUpdatedAt !== undefined && state.sessionUpdatedAt > updatedAt
   );
-}
-
-/** Parse `Authorization: Bearer <token>`; anything else is malformed. */
-function parseBearer(header: string | undefined): string | null {
-  if (header === undefined) return null;
-  const match = /^Bearer[ \t]+(\S+)$/i.exec(header.trim());
-  return match?.[1] ?? null;
 }
 
 async function readSessionBody(c: AppContext): Promise<NewSession | null> {

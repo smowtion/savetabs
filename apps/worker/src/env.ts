@@ -23,6 +23,18 @@ export interface Env {
    * only after a bearer has been verified; absent disables the bucket.
    */
   RATE_LIMITER_AUTH?: RateLimiterBinding;
+  /**
+   * Optional per-email rate-limiting binding (5 requests/minute) for account
+   * signup and reset requests; absent disables the bucket.
+   */
+  RATE_LIMITER_EMAIL?: RateLimiterBinding;
+  /**
+   * Resend API key, set with `wrangler secret put`. Absent disables outbound
+   * email (local development and tests).
+   */
+  RESEND_API_KEY?: string;
+  /** Sender address shown in verification and reset emails. */
+  RESEND_FROM?: string;
 }
 
 /** The subset of the Cloudflare rate-limit binding used by this Worker. */

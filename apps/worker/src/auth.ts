@@ -41,3 +41,10 @@ export function timingSafeEqual(a: string, b: string): boolean {
   }
   return difference === 0;
 }
+
+/** Parse `Authorization: Bearer <token>`; anything else is malformed. */
+export function parseBearer(header: string | undefined): string | null {
+  if (header === undefined) return null;
+  const match = /^Bearer[ \t]+(\S+)$/i.exec(header.trim());
+  return match?.[1] ?? null;
+}
