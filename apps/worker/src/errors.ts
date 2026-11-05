@@ -13,6 +13,9 @@ export type ErrorCode =
   | "invalid_request"
   | "invalid_credentials"
   | "invalid_token"
+  | "proof_required"
+  | "vault_exists"
+  | "auth_id_taken"
   | "rate_limited"
   | "capacity_exceeded"
   | "internal_error";

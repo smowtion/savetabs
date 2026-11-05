@@ -65,6 +65,33 @@ export async function sendEmail(
 }
 
 /**
+ * English reset copy.
+ *
+ * Reset links only exist for accounts without a vault, so the mail can be sent
+ * before any key material exists. Task 15 adds the locale dictionaries.
+ */
+export function resetEmail(locale: string, link: string): EmailContent {
+  // English is the only dictionary today, so every locale renders the same.
+  void locale;
+
+  const subject = "Reset your SaveTabs password";
+  const html = [
+    "<p>Set a new SaveTabs password by opening the link below.</p>",
+    `<p><a href="${link}">Reset password</a></p>`,
+    "<p>This link expires in 24 hours. If you did not request a reset, you can ignore this email.</p>",
+  ].join("\n");
+  const text = [
+    "Set a new SaveTabs password by opening this link:",
+    "",
+    link,
+    "",
+    "This link expires in 24 hours. If you did not request a reset, you can ignore this email.",
+  ].join("\n");
+
+  return { subject, html, text };
+}
+
+/**
  * English verification copy.
  *
  * `locale` is part of the signature so the account routes pass the stored

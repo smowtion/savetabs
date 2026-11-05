@@ -12,8 +12,12 @@ const OTHER_AUTH_HASH = "cd".repeat(32);
 const KDF_SALT = toBase64Url(new Uint8Array(16));
 const OTHER_KDF_SALT = toBase64Url(new Uint8Array(16).fill(7));
 const KDF_ITERATIONS = 600_000;
+const OTHER_KDF_ITERATIONS = 500_000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 const TOKEN_TTL_MS = 30 * DAY_MS;
+
+const KEY_A = "sync-key-bearer-a";
+const KEY_B = "sync-key-bearer-b";
 
 interface ErrorBody {
   error: { code: string; message: string };
@@ -67,6 +71,13 @@ interface TokenRowRead {
   last_used_at: number;
 }
 
+interface KeyRowRead {
+  auth_id: string;
+  key_hash: string;
+  created_at: number;
+  last_seen_at: number;
+}
+
 interface SentEmail {
   to: string;
   subject: string;
@@ -92,6 +103,16 @@ function signupBody(overrides: SignupOverrides = {}): Record<string, unknown> {
   };
 }
 
+/**
+ * Each request presents a distinct client address. The real per-IP limiter is
+ * bound in `wrangler.toml`, and storage (including limiter buckets) is shared
+ * across the tests in this file, so a single address would exhaust its budget
+ * long before the suite finishes.
+ */
+function requestIp(): string {
+  return `test-${crypto.randomUUID()}`;
+}
+
 function post(
   path: string,
   body: unknown,
@@ -99,6 +120,7 @@ function post(
 ): Promise<Response> {
   const headers: Record<string, string> = {
     "content-type": "application/json",
+    "cf-connecting-ip": requestIp(),
   };
   if (token !== undefined) headers.Authorization = `Bearer ${token}`;
   return SELF.fetch(`${BASE_URL}${path}`, {
@@ -111,7 +133,10 @@ function post(
 function postRaw(path: string, body: string): Promise<Response> {
   return SELF.fetch(`${BASE_URL}${path}`, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      "cf-connecting-ip": requestIp(),
+    },
     body,
   });
 }
@@ -216,7 +241,10 @@ async function loginToken(email: string): Promise<string> {
 
 function meStatus(token: string): Promise<Response> {
   return SELF.fetch(`${BASE_URL}/v1/accounts/me`, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "cf-connecting-ip": requestIp(),
+    },
   });
 }
 
@@ -267,7 +295,10 @@ async function latestVerificationToken(
       `${BASE_URL}/v1/accounts/signup`,
       {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: {
+          "content-type": "application/json",
+          "cf-connecting-ip": requestIp(),
+        },
         body: JSON.stringify(signupBody({ email })),
       },
       resendEnv(),
@@ -287,6 +318,7 @@ async function appPost(
 ): Promise<Response> {
   const headers: Record<string, string> = {
     "content-type": "application/json",
+    "cf-connecting-ip": requestIp(),
   };
   if (token !== undefined) headers.Authorization = `Bearer ${token}`;
   return await app.request(
@@ -324,6 +356,148 @@ async function captureEmails(
   } finally {
     globalThis.fetch = originalFetch;
   }
+}
+
+function linkKey(
+  token: string | undefined,
+  authId: string,
+  authKey: string,
+  wrappedKey: string,
+  authHash: string,
+  options: { replace?: boolean } = {},
+): Promise<Response> {
+  return post(
+    "/v1/accounts/key",
+    { authId, authKey, wrappedKey, authHash, ...options },
+    token,
+  );
+}
+
+function del(
+  path: string,
+  body: unknown,
+  token?: string,
+): Promise<Response> {
+  const headers: Record<string, string> = {
+    "content-type": "application/json",
+    "cf-connecting-ip": requestIp(),
+  };
+  if (token !== undefined) headers.Authorization = `Bearer ${token}`;
+  return SELF.fetch(`${BASE_URL}${path}`, {
+    method: "DELETE",
+    headers,
+    body: JSON.stringify(body),
+  });
+}
+
+async function seedKey(authId: string, authKey: string): Promise<void> {
+  const now = Date.now();
+  await env.DB.prepare(
+    `INSERT INTO keys (auth_id, key_hash, created_at, last_seen_at)
+     VALUES (?, ?, ?, ?)`,
+  )
+    .bind(authId, await sha256Hex(authKey), now, now)
+    .run();
+}
+
+function readKeyRow(authId: string): Promise<KeyRowRead | null> {
+  return env.DB.prepare(
+    "SELECT auth_id, key_hash, created_at, last_seen_at FROM keys WHERE auth_id = ?",
+  )
+    .bind(authId)
+    .first<KeyRowRead>();
+}
+
+async function keyRowExists(authId: string): Promise<boolean> {
+  return (await readKeyRow(authId)) !== null;
+}
+
+async function seedSession(authId: string, sessionId: string): Promise<void> {
+  await env.DB.prepare(
+    `INSERT INTO sessions (auth_id, session_id, ciphertext, updated_at, size)
+     VALUES (?, ?, ?, ?, ?)`,
+  )
+    .bind(authId, sessionId, new Uint8Array([1, 2, 3]), 1_000, 3)
+    .run();
+}
+
+async function sessionRowExists(
+  authId: string,
+  sessionId: string,
+): Promise<boolean> {
+  const row = await env.DB.prepare(
+    "SELECT session_id FROM sessions WHERE auth_id = ? AND session_id = ?",
+  )
+    .bind(authId, sessionId)
+    .first();
+  return row !== null;
+}
+
+async function seedDeletion(authId: string, sessionId: string): Promise<void> {
+  await env.DB.prepare(
+    "INSERT INTO deletions (auth_id, session_id, deleted_at) VALUES (?, ?, ?)",
+  )
+    .bind(authId, sessionId, 1_000)
+    .run();
+}
+
+async function deletionRowExists(
+  authId: string,
+  sessionId: string,
+): Promise<boolean> {
+  const row = await env.DB.prepare(
+    "SELECT session_id FROM deletions WHERE auth_id = ? AND session_id = ?",
+  )
+    .bind(authId, sessionId)
+    .first();
+  return row !== null;
+}
+
+/** Read the reset-purpose verifications for an account by email. */
+async function readResetTokens(email: string): Promise<VerificationRowRead[]> {
+  const { results } = await env.DB.prepare(
+    `SELECT v.token_hash, v.account_id, v.created_at, v.expires_at,
+            v.used_at, v.purpose
+       FROM email_verifications v
+       JOIN accounts a ON a.id = v.account_id
+      WHERE a.email = ? AND v.purpose = 'reset'`,
+  )
+    .bind(normalizeEmail(email))
+    .all<VerificationRowRead>();
+  return results;
+}
+
+/** Pull the plaintext token out of a reset email. */
+function resetTokenFrom(email: SentEmail): string {
+  const match = /\/reset\?token=([A-Za-z0-9_-]+)/.exec(email.text);
+  expect(match).not.toBeNull();
+  return match![1]!;
+}
+
+/** A recovery body; overrides let each case change one field. */
+function recoveryBody(
+  authId: string,
+  authKey: string,
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    email: "recovery-target@example.com",
+    authId,
+    authKey,
+    authHash: OTHER_AUTH_HASH,
+    kdfSalt: OTHER_KDF_SALT,
+    kdfIterations: OTHER_KDF_ITERATIONS,
+    wrappedKey: "wrapped-recovered",
+    ...overrides,
+  };
+}
+
+/**
+ * D1 storage is not reset between tests in this file, so every fixture that
+ * creates an account (or a key row) uses a fresh authId.
+ */
+function uniqueAuthId(): string {
+  return `auth-id-${crypto.randomUUID()}`;
 }
 
 describe("POST /v1/accounts/signup", () => {
@@ -425,7 +599,10 @@ describe("POST /v1/accounts/signup", () => {
         `${BASE_URL}/v1/accounts/signup`,
         {
           method: "POST",
-          headers: { "content-type": "application/json" },
+          headers: {
+            "content-type": "application/json",
+            "cf-connecting-ip": requestIp(),
+          },
           body: JSON.stringify(
             signupBody({ email: "Mail@Example.com ", locale: "vi" }),
           ),
@@ -454,7 +631,10 @@ describe("POST /v1/accounts/signup", () => {
         `${BASE_URL}/v1/accounts/signup`,
         {
           method: "POST",
-          headers: { "content-type": "application/json" },
+          headers: {
+            "content-type": "application/json",
+            "cf-connecting-ip": requestIp(),
+          },
           body: JSON.stringify(signupBody({ email: "Dupe@Example.com " })),
         },
         resendEnv(),
@@ -825,6 +1005,724 @@ describe("POST /v1/accounts/resend-verification", () => {
     expect(
       (await readAccount("verified-resend@example.com"))?.email_verified_at,
     ).not.toBeNull();
+  });
+});
+
+describe("POST /v1/accounts/key", () => {
+  it("links once, then requires proof and replace to repoint", async () => {
+    const authIdA = uniqueAuthId();
+    const authIdB = uniqueAuthId();
+    await seedAccount({ email: "link@example.com" });
+    const session = await loginToken("link@example.com");
+
+    const first = await linkKey(
+      session,
+      authIdA,
+      KEY_A,
+      "wrapped-a",
+      CLIENT_AUTH_HASH,
+    );
+    expect(first.status).toBe(200);
+    expect(await first.json()).toEqual({ ok: true });
+
+    let account = await readAccount("link@example.com");
+    expect(account?.auth_id).toBe(authIdA);
+    expect(account?.wrapped_key).toBe("wrapped-a");
+
+    // The first link registers an unknown key exactly like the first sync PUT.
+    const key = await readKeyRow(authIdA);
+    expect(key?.key_hash).toBe(await sha256Hex(KEY_A));
+
+    const blocked = await linkKey(
+      session,
+      authIdB,
+      KEY_B,
+      "wrapped-b",
+      CLIENT_AUTH_HASH,
+    );
+    expect(blocked.status).toBe(409);
+    expect(((await blocked.json()) as ErrorBody).error.code).toBe(
+      "vault_exists",
+    );
+    account = await readAccount("link@example.com");
+    expect(account?.auth_id).toBe(authIdA);
+    expect(account?.wrapped_key).toBe("wrapped-a");
+
+    const wrongProof = await linkKey(
+      session,
+      authIdB,
+      KEY_B,
+      "wrapped-b",
+      OTHER_AUTH_HASH,
+      { replace: true },
+    );
+    expect(wrongProof.status).toBe(401);
+    expect(((await wrongProof.json()) as ErrorBody).error.code).toBe(
+      "proof_required",
+    );
+    account = await readAccount("link@example.com");
+    expect(account?.auth_id).toBe(authIdA);
+
+    const replaced = await linkKey(
+      session,
+      authIdB,
+      KEY_B,
+      "wrapped-b",
+      CLIENT_AUTH_HASH,
+      { replace: true },
+    );
+    expect(replaced.status).toBe(200);
+    account = await readAccount("link@example.com");
+    expect(account?.auth_id).toBe(authIdB);
+    expect(account?.wrapped_key).toBe("wrapped-b");
+
+    // The same key may re-wrap the vault without replace or proof.
+    const rewrapped = await linkKey(
+      session,
+      authIdB,
+      KEY_B,
+      "wrapped-b2",
+      CLIENT_AUTH_HASH,
+    );
+    expect(rewrapped.status).toBe(200);
+    account = await readAccount("link@example.com");
+    expect(account?.auth_id).toBe(authIdB);
+    expect(account?.wrapped_key).toBe("wrapped-b2");
+  });
+
+  it("refuses a key linked to another account and a wrong key bearer", async () => {
+    const authId = uniqueAuthId();
+    await seedAccount({ email: "owner@example.com" });
+    await seedAccount({ email: "other@example.com" });
+    const owner = await loginToken("owner@example.com");
+    const other = await loginToken("other@example.com");
+
+    const linked = await linkKey(
+      owner,
+      authId,
+      KEY_A,
+      "wrapped-a",
+      CLIENT_AUTH_HASH,
+    );
+    expect(linked.status).toBe(200);
+
+    const taken = await linkKey(
+      other,
+      authId,
+      KEY_A,
+      "wrapped-x",
+      CLIENT_AUTH_HASH,
+    );
+    expect(taken.status).toBe(409);
+    expect(((await taken.json()) as ErrorBody).error.code).toBe(
+      "auth_id_taken",
+    );
+    expect((await readAccount("other@example.com"))?.auth_id).toBeNull();
+
+    // A registered authId is only usable with the bearer it was registered for.
+    const wrongBearer = await linkKey(
+      other,
+      authId,
+      "not-the-registered-key",
+      "wrapped-x",
+      CLIENT_AUTH_HASH,
+    );
+    expect(wrongBearer.status).toBe(401);
+    expect(((await wrongBearer.json()) as ErrorBody).error.code).toBe(
+      "unauthorized",
+    );
+    expect((await readAccount("other@example.com"))?.auth_id).toBeNull();
+  });
+
+  it("requires an account token and valid fields", async () => {
+    const authId = uniqueAuthId();
+    const account = await seedAccount({ email: "link-validation@example.com" });
+
+    const missing = await linkKey(
+      undefined,
+      authId,
+      KEY_A,
+      "wrapped",
+      CLIENT_AUTH_HASH,
+    );
+    expect(missing.status).toBe(401);
+    expect(((await missing.json()) as ErrorBody).error.code).toBe(
+      "unauthorized",
+    );
+
+    const session = await loginToken("link-validation@example.com");
+    const invalidBodies: unknown[] = [
+      {},
+      { authId, authKey: KEY_A, wrappedKey: "wrapped" },
+      { authId: "", authKey: KEY_A, wrappedKey: "wrapped", authHash: CLIENT_AUTH_HASH },
+      { authId, authKey: 42, wrappedKey: "wrapped", authHash: CLIENT_AUTH_HASH },
+      { authId, authKey: KEY_A, wrappedKey: "", authHash: CLIENT_AUTH_HASH },
+      { authId, authKey: KEY_A, wrappedKey: "wrapped", authHash: "AB".repeat(32) },
+      { authId, authKey: KEY_A, wrappedKey: "wrapped", authHash: CLIENT_AUTH_HASH, replace: "yes" },
+      [],
+    ];
+
+    for (const invalid of invalidBodies) {
+      const response = await post("/v1/accounts/key", invalid, session);
+      expect(response.status).toBe(400);
+      expect(((await response.json()) as ErrorBody).error.code).toBe(
+        "invalid_request",
+      );
+    }
+
+    // Rejected bodies never register a key.
+    expect(await keyRowExists(authId)).toBe(false);
+    expect(await readAccount("link-validation@example.com")).toEqual({
+      ...account,
+      auth_hash: await sha256Hex(CLIENT_AUTH_HASH),
+      kdf_salt: KDF_SALT,
+      kdf_iterations: KDF_ITERATIONS,
+      wrapped_key: null,
+      auth_id: null,
+      locale: "en",
+      email_verified_at: null,
+    });
+  });
+});
+
+describe("POST /v1/accounts/password", () => {
+  it("changes the proof, revokes every token and returns a fresh one", async () => {
+    const authId = uniqueAuthId();
+    const seeded = await seedAccount({
+      email: "password@example.com",
+      authId,
+      wrappedKey: "wrapped-old",
+    });
+    const first = await loginToken("password@example.com");
+    const second = await loginToken("password@example.com");
+
+    const response = await post(
+      "/v1/accounts/password",
+      {
+        oldAuthHash: CLIENT_AUTH_HASH,
+        newAuthHash: OTHER_AUTH_HASH,
+        kdfSalt: OTHER_KDF_SALT,
+        kdfIterations: OTHER_KDF_ITERATIONS,
+        wrappedKey: "wrapped-new",
+      },
+      first,
+    );
+
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as { token: string };
+    expect(body.token).toMatch(/^[A-Za-z0-9_-]{43}$/);
+
+    // Every old session is revoked; only the returned bearer works.
+    expect((await meStatus(first)).status).toBe(401);
+    expect((await meStatus(second)).status).toBe(401);
+    expect((await meStatus(body.token)).status).toBe(200);
+
+    const account = await readAccount("password@example.com");
+    expect(account?.auth_hash).toBe(await sha256Hex(OTHER_AUTH_HASH));
+    expect(account?.kdf_salt).toBe(OTHER_KDF_SALT);
+    expect(account?.kdf_iterations).toBe(OTHER_KDF_ITERATIONS);
+    expect(account?.wrapped_key).toBe("wrapped-new");
+    expect(account?.auth_id).toBe(authId);
+    expect(await readTokens(seeded.id)).toHaveLength(1);
+    expect((await readTokens(seeded.id))[0]?.token_hash).toBe(
+      await hashToken(body.token),
+    );
+
+    const oldLogin = await post("/v1/accounts/login", {
+      email: "password@example.com",
+      authHash: CLIENT_AUTH_HASH,
+    });
+    expect(oldLogin.status).toBe(401);
+    const newLogin = await post("/v1/accounts/login", {
+      email: "password@example.com",
+      authHash: OTHER_AUTH_HASH,
+    });
+    expect(newLogin.status).toBe(200);
+  });
+
+  it("rejects a wrong current proof without touching the account", async () => {
+    const authId = uniqueAuthId();
+    const seeded = await seedAccount({
+      email: "wrong-old@example.com",
+      authId,
+      wrappedKey: "wrapped-old",
+    });
+    const session = await loginToken("wrong-old@example.com");
+
+    const response = await post(
+      "/v1/accounts/password",
+      {
+        oldAuthHash: OTHER_AUTH_HASH,
+        newAuthHash: OTHER_AUTH_HASH,
+        kdfSalt: OTHER_KDF_SALT,
+        kdfIterations: OTHER_KDF_ITERATIONS,
+        wrappedKey: "wrapped-new",
+      },
+      session,
+    );
+
+    expect(response.status).toBe(401);
+    expect(((await response.json()) as ErrorBody).error.code).toBe(
+      "proof_required",
+    );
+
+    const account = await readAccount("wrong-old@example.com");
+    expect(account?.auth_hash).toBe(await sha256Hex(CLIENT_AUTH_HASH));
+    expect(account?.kdf_salt).toBe(KDF_SALT);
+    expect(account?.kdf_iterations).toBe(KDF_ITERATIONS);
+    expect(account?.wrapped_key).toBe("wrapped-old");
+    expect(await readTokens(seeded.id)).toHaveLength(1);
+    expect((await meStatus(session)).status).toBe(200);
+  });
+
+  it("requires an account token and valid fields", async () => {
+    const missing = await post("/v1/accounts/password", {});
+    expect(missing.status).toBe(401);
+
+    await seedAccount({ email: "password-validation@example.com" });
+    const session = await loginToken("password-validation@example.com");
+    const valid = {
+      oldAuthHash: CLIENT_AUTH_HASH,
+      newAuthHash: OTHER_AUTH_HASH,
+      kdfSalt: OTHER_KDF_SALT,
+      kdfIterations: OTHER_KDF_ITERATIONS,
+      wrappedKey: "wrapped-new",
+    };
+    const invalidBodies: unknown[] = [
+      {},
+      { ...valid, oldAuthHash: "AB".repeat(32) },
+      { ...valid, newAuthHash: 42 },
+      { ...valid, kdfSalt: "AAAA" },
+      { ...valid, kdfIterations: 99_999 },
+      { ...valid, wrappedKey: "" },
+      [],
+    ];
+
+    for (const invalid of invalidBodies) {
+      const response = await post("/v1/accounts/password", invalid, session);
+      expect(response.status).toBe(400);
+      expect(((await response.json()) as ErrorBody).error.code).toBe(
+        "invalid_request",
+      );
+    }
+
+    expect((await meStatus(session)).status).toBe(200);
+    expect((await readAccount("password-validation@example.com"))?.auth_hash).toBe(
+      await sha256Hex(CLIENT_AUTH_HASH),
+    );
+  });
+});
+
+describe("POST /v1/accounts/recover", () => {
+  it("resets the proof and vault when the recovery key owns the account", async () => {
+    const authId = uniqueAuthId();
+    const seeded = await seedAccount({
+      email: "recover@example.com",
+      authId,
+      wrappedKey: "wrapped-old",
+    });
+    await seedKey(authId, KEY_A);
+    const oldSession = await loginToken("recover@example.com");
+
+    const response = await post(
+      "/v1/accounts/recover",
+      recoveryBody(authId, KEY_A, {
+        email: " Recover@Example.com ",
+        wrappedKey: "wrapped-recovered",
+      }),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true });
+
+    const account = await readAccount("recover@example.com");
+    expect(account?.auth_hash).toBe(await sha256Hex(OTHER_AUTH_HASH));
+    expect(account?.kdf_salt).toBe(OTHER_KDF_SALT);
+    expect(account?.kdf_iterations).toBe(OTHER_KDF_ITERATIONS);
+    expect(account?.wrapped_key).toBe("wrapped-recovered");
+    expect(account?.auth_id).toBe(authId);
+
+    // Recovery revokes every account token.
+    expect(await readTokens(seeded.id)).toHaveLength(0);
+    expect((await meStatus(oldSession)).status).toBe(401);
+
+    const oldLogin = await post("/v1/accounts/login", {
+      email: "recover@example.com",
+      authHash: CLIENT_AUTH_HASH,
+    });
+    expect(oldLogin.status).toBe(401);
+    const newLogin = await post("/v1/accounts/login", {
+      email: "recover@example.com",
+      authHash: OTHER_AUTH_HASH,
+    });
+    expect(newLogin.status).toBe(200);
+    expect(((await newLogin.json()) as LoginBody).vault?.wrappedKey).toBe(
+      "wrapped-recovered",
+    );
+  });
+
+  it("rejects recovery when the key does not own the account", async () => {
+    const authIdA = uniqueAuthId();
+    const authIdB = uniqueAuthId();
+    await seedAccount({
+      email: "recovery-target@example.com",
+      authId: authIdA,
+      wrappedKey: "wrapped-old",
+    });
+    await seedKey(authIdA, KEY_A);
+    await seedKey(authIdB, KEY_B);
+
+    const wrongKey = await post(
+      "/v1/accounts/recover",
+      recoveryBody(authIdA, KEY_B),
+    );
+    expect(wrongKey.status).toBe(404);
+    expect(((await wrongKey.json()) as ErrorBody).error.code).toBe("not_found");
+
+    // Unknown email, unknown authId and a mismatched authId are indistinguishable.
+    const cases = [
+      recoveryBody(authIdA, KEY_A, { email: "nobody@example.com" }),
+      recoveryBody("unknown-auth-id", KEY_A),
+      recoveryBody(authIdB, KEY_A),
+    ];
+    for (const candidate of cases) {
+      const response = await post("/v1/accounts/recover", candidate);
+      expect(response.status).toBe(404);
+      expect(((await response.json()) as ErrorBody).error.code).toBe(
+        "not_found",
+      );
+    }
+
+    const account = await readAccount("recovery-target@example.com");
+    expect(account?.auth_hash).toBe(await sha256Hex(CLIENT_AUTH_HASH));
+    expect(account?.wrapped_key).toBe("wrapped-old");
+  });
+
+  it("rejects malformed bodies", async () => {
+    const valid = recoveryBody(uniqueAuthId(), KEY_A);
+    const invalidBodies: unknown[] = [
+      {},
+      { ...valid, email: 42 },
+      { ...valid, email: "   " },
+      { ...valid, authId: "" },
+      { ...valid, authKey: 42 },
+      { ...valid, authHash: "CD".repeat(32) },
+      { ...valid, kdfSalt: "AAAA" },
+      { ...valid, kdfIterations: "600000" },
+      { ...valid, wrappedKey: "" },
+      [],
+    ];
+
+    for (const invalid of invalidBodies) {
+      const response = await post("/v1/accounts/recover", invalid);
+      expect(response.status).toBe(400);
+      expect(((await response.json()) as ErrorBody).error.code).toBe(
+        "invalid_request",
+      );
+    }
+  });
+});
+
+describe("POST /v1/accounts/reset-unlinked", () => {
+  it("emails a 24-hour reset link to an account with no vault", async () => {
+    await seedAccount({ email: "Reset@Example.com " });
+
+    const sent: SentEmail[] = [];
+    let response: Response | undefined;
+    await captureEmails(sent, async () => {
+      response = await appPost("/v1/accounts/reset-unlinked", {
+        email: " Reset@Example.com",
+        locale: "vi",
+      });
+    });
+
+    expect(response!.status).toBe(202);
+    expect(await response!.json()).toEqual({ ok: true });
+    expect(sent).toHaveLength(1);
+    expect(sent[0]?.to).toBe("reset@example.com");
+    expect(sent[0]?.subject).toMatch(/reset/i);
+    expect(sent[0]?.html).toContain(`${env.WEB_ORIGIN}/reset?token=`);
+    expect(sent[0]?.text).toContain(`${env.WEB_ORIGIN}/reset?token=`);
+
+    const tokens = await readResetTokens("reset@example.com");
+    expect(tokens).toHaveLength(1);
+    expect(tokens[0]?.purpose).toBe("reset");
+    expect(tokens[0]?.used_at).toBeNull();
+    expect(tokens[0]!.expires_at - tokens[0]!.created_at).toBe(DAY_MS);
+    // Only the digest is stored; the email carries the plaintext token.
+    expect(tokens[0]?.token_hash).toBe(
+      await hashToken(resetTokenFrom(sent[0]!)),
+    );
+  });
+
+  it("never resets an account that has a vault", async () => {
+    await seedAccount({
+      email: "vaulted@example.com",
+      authId: uniqueAuthId(),
+      wrappedKey: "wrapped",
+    });
+
+    const sent: SentEmail[] = [];
+    let response: Response | undefined;
+    await captureEmails(sent, async () => {
+      response = await appPost("/v1/accounts/reset-unlinked", {
+        email: "vaulted@example.com",
+        locale: "en",
+      });
+    });
+
+    expect(response!.status).toBe(202);
+    expect(await response!.json()).toEqual({ ok: true });
+    expect(sent).toHaveLength(0);
+    expect(await readResetTokens("vaulted@example.com")).toHaveLength(0);
+  });
+
+  it("answers unknown and known emails the same way", async () => {
+    await seedAccount({
+      email: "verified-unlinked@example.com",
+      emailVerifiedAt: Date.now() - DAY_MS,
+    });
+
+    const sent: SentEmail[] = [];
+    let unknown: Response | undefined;
+    let verified: Response | undefined;
+    await captureEmails(sent, async () => {
+      unknown = await appPost("/v1/accounts/reset-unlinked", {
+        email: "nobody@example.com",
+        locale: "en",
+      });
+      verified = await appPost("/v1/accounts/reset-unlinked", {
+        email: "verified-unlinked@example.com",
+        locale: "en",
+      });
+    });
+
+    expect(unknown!.status).toBe(202);
+    expect(verified!.status).toBe(202);
+    expect(await unknown!.json()).toEqual(await verified!.json());
+    // Only the existing account gets an email; a verified account with no
+    // vault can still reset because there is nothing encrypted.
+    expect(sent).toHaveLength(1);
+    expect(sent[0]?.to).toBe("verified-unlinked@example.com");
+    expect(await readResetTokens("verified-unlinked@example.com")).toHaveLength(
+      1,
+    );
+  });
+
+  it("rejects malformed bodies", async () => {
+    for (const invalid of [
+      {},
+      { email: 42, locale: "en" },
+      { email: "   ", locale: "en" },
+      { email: "a@b.c", locale: 42 },
+      [],
+      null,
+    ]) {
+      const response = await post("/v1/accounts/reset-unlinked", invalid);
+      expect(response.status).toBe(400);
+      expect(((await response.json()) as ErrorBody).error.code).toBe(
+        "invalid_request",
+      );
+    }
+  });
+});
+
+describe("POST /v1/accounts/reset-unlinked/confirm", () => {
+  const newProof = {
+    authHash: OTHER_AUTH_HASH,
+    kdfSalt: OTHER_KDF_SALT,
+    kdfIterations: OTHER_KDF_ITERATIONS,
+  };
+
+  it("sets a new proof once for an account with no vault", async () => {
+    const resetToken = `reset-${crypto.randomUUID()}`;
+    const seeded = await seedAccount({ email: "confirm@example.com" });
+    await seedVerification(seeded.id, resetToken, { purpose: "reset" });
+    const oldSession = await loginToken("confirm@example.com");
+
+    const response = await post("/v1/accounts/reset-unlinked/confirm", {
+      token: resetToken,
+      ...newProof,
+    });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true });
+
+    const account = await readAccount("confirm@example.com");
+    expect(account?.auth_hash).toBe(await sha256Hex(OTHER_AUTH_HASH));
+    expect(account?.kdf_salt).toBe(OTHER_KDF_SALT);
+    expect(account?.kdf_iterations).toBe(OTHER_KDF_ITERATIONS);
+    expect(account?.auth_id).toBeNull();
+    // Resetting the password revokes existing sessions.
+    expect(await readTokens(seeded.id)).toHaveLength(0);
+    expect((await meStatus(oldSession)).status).toBe(401);
+
+    const verifications = await readVerifications(seeded.id);
+    expect(verifications).toHaveLength(1);
+    expect(verifications[0]?.used_at).toBeGreaterThan(0);
+
+    expect(
+      (
+        await post("/v1/accounts/login", {
+          email: "confirm@example.com",
+          authHash: CLIENT_AUTH_HASH,
+        })
+      ).status,
+    ).toBe(401);
+    expect(
+      (
+        await post("/v1/accounts/login", {
+          email: "confirm@example.com",
+          authHash: OTHER_AUTH_HASH,
+        })
+      ).status,
+    ).toBe(200);
+
+    const again = await post("/v1/accounts/reset-unlinked/confirm", {
+      token: resetToken,
+      ...newProof,
+    });
+    expect(again.status).toBe(410);
+    expect(((await again.json()) as ErrorBody).error.code).toBe(
+      "invalid_token",
+    );
+  });
+
+  it("rejects expired, used, wrong-purpose and vaulted resets", async () => {
+    const unlinked = await seedAccount({ email: "bad-reset@example.com" });
+    const linked = await seedAccount({
+      email: "linked-reset@example.com",
+      authId: uniqueAuthId(),
+      wrappedKey: "wrapped",
+    });
+    const now = Date.now();
+    await seedVerification(unlinked.id, "expired-reset", {
+      purpose: "reset",
+      expiresAt: now - 1,
+    });
+    await seedVerification(unlinked.id, "used-reset", {
+      purpose: "reset",
+      usedAt: now - DAY_MS,
+    });
+    await seedVerification(unlinked.id, "verify-purpose", {
+      purpose: "verify",
+    });
+    await seedVerification(linked.id, "vaulted-reset", { purpose: "reset" });
+
+    for (const token of [
+      "unknown-token",
+      "expired-reset",
+      "used-reset",
+      "verify-purpose",
+      "vaulted-reset",
+    ]) {
+      const response = await post("/v1/accounts/reset-unlinked/confirm", {
+        token,
+        ...newProof,
+      });
+      expect(response.status).toBe(410);
+      expect(((await response.json()) as ErrorBody).error.code).toBe(
+        "invalid_token",
+      );
+    }
+
+    // The linked account still holds its original proof.
+    expect((await readAccount("linked-reset@example.com"))?.auth_hash).toBe(
+      await sha256Hex(CLIENT_AUTH_HASH),
+    );
+    const vaultedTokenHash = await hashToken("vaulted-reset");
+    const vaultedRow = (await readVerifications(linked.id)).find(
+      (row) => row.token_hash === vaultedTokenHash,
+    );
+    expect(vaultedRow?.used_at).toBeNull();
+  });
+
+  it("rejects malformed bodies", async () => {
+    for (const invalid of [
+      {},
+      { token: 42, ...newProof },
+      { token: "", ...newProof },
+      { token: "t", ...newProof, authHash: "AB".repeat(32) },
+      { token: "t", ...newProof, kdfSalt: "AAAA" },
+      { token: "t", ...newProof, kdfIterations: 2_000_001 },
+      [],
+    ]) {
+      const response = await post(
+        "/v1/accounts/reset-unlinked/confirm",
+        invalid,
+      );
+      expect(response.status).toBe(400);
+      expect(((await response.json()) as ErrorBody).error.code).toBe(
+        "invalid_request",
+      );
+    }
+  });
+});
+
+describe("DELETE /v1/accounts", () => {
+  it("deletes the account without touching sync data", async () => {
+    const authId = uniqueAuthId();
+    const seeded = await seedAccount({
+      email: "delete@example.com",
+      authId,
+      wrappedKey: "wrapped",
+    });
+    await seedKey(authId, KEY_A);
+    await seedSession(authId, "session-1");
+    await seedDeletion(authId, "session-2");
+    await seedVerification(seeded.id, "verify-token");
+    const session = await loginToken("delete@example.com");
+
+    const response = await del(
+      "/v1/accounts",
+      { authHash: CLIENT_AUTH_HASH },
+      session,
+    );
+    expect(response.status).toBe(204);
+    expect(await response.text()).toBe("");
+
+    expect(await readAccount("delete@example.com")).toBeNull();
+    expect(await readTokens(seeded.id)).toHaveLength(0);
+    expect(await readVerifications(seeded.id)).toHaveLength(0);
+    // Sync data and the key registration are untouched.
+    expect(await keyRowExists(authId)).toBe(true);
+    expect(await sessionRowExists(authId, "session-1")).toBe(true);
+    expect(await deletionRowExists(authId, "session-2")).toBe(true);
+    expect((await meStatus(session)).status).toBe(401);
+  });
+
+  it("requires the correct password proof", async () => {
+    await seedAccount({ email: "delete-proof@example.com" });
+    const session = await loginToken("delete-proof@example.com");
+
+    const response = await del(
+      "/v1/accounts",
+      { authHash: OTHER_AUTH_HASH },
+      session,
+    );
+    expect(response.status).toBe(401);
+    expect(((await response.json()) as ErrorBody).error.code).toBe(
+      "proof_required",
+    );
+
+    expect(await readAccount("delete-proof@example.com")).not.toBeNull();
+    expect((await meStatus(session)).status).toBe(200);
+  });
+
+  it("requires an account token and valid fields", async () => {
+    await seedAccount({ email: "delete-validation@example.com" });
+    const session = await loginToken("delete-validation@example.com");
+
+    const missing = await del("/v1/accounts", { authHash: CLIENT_AUTH_HASH });
+    expect(missing.status).toBe(401);
+
+    for (const invalid of [{}, { authHash: "AB".repeat(32) }, { authHash: 42 }, []]) {
+      const response = await del("/v1/accounts", invalid, session);
+      expect(response.status).toBe(400);
+      expect(((await response.json()) as ErrorBody).error.code).toBe(
+        "invalid_request",
+      );
+    }
+
+    expect(await readAccount("delete-validation@example.com")).not.toBeNull();
   });
 });
 
