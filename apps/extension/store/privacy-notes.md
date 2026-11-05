@@ -111,3 +111,52 @@ content scripts, remote scripts, telemetry endpoints, or advertising SDKs.
   opt-in, so nothing is required; data is not sold or transferred.
 - Contact: the support contact on the Chrome Web Store listing; the public
   policy lives at https://savetabs.azcom.dev/privacy.
+
+## AMO submission answers
+
+- Experimental: **No**. Payment/non-free/hardware: **No**.
+- Categories: **Tabs** and **Privacy & Security**.
+- Support website: https://savetabs.azcom.dev
+- License: **All Rights Reserved** (repository is private; no LICENSE file).
+- Privacy policy: **Yes** — https://savetabs.azcom.dev/privacy
+- Notes to reviewer (paste into the form):
+
+```text
+SaveTabs saves open tabs as named sessions and restores them later. Sync is
+optional and end-to-end encrypted.
+
+Build from the attached sources zip:
+1. Node.js 22.12+ and pnpm 10.33 (`corepack enable` reads the pinned
+   packageManager field).
+2. pnpm install --frozen-lockfile
+3. pnpm --filter @savetabs/extension exec wxt prepare
+4. WXT_SAVETABS_API_BASE=https://savetabs-api.azcom.dev \
+     pnpm --filter @savetabs/extension zip:firefox
+   Output: apps/extension/.output/savetabs-0.1.0-firefox.zip
+
+The submitted build is minified; the sources zip contains the same tree and
+these commands reproduce the package.
+
+Runtime notes:
+- Manifest V3 with an event-page background script; no service worker.
+- No remote code. The daily update check fetches a JSON manifest from
+  https://savetabs-api.azcom.dev/v1/version and compares version numbers; no
+  fetched content is evaluated.
+- Permissions: tabs (save/restore), storage (settings and local sessions),
+  alarms (auto-discard schedule and update check), contextMenus (right-click
+  actions). Host permission is limited to https://savetabs-api.azcom.dev/*.
+- Sync is opt-in. A 128-bit sync key is generated locally; sessions are
+  encrypted in the browser with AES-GCM-256 and only ciphertext is uploaded.
+  The server stores a public authId, a SHA-256 hash of a derived bearer key,
+  encrypted blobs, timestamps and deletion tombstones. The sync key never
+  leaves the device.
+- Incognito/private sessions are marked local-only and never uploaded.
+- Auto-discard uses tabs.discard and is disabled where the API is unavailable.
+- No analytics, telemetry, content scripts or third-party services.
+- To test sync: Settings → Sync → create a key, save a window, then open the
+  key in https://savetabs.azcom.dev.
+
+Declared data collection: required none; optional browsingActivity (synced
+tab URLs/titles after the user enables sync) and technicalAndInteraction
+(IP used for rate limiting, version check).
+```
