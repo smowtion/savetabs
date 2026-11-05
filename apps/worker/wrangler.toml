@@ -39,6 +39,11 @@ name = "RATE_LIMITER_EMAIL"
 namespace_id = "1003"
 simple = { limit = 5, period = 60 }
 
+# Daily retention sweep for accounts that never verified their address and
+# never linked a vault (30-day TTL). Runs at 03:17 UTC.
+[triggers]
+crons = ["17 3 * * *"]
+
 [vars]
 # Only this origin (the web app) may call the API from a browser; the
 # extension sends a bearer token and no cookies.

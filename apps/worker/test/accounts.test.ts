@@ -1,10 +1,14 @@
 import { env, SELF } from "cloudflare:test";
 import { describe, expect, it } from "vitest";
 import { toBase64Url } from "@savetabs/shared/base64url";
-import app from "../src/index";
+import { app } from "../src/index";
 import type { Env } from "../src/env";
 import { sha256Hex } from "../src/auth";
 import { hashToken, normalizeEmail } from "../src/accounts/tokens";
+import {
+  consumeEmailSend,
+  DAILY_EMAIL_LIMIT,
+} from "../src/accounts/email-sends";
 import { currentDay } from "../src/counters";
 
 const BASE_URL = "https://savetabs.test";
@@ -344,7 +348,7 @@ function testExecutionContext(): ExecutionContext {
 }
 
 /** Env copy with Resend enabled so the signup routes attempt a send. */
-function resendEnv(): Env {
+function resendEnv(overrides: Partial<Env> = {}): Env {
   return {
     DB: env.DB,
     RELEASES: env.RELEASES,
@@ -353,7 +357,33 @@ function resendEnv(): Env {
     GLOBAL_MAX_KEYS: env.GLOBAL_MAX_KEYS,
     RESEND_API_KEY: "re_test",
     RESEND_FROM: "SaveTabs <noreply@azcom.dev>",
+    ...overrides,
   };
+}
+
+/** Seed today's send counter row for an account. */
+async function seedEmailSends(
+  accountId: string,
+  count: number,
+  now: number = Date.now(),
+): Promise<void> {
+  await env.DB.prepare(
+    "INSERT INTO email_sends (account_id, day, count) VALUES (?, ?, ?)",
+  )
+    .bind(accountId, currentDay(now), count)
+    .run();
+}
+
+/** Today's send counter for an account, or null when no row exists. */
+function readEmailSends(
+  accountId: string,
+  now: number = Date.now(),
+): Promise<{ count: number } | null> {
+  return env.DB.prepare(
+    "SELECT count FROM email_sends WHERE account_id = ? AND day = ?",
+  )
+    .bind(accountId, currentDay(now))
+    .first<{ count: number }>();
 }
 
 /** Capture outbound Resend calls while `run` executes. */
@@ -665,6 +695,232 @@ describe("POST /v1/accounts/signup", () => {
 
     const account = await readAccount("dupe@example.com");
     expect(await readVerifications(account!.id)).toHaveLength(1);
+  });
+});
+
+describe("consumeEmailSend", () => {
+  it("allows five sends per UTC day and refuses the next", async () => {
+    const now = Date.now();
+    const accountId = crypto.randomUUID();
+
+    expect(DAILY_EMAIL_LIMIT).toBe(5);
+    for (let attempt = 0; attempt < DAILY_EMAIL_LIMIT; attempt += 1) {
+      expect(await consumeEmailSend(env.DB, accountId, now)).toBe(true);
+    }
+    expect(await consumeEmailSend(env.DB, accountId, now)).toBe(false);
+    expect(await consumeEmailSend(env.DB, accountId, now)).toBe(false);
+
+    // Refused attempts must not push the stored count past the cap.
+    expect(await readEmailSends(accountId, now)).toEqual({
+      count: DAILY_EMAIL_LIMIT,
+    });
+  });
+
+  it("starts a fresh budget on the next UTC day", async () => {
+    const now = Date.now();
+    const accountId = crypto.randomUUID();
+    await seedEmailSends(accountId, DAILY_EMAIL_LIMIT, now);
+
+    expect(await consumeEmailSend(env.DB, accountId, now)).toBe(false);
+    expect(await consumeEmailSend(env.DB, accountId, now + DAY_MS)).toBe(true);
+  });
+
+  it("tracks each account independently", async () => {
+    const now = Date.now();
+    const spent = crypto.randomUUID();
+    const fresh = crypto.randomUUID();
+    await seedEmailSends(spent, DAILY_EMAIL_LIMIT, now);
+
+    expect(await consumeEmailSend(env.DB, spent, now)).toBe(false);
+    expect(await consumeEmailSend(env.DB, fresh, now)).toBe(true);
+  });
+});
+
+describe("account email rate limit", () => {
+  function fakeEmailLimiter(allow: boolean): {
+    seen: string[];
+    limiter: NonNullable<Env["RATE_LIMITER_EMAIL"]>;
+  } {
+    const seen: string[] = [];
+    return {
+      seen,
+      limiter: {
+        limit: async ({ key }) => {
+          seen.push(key);
+          return { success: allow };
+        },
+      },
+    };
+  }
+
+  async function requestWithLimiter(
+    path: string,
+    body: unknown,
+    limiter: NonNullable<Env["RATE_LIMITER_EMAIL"]>,
+  ): Promise<Response> {
+    return await app.request(
+      `${BASE_URL}${path}`,
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "cf-connecting-ip": requestIp(),
+        },
+        body: JSON.stringify(body),
+      },
+      resendEnv({ RATE_LIMITER_EMAIL: limiter }),
+      testExecutionContext(),
+    );
+  }
+
+  it("charges signup with the normalized email", async () => {
+    const { seen, limiter } = fakeEmailLimiter(true);
+
+    const response = await requestWithLimiter(
+      "/v1/accounts/signup",
+      signupBody({ email: " Limit@Example.com " }),
+      limiter,
+    );
+
+    expect(response.status).toBe(202);
+    expect(seen).toEqual(["email:limit@example.com"]);
+  });
+
+  it("charges reset-unlinked with the normalized email", async () => {
+    const { seen, limiter } = fakeEmailLimiter(true);
+
+    const response = await requestWithLimiter(
+      "/v1/accounts/reset-unlinked",
+      { email: " Reset@Example.com", locale: "en" },
+      limiter,
+    );
+
+    expect(response.status).toBe(202);
+    expect(seen).toEqual(["email:reset@example.com"]);
+  });
+
+  it("returns the rate_limited envelope without creating an account", async () => {
+    const { limiter } = fakeEmailLimiter(false);
+
+    const response = await requestWithLimiter(
+      "/v1/accounts/signup",
+      signupBody({ email: "blocked@example.com" }),
+      limiter,
+    );
+
+    expect(response.status).toBe(429);
+    expect(((await response.json()) as ErrorBody).error.code).toBe(
+      "rate_limited",
+    );
+    expect(await readAccount("blocked@example.com")).toBeNull();
+  });
+
+  it("does not charge invalid bodies", async () => {
+    const { seen, limiter } = fakeEmailLimiter(true);
+
+    const signup = await requestWithLimiter(
+      "/v1/accounts/signup",
+      { ...signupBody({ email: "invalid-limit@example.com" }), authHash: "no" },
+      limiter,
+    );
+    const reset = await requestWithLimiter(
+      "/v1/accounts/reset-unlinked",
+      { email: 42, locale: "en" },
+      limiter,
+    );
+
+    expect(signup.status).toBe(400);
+    expect(reset.status).toBe(400);
+    expect(seen).toEqual([]);
+  });
+
+  it("enforces the bound burst budget for one address", async () => {
+    const email = `burst-${crypto.randomUUID()}@example.com`;
+
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      const response = await post(
+        "/v1/accounts/signup",
+        signupBody({ email }),
+      );
+      expect(response.status).toBe(202);
+    }
+
+    const blocked = await post("/v1/accounts/signup", signupBody({ email }));
+    expect(blocked.status).toBe(429);
+    expect(((await blocked.json()) as ErrorBody).error.code).toBe(
+      "rate_limited",
+    );
+  });
+});
+
+describe("daily email cap", () => {
+  it("records one send for a fresh signup", async () => {
+    const sent: SentEmail[] = [];
+    await captureEmails(sent, async () => {
+      const response = await appPost(
+        "/v1/accounts/signup",
+        signupBody({ email: "cap-signup@example.com" }),
+      );
+      expect(response.status).toBe(202);
+    });
+
+    expect(sent).toHaveLength(1);
+    const account = await readAccount("cap-signup@example.com");
+    expect(await readEmailSends(account!.id)).toEqual({ count: 1 });
+  });
+
+  it("skips the duplicate notice once the account has used its five sends", async () => {
+    const account = await seedAccount({ email: "cap-duplicate@example.com" });
+    await seedEmailSends(account.id, DAILY_EMAIL_LIMIT);
+
+    const sent: SentEmail[] = [];
+    await captureEmails(sent, async () => {
+      const response = await appPost(
+        "/v1/accounts/signup",
+        signupBody({ email: "cap-duplicate@example.com" }),
+      );
+      expect(response.status).toBe(202);
+      expect(await response.json()).toEqual({ ok: true });
+    });
+
+    expect(sent).toHaveLength(0);
+    expect(await readEmailSends(account.id)).toEqual({
+      count: DAILY_EMAIL_LIMIT,
+    });
+  });
+
+  it("skips resend-verification once the account has used its five sends", async () => {
+    const account = await seedAccount({ email: "cap-resend@example.com" });
+    await seedEmailSends(account.id, DAILY_EMAIL_LIMIT);
+    const session = await loginToken("cap-resend@example.com");
+
+    const sent: SentEmail[] = [];
+    let response: Response | undefined;
+    await captureEmails(sent, async () => {
+      response = await appPost("/v1/accounts/resend-verification", {}, session);
+    });
+
+    expect(response!.status).toBe(202);
+    expect(await response!.json()).toEqual({ ok: true });
+    expect(sent).toHaveLength(0);
+  });
+
+  it("skips the reset email once the account has used its five sends", async () => {
+    const account = await seedAccount({ email: "cap-reset@example.com" });
+    await seedEmailSends(account.id, DAILY_EMAIL_LIMIT);
+
+    const sent: SentEmail[] = [];
+    let response: Response | undefined;
+    await captureEmails(sent, async () => {
+      response = await appPost("/v1/accounts/reset-unlinked", {
+        email: "cap-reset@example.com",
+        locale: "en",
+      });
+    });
+
+    expect(response!.status).toBe(202);
+    expect(await response!.json()).toEqual({ ok: true });
+    expect(sent).toHaveLength(0);
   });
 });
 
@@ -1741,6 +1997,7 @@ describe("DELETE /v1/accounts", () => {
     await seedSession(authId, "session-1");
     await seedDeletion(authId, "session-2");
     await seedVerification(seeded.id, "verify-token");
+    await seedEmailSends(seeded.id, 1);
     const session = await loginToken("delete@example.com");
 
     const response = await del(
@@ -1754,6 +2011,7 @@ describe("DELETE /v1/accounts", () => {
     expect(await readAccount("delete@example.com")).toBeNull();
     expect(await readTokens(seeded.id)).toHaveLength(0);
     expect(await readVerifications(seeded.id)).toHaveLength(0);
+    expect(await readEmailSends(seeded.id)).toBeNull();
     // Sync data and the key registration are untouched.
     expect(await keyRowExists(authId)).toBe(true);
     expect(await sessionRowExists(authId, "session-1")).toBe(true);

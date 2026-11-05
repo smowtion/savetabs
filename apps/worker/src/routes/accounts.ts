@@ -5,9 +5,11 @@ import {
   sendEmail,
   verificationEmail,
 } from "../accounts/email";
+import { consumeEmailSend } from "../accounts/email-sends";
 import { createToken, hashToken, normalizeEmail } from "../accounts/tokens";
 import { parseBearer, sha256Hex, timingSafeEqual } from "../auth";
 import {
+  allowRequest,
   DEFAULT_MAX_KEYS,
   keysCreatedToday,
   parseLimit,
@@ -85,6 +87,11 @@ accountsRoutes.post("/accounts/signup", async (c) => {
   if (!isValidIterations(kdfIterations)) return invalidRequest(c);
   if (typeof locale !== "string") return invalidRequest(c);
 
+  // Charge the per-email bucket after validation, so a malformed flood cannot
+  // spend a victim's budget; the daily counter below then bounds the total.
+  const limited = await enforceEmailRateLimit(c, email);
+  if (limited !== null) return limited;
+
   const now = Date.now();
   const accountId = crypto.randomUUID();
   const inserted = await c.env.DB.prepare(
@@ -106,12 +113,26 @@ accountsRoutes.post("/accounts/signup", async (c) => {
     .run();
 
   // An existing address gets a generic notice, never a second account or a
-  // verification token. The response is identical to a fresh signup.
+  // verification token. The response is identical to a fresh signup, and the
+  // notice itself is skipped once the account's daily budget is spent.
   if ((inserted.meta.changes ?? 0) === 0) {
-    await sendEmail(c.env, { to: email, ...signupNotice(c.env.WEB_ORIGIN) });
+    const existing = await c.env.DB.prepare(
+      "SELECT id FROM accounts WHERE email = ?",
+    )
+      .bind(email)
+      .first<{ id: string }>();
+
+    if (
+      existing !== null &&
+      (await consumeEmailSend(c.env.DB, existing.id, now))
+    ) {
+      await sendEmail(c.env, { to: email, ...signupNotice(c.env.WEB_ORIGIN) });
+    }
     return c.json({ ok: true }, 202);
   }
 
+  // The account and its verification token are created regardless; only the
+  // Resend call is skipped once the account's daily budget is spent.
   const { token, tokenHash } = await createToken();
   await c.env.DB.prepare(
     `INSERT INTO email_verifications
@@ -121,8 +142,10 @@ accountsRoutes.post("/accounts/signup", async (c) => {
     .bind(tokenHash, accountId, now, now + VERIFICATION_TTL_MS)
     .run();
 
-  const link = `${c.env.WEB_ORIGIN}/verify?token=${token}`;
-  await sendEmail(c.env, { to: email, ...verificationEmail(locale, link) });
+  if (await consumeEmailSend(c.env.DB, accountId, now)) {
+    const link = `${c.env.WEB_ORIGIN}/verify?token=${token}`;
+    await sendEmail(c.env, { to: email, ...verificationEmail(locale, link) });
+  }
 
   return c.json({ ok: true }, 202);
 });
@@ -261,12 +284,15 @@ accountsRoutes.post("/accounts/resend-verification", async (c) => {
     .run();
 
   // A fresh link goes out whether or not the account is already verified, so
-  // the response never reveals the current verification state.
-  const link = `${c.env.WEB_ORIGIN}/verify?token=${token}`;
-  await sendEmail(c.env, {
-    to: auth.account.email,
-    ...verificationEmail(auth.account.locale, link),
-  });
+  // the response never reveals the current verification state. The daily
+  // budget can still suppress the send without changing that response.
+  if (await consumeEmailSend(c.env.DB, auth.account.id, now)) {
+    const link = `${c.env.WEB_ORIGIN}/verify?token=${token}`;
+    await sendEmail(c.env, {
+      to: auth.account.email,
+      ...verificationEmail(auth.account.locale, link),
+    });
+  }
 
   return c.json({ ok: true }, 202);
 });
@@ -538,6 +564,12 @@ accountsRoutes.post("/accounts/reset-unlinked", async (c) => {
   const normalizedEmail = normalizeEmail(email);
   if (normalizedEmail.length === 0) return invalidRequest(c);
 
+  // Charge before the account lookup so unknown and known addresses cost the
+  // same. Unknown emails have no account id for the daily counter, so the
+  // per-IP bucket is what bounds those requests.
+  const limited = await enforceEmailRateLimit(c, normalizedEmail);
+  if (limited !== null) return limited;
+
   // Only an account with no linked vault may reset by email; a linked
   // account's encrypted data is unreachable this way by construction.
   const account = await c.env.DB.prepare(
@@ -560,12 +592,15 @@ accountsRoutes.post("/accounts/reset-unlinked", async (c) => {
     const link = `${c.env.WEB_ORIGIN}/reset?token=${token}`;
     // Deliver after the response: an unknown address must not be measurably
     // faster than a real send, and a provider failure must not break the 202.
-    c.executionCtx.waitUntil(
-      sendEmail(c.env, {
-        to: normalizedEmail,
-        ...resetEmail(locale, link),
-      }),
-    );
+    // The daily budget can suppress delivery without changing the response.
+    if (await consumeEmailSend(c.env.DB, account.id, now)) {
+      c.executionCtx.waitUntil(
+        sendEmail(c.env, {
+          to: normalizedEmail,
+          ...resetEmail(locale, link),
+        }),
+      );
+    }
   }
 
   // The response never discloses whether the address exists or has a vault.
@@ -652,8 +687,9 @@ accountsRoutes.delete("/accounts", async (c) => {
     return proofRequired(c);
   }
 
-  // There is no FK cascade: tokens and verifications are removed explicitly.
-  // Sync tables (keys, sessions, deletions) stay untouched by design.
+  // There is no FK cascade: tokens, verifications and send counters are
+  // removed explicitly. Sync tables (keys, sessions, deletions) stay
+  // untouched by design.
   await c.env.DB.batch([
     c.env.DB.prepare("DELETE FROM account_tokens WHERE account_id = ?").bind(
       auth.account.id,
@@ -661,6 +697,9 @@ accountsRoutes.delete("/accounts", async (c) => {
     c.env.DB.prepare(
       "DELETE FROM email_verifications WHERE account_id = ?",
     ).bind(auth.account.id),
+    c.env.DB.prepare("DELETE FROM email_sends WHERE account_id = ?").bind(
+      auth.account.id,
+    ),
     c.env.DB.prepare("DELETE FROM accounts WHERE id = ?").bind(
       auth.account.id,
     ),
@@ -674,6 +713,30 @@ accountsRoutes.delete("/accounts", async (c) => {
 // ---------------------------------------------------------------------------
 
 type AccountAuth = { account: AccountRow } | { response: Response };
+
+/**
+ * Charge the per-email bucket for signup and reset requests, keyed by the
+ * normalized address so no single mailbox can be flooded. A no-op when the
+ * binding is absent (local development and unit tests).
+ *
+ * Returns a 429 response when the bucket is exhausted, otherwise `null`.
+ */
+async function enforceEmailRateLimit(
+  c: AppContext,
+  email: string,
+): Promise<Response | null> {
+  const limiter = c.env.RATE_LIMITER_EMAIL;
+  if (limiter === undefined) return null;
+
+  if (await allowRequest(limiter, [`email:${email}`])) return null;
+
+  return apiError(
+    c,
+    429,
+    "rate_limited",
+    "Too many requests; slow down and retry shortly.",
+  );
+}
 
 /**
  * Resolve the account token on the request. Tokens are stored only as their

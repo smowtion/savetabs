@@ -2,7 +2,7 @@ import { env, SELF } from "cloudflare:test";
 import { describe, expect, it } from "vitest";
 import { toBase64Url } from "@savetabs/shared/base64url";
 import { LIMITS } from "@savetabs/shared/constants";
-import app from "../src/index";
+import { app } from "../src/index";
 import type { Env } from "../src/env";
 import { sha256Hex } from "../src/auth";
 import { currentDay } from "../src/counters";

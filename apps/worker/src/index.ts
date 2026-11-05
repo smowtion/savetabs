@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { cleanupUnverifiedAccounts } from "./accounts/cleanup";
 import { corsMiddleware } from "./cors";
 import { capacityMiddleware, ipRateLimitMiddleware } from "./counters";
 import type { Env } from "./env";
@@ -7,7 +8,7 @@ import { accountsRoutes } from "./routes/accounts";
 import { sessionsRoutes } from "./routes/sessions";
 import { versionRoutes } from "./routes/version";
 
-const app = new Hono<{ Bindings: Env }>();
+export const app = new Hono<{ Bindings: Env }>();
 
 // Order matters: CORS answers preflight and exits before the abuse controls so
 // a browser preflight never receives an API error response. The IP bucket runs
@@ -30,4 +31,23 @@ app.onError((error, c) => {
   return apiError(c, 500, "internal_error", "Unexpected server error.");
 });
 
-export default app;
+/**
+ * Cron entry point (see `[triggers]` in wrangler.toml). Runs the retention
+ * sweep for accounts that never verified their address or linked a vault.
+ */
+async function scheduled(
+  controller: ScheduledController,
+  env: Env,
+  _ctx: ExecutionContext,
+): Promise<void> {
+  const deleted = await cleanupUnverifiedAccounts(
+    env.DB,
+    controller.scheduledTime,
+  );
+  console.log("cleanup_unverified_accounts", { deleted });
+}
+
+export default {
+  fetch: app.fetch,
+  scheduled,
+} satisfies ExportedHandler<Env>;
