@@ -1,0 +1,9 @@
+name = "savetabs-web"
+compatibility_date = "2026-08-01"
+
+[assets]
+directory = "./dist"
+
+[[routes]]
+pattern = "savetabs.azcom.dev"
+custom_domain = true

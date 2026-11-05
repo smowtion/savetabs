@@ -1,6 +1,10 @@
-name = "savetabs-api"
+name = "savetabs"
 main = "src/index.ts"
 compatibility_date = "2026-08-01"
+
+[[routes]]
+pattern = "savetabs-api.azcom.dev"
+custom_domain = true
 
 # Sync metadata (keys, encrypted sessions, tombstones, daily counters).
 # Replace `database_id` with the id printed by `wrangler d1 create savetabs`
@@ -8,7 +12,7 @@ compatibility_date = "2026-08-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "savetabs"
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "801f65e9-52c1-4702-b511-842281a033dc"
 migrations_dir = "migrations"
 
 # Release artifacts and versions.json served by GET /v1/version.
@@ -32,6 +36,6 @@ simple = { limit = 240, period = 60 }
 [vars]
 # Only this origin (the web app) may call the API from a browser; the
 # extension sends a bearer token and no cookies.
-WEB_ORIGIN = "https://savetabs.pages.dev"
+WEB_ORIGIN = "https://savetabs.azcom.dev"
 GLOBAL_DAILY_REQUESTS = "100000"
 GLOBAL_MAX_KEYS = "10000"

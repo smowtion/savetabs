@@ -1,11 +1,10 @@
 # Cloudflare Pages response headers for the SaveTabs web app.
-# The API origin is a placeholder until the production domain is registered.
-# This file is static: when the real domain is registered, update the
-# connect-src origin to match VITE_API_BASE (or generate this file at build
-# time). The release runs scripts/verify-csp.mjs and fails if the built file
-# does not allow the configured API origin.
+# The API origin is the production subdomain for azcom.dev.
+# This file is static: if the API domain changes, update connect-src to match
+# VITE_API_BASE. The release runs scripts/verify-csp.mjs and fails if the built
+# file does not allow the configured API origin.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api.savetabs.example; frame-ancestors 'none'; base-uri 'self'; form-action 'self';
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://savetabs-api.azcom.dev; frame-ancestors 'none'; base-uri 'self'; form-action 'self';
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
