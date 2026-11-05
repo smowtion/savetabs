@@ -467,6 +467,26 @@
     }
   },
   "web": {
+    "signup": {
+      "title": "Create your account",
+      "description": "Back up your saved sessions with end-to-end encryption and open them on any device. Everything is encrypted in your browser.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "passwordHint": "Use at least 12 characters.",
+      "confirmLabel": "Confirm password",
+      "submit": "Create account",
+      "submitting": "Creating account…",
+      "passwordTooShort": "Use a password with at least 12 characters.",
+      "passwordMismatch": "The passwords do not match.",
+      "error": "We could not create your account. Try again.",
+      "recoveryTitle": "Save your recovery key",
+      "recoveryMessage": "This key is the only way to recover your encrypted sessions. It will not be shown again.",
+      "recoveryKeyLabel": "Your key",
+      "recoveryConfirm": "I saved it",
+      "continue": "Continue",
+      "back": "Back to SaveTabs"
+    },
     "landing": {
       "title": "Open your saved tabs",
       "description": "Enter your sync key to view your saved sessions. Everything is decrypted in your browser.",

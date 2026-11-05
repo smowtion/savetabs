@@ -6,6 +6,7 @@ import { loadKey } from "./lib/key-session";
 import Landing from "./pages/Landing";
 import Privacy from "./pages/Privacy";
 import Sessions from "./pages/Sessions";
+import Signup from "./pages/Signup";
 
 /** Route guard: session pages require a stored sync key. */
 function RequireKey({ children }: { children: ReactNode }) {
@@ -25,6 +26,7 @@ export default function App() {
             </RequireKey>
           }
         />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

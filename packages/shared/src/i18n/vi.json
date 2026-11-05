@@ -467,6 +467,26 @@
     }
   },
   "web": {
+    "signup": {
+      "title": "Tạo tài khoản của bạn",
+      "description": "Sao lưu các phiên đã lưu với mã hóa đầu cuối và mở chúng trên mọi thiết bị. Mọi dữ liệu được mã hóa ngay trong trình duyệt của bạn.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Mật khẩu",
+      "passwordHint": "Dùng ít nhất 12 ký tự.",
+      "confirmLabel": "Xác nhận mật khẩu",
+      "submit": "Tạo tài khoản",
+      "submitting": "Đang tạo tài khoản…",
+      "passwordTooShort": "Mật khẩu phải có ít nhất 12 ký tự.",
+      "passwordMismatch": "Mật khẩu xác nhận không khớp.",
+      "error": "Không thể tạo tài khoản. Hãy thử lại.",
+      "recoveryTitle": "Lưu khóa khôi phục của bạn",
+      "recoveryMessage": "Đây là cách duy nhất để khôi phục các phiên đã mã hóa của bạn. Khóa sẽ không được hiển thị lại.",
+      "recoveryKeyLabel": "Khóa của bạn",
+      "recoveryConfirm": "Tôi đã lưu rồi",
+      "continue": "Tiếp tục",
+      "back": "Quay lại SaveTabs"
+    },
     "landing": {
       "title": "Mở các tab đã lưu",
       "description": "Nhập key đồng bộ để xem các phiên đã lưu. Mọi dữ liệu được giải mã ngay trong trình duyệt của bạn.",
