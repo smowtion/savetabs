@@ -98,7 +98,7 @@ jobs:
         run: pnpm build
 
       - name: Package extension
-        run: pnpm zip:chrome && pnpm zip:firefox
+        run: pnpm zip:chrome && pnpm zip:firefox && pnpm zip:sources
 
       - name: Verify extension build
         run: pnpm verify:build
