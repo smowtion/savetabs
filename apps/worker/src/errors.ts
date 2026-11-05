@@ -11,6 +11,7 @@ export type ErrorCode =
   | "quota_exceeded"
   | "payload_too_large"
   | "invalid_request"
+  | "invalid_credentials"
   | "rate_limited"
   | "capacity_exceeded"
   | "internal_error";

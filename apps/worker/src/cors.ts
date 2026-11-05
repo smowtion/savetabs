@@ -1,7 +1,7 @@
 import type { MiddlewareHandler } from "hono";
 import type { Env } from "./env";
 
-export const CORS_ALLOW_METHODS = "GET, PUT, DELETE, OPTIONS";
+export const CORS_ALLOW_METHODS = "GET, POST, PUT, DELETE, OPTIONS";
 export const CORS_ALLOW_HEADERS = "Authorization, Content-Type";
 
 /**

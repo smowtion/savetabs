@@ -7,6 +7,7 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
+    "./account/kdf": "./src/account/kdf.ts",
     "./base64url": "./src/base64url.ts",
     "./constants": "./src/constants.ts",
     "./crypto/key": "./src/crypto/key.ts",

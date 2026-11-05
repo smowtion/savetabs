@@ -578,7 +578,7 @@ describe("CORS", () => {
       env.WEB_ORIGIN,
     );
     expect(response.headers.get("access-control-allow-methods")).toBe(
-      "GET, PUT, DELETE, OPTIONS",
+      "GET, POST, PUT, DELETE, OPTIONS",
     );
     expect(response.headers.get("access-control-allow-headers")).toBe(
       "Authorization, Content-Type",
