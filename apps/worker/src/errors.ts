@@ -12,12 +12,21 @@ export type ErrorCode =
   | "payload_too_large"
   | "invalid_request"
   | "invalid_credentials"
+  | "invalid_token"
   | "rate_limited"
   | "capacity_exceeded"
   | "internal_error";
 
 /** HTTP statuses that carry a JSON error body in this API. */
-export type ErrorStatus = 400 | 401 | 404 | 409 | 413 | 429 | 500;
+export type ErrorStatus =
+  | 400
+  | 401
+  | 404
+  | 409
+  | 410
+  | 413
+  | 429
+  | 500;
 
 export type AppContext = Context<{ Bindings: Env }>;
 

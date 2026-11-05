@@ -188,6 +188,75 @@ accountsRoutes.post("/accounts/logout", async (c) => {
 });
 
 // ---------------------------------------------------------------------------
+// Email verification
+// ---------------------------------------------------------------------------
+
+accountsRoutes.post("/accounts/verify-email", async (c) => {
+  const body = await readJsonBody(c);
+  if (body === null || typeof body.token !== "string") {
+    return invalidRequest(c);
+  }
+
+  const now = Date.now();
+  const tokenHash = await hashToken(body.token);
+
+  const verification = await c.env.DB.prepare(
+    `SELECT account_id FROM email_verifications
+      WHERE token_hash = ? AND purpose = 'verify'
+        AND used_at IS NULL AND expires_at > ?`,
+  )
+    .bind(tokenHash, now)
+    .first<{ account_id: string }>();
+
+  if (verification === null) return invalidToken(c);
+
+  // Repeating the predicate in the UPDATE lets a concurrent second request
+  // lose the race instead of consuming the same token twice.
+  const claimed = await c.env.DB.prepare(
+    `UPDATE email_verifications SET used_at = ?
+      WHERE token_hash = ? AND purpose = 'verify'
+        AND used_at IS NULL AND expires_at > ?`,
+  )
+    .bind(now, tokenHash, now)
+    .run();
+
+  if ((claimed.meta.changes ?? 0) === 0) return invalidToken(c);
+
+  await c.env.DB.prepare(
+    "UPDATE accounts SET email_verified_at = ?, updated_at = ? WHERE id = ?",
+  )
+    .bind(now, now, verification.account_id)
+    .run();
+
+  return c.json({ verified: true });
+});
+
+accountsRoutes.post("/accounts/resend-verification", async (c) => {
+  const auth = await authenticateAccount(c);
+  if ("response" in auth) return auth.response;
+
+  const now = Date.now();
+  const { token, tokenHash } = await createToken();
+  await c.env.DB.prepare(
+    `INSERT INTO email_verifications
+       (token_hash, account_id, created_at, expires_at, used_at, purpose)
+     VALUES (?, ?, ?, ?, NULL, 'verify')`,
+  )
+    .bind(tokenHash, auth.account.id, now, now + VERIFICATION_TTL_MS)
+    .run();
+
+  // A fresh link goes out whether or not the account is already verified, so
+  // the response never reveals the current verification state.
+  const link = `${c.env.WEB_ORIGIN}/verify?token=${token}`;
+  await sendEmail(c.env, {
+    to: auth.account.email,
+    ...verificationEmail(auth.account.locale, link),
+  });
+
+  return c.json({ ok: true }, 202);
+});
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
@@ -312,6 +381,15 @@ function invalidCredentials(c: AppContext) {
     401,
     "invalid_credentials",
     "Email or password is incorrect.",
+  );
+}
+
+function invalidToken(c: AppContext) {
+  return apiError(
+    c,
+    410,
+    "invalid_token",
+    "The verification link is invalid or has expired.",
   );
 }
 

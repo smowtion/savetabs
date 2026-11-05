@@ -220,6 +220,82 @@ function meStatus(token: string): Promise<Response> {
   });
 }
 
+/** Seed one verification row without going through signup. */
+async function seedVerification(
+  accountId: string,
+  token: string,
+  options: {
+    expiresAt?: number;
+    usedAt?: number | null;
+    purpose?: "verify" | "reset";
+  } = {},
+): Promise<void> {
+  const now = Date.now();
+  await env.DB.prepare(
+    `INSERT INTO email_verifications
+       (token_hash, account_id, created_at, expires_at, used_at, purpose)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+  )
+    .bind(
+      await hashToken(token),
+      accountId,
+      now,
+      options.expiresAt ?? now + DAY_MS,
+      options.usedAt ?? null,
+      options.purpose ?? "verify",
+    )
+    .run();
+}
+
+/** Pull the plaintext token out of a verification email. */
+function verificationTokenFrom(email: SentEmail): string {
+  const match = /\/verify\?token=([A-Za-z0-9_-]+)/.exec(email.text);
+  expect(match).not.toBeNull();
+  return match![1]!;
+}
+
+/**
+ * Sign up with email delivery enabled and read the raw token back out of the
+ * link. Signup is the only point where the plaintext token exists.
+ */
+async function latestVerificationToken(
+  email = `verification-${crypto.randomUUID()}@example.com`,
+): Promise<string> {
+  const sent: SentEmail[] = [];
+  await captureEmails(sent, async () => {
+    const response = await app.request(
+      `${BASE_URL}/v1/accounts/signup`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(signupBody({ email })),
+      },
+      resendEnv(),
+    );
+    expect(response.status).toBe(202);
+  });
+
+  expect(sent).toHaveLength(1);
+  return verificationTokenFrom(sent[0]!);
+}
+
+/** Dispatch through the app with Resend enabled so sends can be captured. */
+async function appPost(
+  path: string,
+  body: unknown,
+  token?: string,
+): Promise<Response> {
+  const headers: Record<string, string> = {
+    "content-type": "application/json",
+  };
+  if (token !== undefined) headers.Authorization = `Bearer ${token}`;
+  return await app.request(
+    `${BASE_URL}${path}`,
+    { method: "POST", headers, body: JSON.stringify(body) },
+    resendEnv(),
+  );
+}
+
 /** Env copy with Resend enabled so the signup routes attempt a send. */
 function resendEnv(): Env {
   return {
@@ -593,6 +669,162 @@ describe("POST /v1/accounts/logout", () => {
       method: "POST",
     });
     expect(missing.status).toBe(401);
+  });
+});
+
+describe("POST /v1/accounts/verify-email", () => {
+  it("verifies a token once", async () => {
+    const email = "verify-once@example.com";
+    const token = await latestVerificationToken(email);
+
+    const first = await post("/v1/accounts/verify-email", { token });
+    expect(first.status).toBe(200);
+    expect(await first.json()).toEqual({ verified: true });
+
+    const account = await readAccount(email);
+    expect(account?.email_verified_at).toBeGreaterThan(0);
+    const verifications = await readVerifications(account!.id);
+    expect(verifications).toHaveLength(1);
+    expect(verifications[0]?.purpose).toBe("verify");
+    expect(verifications[0]?.used_at).toBeGreaterThan(0);
+
+    const second = await post("/v1/accounts/verify-email", { token });
+    expect(second.status).toBe(410);
+    expect(((await second.json()) as ErrorBody).error.code).toBe(
+      "invalid_token",
+    );
+  });
+
+  it("rejects unknown, expired and wrong-purpose tokens", async () => {
+    const account = await seedAccount({ email: "bad-tokens@example.com" });
+    const now = Date.now();
+    await seedVerification(account.id, "expired-token", {
+      expiresAt: now - 1,
+    });
+    await seedVerification(account.id, "used-token", { usedAt: now - DAY_MS });
+    await seedVerification(account.id, "reset-token", { purpose: "reset" });
+
+    for (const token of [
+      "unknown-token",
+      "expired-token",
+      "used-token",
+      "reset-token",
+    ]) {
+      const response = await post("/v1/accounts/verify-email", { token });
+      expect(response.status).toBe(410);
+      expect(await response.json()).toEqual({
+        error: { code: "invalid_token", message: expect.any(String) },
+      });
+    }
+
+    expect(
+      (await readAccount("bad-tokens@example.com"))?.email_verified_at,
+    ).toBeNull();
+  });
+
+  it("rejects malformed bodies", async () => {
+    for (const invalid of [{}, { token: 42 }, { token: null }, [], null]) {
+      const response = await post("/v1/accounts/verify-email", invalid);
+      expect(response.status).toBe(400);
+      expect(((await response.json()) as ErrorBody).error.code).toBe(
+        "invalid_request",
+      );
+    }
+
+    const malformed = await postRaw("/v1/accounts/verify-email", "{");
+    expect(malformed.status).toBe(400);
+    expect(((await malformed.json()) as ErrorBody).error.code).toBe(
+      "invalid_request",
+    );
+  });
+});
+
+describe("POST /v1/accounts/resend-verification", () => {
+  it("requires a signed-in account", async () => {
+    const missing = await post("/v1/accounts/resend-verification", {});
+    expect(missing.status).toBe(401);
+    expect(((await missing.json()) as ErrorBody).error.code).toBe(
+      "unauthorized",
+    );
+
+    const unknown = await post(
+      "/v1/accounts/resend-verification",
+      {},
+      "not-a-token",
+    );
+    expect(unknown.status).toBe(401);
+
+    const account = await seedAccount({ email: "resend-expired@example.com" });
+    await seedToken(account.id, "expired-account-token", {
+      expiresAt: Date.now() - 1,
+    });
+    const expired = await post(
+      "/v1/accounts/resend-verification",
+      {},
+      "expired-account-token",
+    );
+    expect(expired.status).toBe(401);
+  });
+
+  it("issues a fresh 24-hour token and emails the link", async () => {
+    const account = await seedAccount({
+      email: "resend@example.com",
+      locale: "vi",
+    });
+    const session = await loginToken("resend@example.com");
+
+    const sent: SentEmail[] = [];
+    let response: Response | undefined;
+    await captureEmails(sent, async () => {
+      response = await appPost("/v1/accounts/resend-verification", {}, session);
+    });
+
+    expect(response!.status).toBe(202);
+    expect(await response!.json()).toEqual({ ok: true });
+    expect(sent).toHaveLength(1);
+    expect(sent[0]?.to).toBe("resend@example.com");
+    expect(sent[0]?.text).toContain(`${env.WEB_ORIGIN}/verify?token=`);
+
+    const emailedToken = verificationTokenFrom(sent[0]!);
+    const verifications = await readVerifications(account.id);
+    expect(verifications).toHaveLength(1);
+    expect(verifications[0]?.purpose).toBe("verify");
+    expect(verifications[0]?.used_at).toBeNull();
+    expect(verifications[0]!.expires_at - verifications[0]!.created_at).toBe(
+      DAY_MS,
+    );
+    // Only the digest is stored; the email carries the plaintext token.
+    expect(verifications[0]?.token_hash).toBe(await hashToken(emailedToken));
+
+    const verify = await post("/v1/accounts/verify-email", {
+      token: emailedToken,
+    });
+    expect(verify.status).toBe(200);
+    expect(
+      (await readAccount("resend@example.com"))?.email_verified_at,
+    ).toBeGreaterThan(0);
+  });
+
+  it("acknowledges an already-verified account and sends again", async () => {
+    const account = await seedAccount({
+      email: "verified-resend@example.com",
+      emailVerifiedAt: Date.now() - DAY_MS,
+    });
+    const session = await loginToken("verified-resend@example.com");
+
+    const sent: SentEmail[] = [];
+    let response: Response | undefined;
+    await captureEmails(sent, async () => {
+      response = await appPost("/v1/accounts/resend-verification", {}, session);
+    });
+
+    expect(response!.status).toBe(202);
+    expect(await response!.json()).toEqual({ ok: true });
+    expect(sent).toHaveLength(1);
+    expect(await readVerifications(account.id)).toHaveLength(1);
+    expect(
+      (await readAccount("verified-resend@example.com"))?.email_verified_at,
+    ).not.toBeNull();
   });
 });
 
