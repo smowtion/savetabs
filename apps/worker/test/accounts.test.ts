@@ -5,6 +5,7 @@ import app from "../src/index";
 import type { Env } from "../src/env";
 import { sha256Hex } from "../src/auth";
 import { hashToken, normalizeEmail } from "../src/accounts/tokens";
+import { currentDay } from "../src/counters";
 
 const BASE_URL = "https://savetabs.test";
 const CLIENT_AUTH_HASH = "ab".repeat(32);
@@ -325,7 +326,21 @@ async function appPost(
     `${BASE_URL}${path}`,
     { method: "POST", headers, body: JSON.stringify(body) },
     resendEnv(),
+    testExecutionContext(),
   );
+}
+
+/**
+ * `app.request()` runs outside a Worker fetch handler, so it has no
+ * ExecutionContext of its own. Routes that hand background work to
+ * `waitUntil` need the same one a deployment provides.
+ */
+function testExecutionContext(): ExecutionContext {
+  return {
+    waitUntil: () => {},
+    passThroughOnException: () => {},
+    props: {},
+  } as unknown as ExecutionContext;
 }
 
 /** Env copy with Resend enabled so the signup routes attempt a send. */
@@ -1044,6 +1059,8 @@ describe("POST /v1/accounts/key", () => {
     expect(((await blocked.json()) as ErrorBody).error.code).toBe(
       "vault_exists",
     );
+    // A rejected link registers nothing.
+    expect(await keyRowExists(authIdB)).toBe(false);
     account = await readAccount("link@example.com");
     expect(account?.auth_id).toBe(authIdA);
     expect(account?.wrapped_key).toBe("wrapped-a");
@@ -1060,6 +1077,7 @@ describe("POST /v1/accounts/key", () => {
     expect(((await wrongProof.json()) as ErrorBody).error.code).toBe(
       "proof_required",
     );
+    expect(await keyRowExists(authIdB)).toBe(false);
     account = await readAccount("link@example.com");
     expect(account?.auth_id).toBe(authIdA);
 
@@ -1182,6 +1200,54 @@ describe("POST /v1/accounts/key", () => {
       locale: "en",
       email_verified_at: null,
     });
+  });
+
+  it("rejects a new key once the global key capacity is spent", async () => {
+    await seedAccount({ email: "key-cap@example.com" });
+    const session = await loginToken("key-cap@example.com");
+    const authId = uniqueAuthId();
+    const maxKeys = Number(env.GLOBAL_MAX_KEYS);
+
+    await env.DB.prepare(
+      `INSERT INTO counters (day, requests, keys_created) VALUES (?, 0, ?)
+       ON CONFLICT (day) DO UPDATE SET keys_created = excluded.keys_created`,
+    )
+      .bind(currentDay(), maxKeys)
+      .run();
+
+    try {
+      const rejected = await linkKey(
+        session,
+        authId,
+        KEY_A,
+        "wrapped",
+        CLIENT_AUTH_HASH,
+      );
+      expect(rejected.status).toBe(429);
+      expect(((await rejected.json()) as ErrorBody).error.code).toBe(
+        "capacity_exceeded",
+      );
+      expect(await keyRowExists(authId)).toBe(false);
+      expect((await readAccount("key-cap@example.com"))?.auth_id).toBeNull();
+
+      // An already-registered key is verified, not charged: the cap only
+      // applies to new key rows.
+      await seedKey(authId, KEY_A);
+      const existing = await linkKey(
+        session,
+        authId,
+        KEY_A,
+        "wrapped",
+        CLIENT_AUTH_HASH,
+      );
+      expect(existing.status).toBe(200);
+      expect((await readAccount("key-cap@example.com"))?.auth_id).toBe(authId);
+    } finally {
+      // The counter row is shared by the rest of the file.
+      await env.DB.prepare("DELETE FROM counters WHERE day = ?")
+        .bind(currentDay())
+        .run();
+    }
   });
 });
 
@@ -1538,6 +1604,9 @@ describe("POST /v1/accounts/reset-unlinked/confirm", () => {
     const seeded = await seedAccount({ email: "confirm@example.com" });
     await seedVerification(seeded.id, resetToken, { purpose: "reset" });
     const oldSession = await loginToken("confirm@example.com");
+    expect(
+      (await readAccount("confirm@example.com"))?.email_verified_at,
+    ).toBeNull();
 
     const response = await post("/v1/accounts/reset-unlinked/confirm", {
       token: resetToken,
@@ -1551,6 +1620,9 @@ describe("POST /v1/accounts/reset-unlinked/confirm", () => {
     expect(account?.kdf_salt).toBe(OTHER_KDF_SALT);
     expect(account?.kdf_iterations).toBe(OTHER_KDF_ITERATIONS);
     expect(account?.auth_id).toBeNull();
+    // Consuming the emailed link proves mailbox control, so the account is
+    // verified and the unverified-account cleanup can no longer sweep it.
+    expect(account?.email_verified_at).toBeGreaterThan(0);
     // Resetting the password revokes existing sessions.
     expect(await readTokens(seeded.id)).toHaveLength(0);
     expect((await meStatus(oldSession)).status).toBe(401);

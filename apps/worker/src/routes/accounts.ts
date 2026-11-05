@@ -7,6 +7,12 @@ import {
 } from "../accounts/email";
 import { createToken, hashToken, normalizeEmail } from "../accounts/tokens";
 import { parseBearer, sha256Hex, timingSafeEqual } from "../auth";
+import {
+  DEFAULT_MAX_KEYS,
+  keysCreatedToday,
+  parseLimit,
+  recordKeyCreated,
+} from "../counters";
 import type { Env } from "../env";
 import { apiError, type AppContext } from "../errors";
 
@@ -293,27 +299,15 @@ accountsRoutes.post("/accounts/key", async (c) => {
   const keyHash = await sha256Hex(authKey);
   const now = Date.now();
 
-  // Register an unknown key exactly like the first sync PUT. OR IGNORE keeps
-  // two concurrent registrations from racing into a unique-constraint error.
-  const registered = await c.env.DB.prepare(
-    `INSERT OR IGNORE INTO keys (auth_id, key_hash, created_at, last_seen_at)
-     VALUES (?, ?, ?, ?)`,
-  )
-    .bind(authId, keyHash, now, now)
-    .run();
-
-  if ((registered.meta.changes ?? 0) === 0) {
-    const existingKey = await loadKey(c.env.DB, authId);
-    if (
-      existingKey === null ||
-      !timingSafeEqual(existingKey.key_hash, keyHash)
-    ) {
-      return invalidKey(c);
-    }
+  // An already-registered key must match its bearer before the link is
+  // considered. This check writes nothing.
+  const existingKey = await loadKey(c.env.DB, authId);
+  if (existingKey !== null && !timingSafeEqual(existingKey.key_hash, keyHash)) {
+    return invalidKey(c);
   }
 
-  // The sync key belongs to at most one account. Checking this before the
-  // replace path keeps a stolen account token from stealing another vault.
+  // The sync key belongs to at most one account. These checks run before any
+  // insert, so a rejected link never leaves an orphan key row behind.
   const linked = await c.env.DB.prepare(
     "SELECT id FROM accounts WHERE auth_id = ?",
   )
@@ -343,6 +337,38 @@ accountsRoutes.post("/accounts/key", async (c) => {
     const digest = await sha256Hex(authHash);
     if (!timingSafeEqual(auth.account.auth_hash, digest)) {
       return proofRequired(c);
+    }
+  }
+
+  // An unknown key is registered exactly like the first sync PUT, charged
+  // against the same global key capacity.
+  if (existingKey === null) {
+    const maxKeys = parseLimit(c.env.GLOBAL_MAX_KEYS, DEFAULT_MAX_KEYS);
+    if ((await keysCreatedToday(c.env.DB, now)) >= maxKeys) {
+      return apiError(
+        c,
+        429,
+        "capacity_exceeded",
+        "The global key capacity has been reached.",
+      );
+    }
+
+    // OR IGNORE keeps two concurrent registrations from racing into a
+    // unique-constraint error.
+    const registered = await c.env.DB.prepare(
+      `INSERT OR IGNORE INTO keys (auth_id, key_hash, created_at, last_seen_at)
+       VALUES (?, ?, ?, ?)`,
+    )
+      .bind(authId, keyHash, now, now)
+      .run();
+
+    if ((registered.meta.changes ?? 0) > 0) {
+      await recordKeyCreated(c.env.DB, now);
+    } else {
+      const racedKey = await loadKey(c.env.DB, authId);
+      if (racedKey === null || !timingSafeEqual(racedKey.key_hash, keyHash)) {
+        return invalidKey(c);
+      }
     }
   }
 
@@ -532,10 +558,14 @@ accountsRoutes.post("/accounts/reset-unlinked", async (c) => {
       .run();
 
     const link = `${c.env.WEB_ORIGIN}/reset?token=${token}`;
-    await sendEmail(c.env, {
-      to: normalizedEmail,
-      ...resetEmail(locale, link),
-    });
+    // Deliver after the response: an unknown address must not be measurably
+    // faster than a real send, and a provider failure must not break the 202.
+    c.executionCtx.waitUntil(
+      sendEmail(c.env, {
+        to: normalizedEmail,
+        ...resetEmail(locale, link),
+      }),
+    );
   }
 
   // The response never discloses whether the address exists or has a vault.
@@ -576,13 +606,16 @@ accountsRoutes.post("/accounts/reset-unlinked/confirm", async (c) => {
 
   const updated = await c.env.DB.prepare(
     `UPDATE accounts SET auth_hash = ?, kdf_salt = ?, kdf_iterations = ?,
-            updated_at = ?
+            email_verified_at = ?, updated_at = ?
       WHERE id = ? AND auth_id IS NULL`,
   )
     .bind(
       await sha256Hex(authHash),
       kdfSalt,
       kdfIterations,
+      // Following the reset link proves mailbox control, so the account is
+      // verified and the unverified-account cleanup can no longer sweep it.
+      now,
       now,
       claimed.account_id,
     )
