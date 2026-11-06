@@ -29,7 +29,7 @@ export function SettingsSidebar({
   t,
 }: SettingsSidebarProps) {
   return (
-    <aside className="flex w-full shrink-0 flex-col gap-3 border-b border-neutral-200 bg-white px-3 py-4 dark:border-neutral-800 dark:bg-neutral-950 min-[900px]:sticky min-[900px]:top-0 min-[900px]:h-screen min-[900px]:w-[220px] min-[900px]:border-b-0 min-[900px]:border-r">
+    <aside className="flex w-full shrink-0 flex-col gap-3 border-b border-neutral-200 bg-white px-3 py-4 dark:border-neutral-800 dark:bg-neutral-950 min-[900px]:sticky min-[900px]:top-0 min-[900px]:h-screen min-[900px]:w-[220px] min-[900px]:border-b-0 min-[900px]:border-e">
       <div className="px-2 text-lg font-semibold tracking-tight">SaveTabs</div>
 
       <select
@@ -60,7 +60,7 @@ export function SettingsSidebar({
                   type="button"
                   aria-current={active ? "page" : undefined}
                   onClick={() => onSelect(category.id)}
-                  className={`flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors ${
+                  className={`flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-start text-sm transition-colors ${
                     active
                       ? "bg-neutral-900 font-medium text-white dark:bg-neutral-100 dark:text-neutral-900"
                       : "text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-900"

@@ -327,13 +327,13 @@ export function SessionCard({
                     setMenuOpen(false);
                   }
                 }}
-                className="absolute right-0 z-20 mt-1 flex w-48 flex-col rounded-md border border-neutral-200 bg-white p-1 shadow-lg dark:border-neutral-700 dark:bg-neutral-900"
+                className="absolute end-0 z-20 mt-1 flex w-48 flex-col rounded-md border border-neutral-200 bg-white p-1 shadow-lg dark:border-neutral-700 dark:bg-neutral-900"
               >
                 <button
                   type="button"
                   role="menuitem"
                   onClick={beginRename}
-                  className="rounded px-2 py-1.5 text-left text-sm transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                  className="rounded px-2 py-1.5 text-start text-sm transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800"
                 >
                   {t("sessions.rename")}
                 </button>
@@ -341,7 +341,7 @@ export function SessionCard({
                   type="button"
                   role="menuitem"
                   onClick={exportSession}
-                  className="rounded px-2 py-1.5 text-left text-sm transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                  className="rounded px-2 py-1.5 text-start text-sm transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800"
                 >
                   {t("sessions.exportSession")}
                 </button>
@@ -349,7 +349,7 @@ export function SessionCard({
                   type="button"
                   role="menuitem"
                   onClick={requestDelete}
-                  className="rounded px-2 py-1.5 text-left text-sm text-red-700 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950"
+                  className="rounded px-2 py-1.5 text-start text-sm text-red-700 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950"
                 >
                   {t("common.delete")}
                 </button>

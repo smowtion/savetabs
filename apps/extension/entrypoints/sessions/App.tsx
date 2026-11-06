@@ -283,7 +283,7 @@ export function App() {
         <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-3 px-4 py-3">
           <h1 className="text-lg font-semibold">
             {APP_NAME}
-            <span className="ml-2 align-middle text-sm font-normal text-neutral-500 dark:text-neutral-400">
+            <span className="ms-2 align-middle text-sm font-normal text-neutral-500 dark:text-neutral-400">
               {t("sessions.title")}
             </span>
           </h1>

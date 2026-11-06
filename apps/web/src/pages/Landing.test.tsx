@@ -2,7 +2,7 @@ import { missingKeys } from "@savetabs/shared";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
   KEY_STORAGE_KEY,
@@ -107,6 +107,13 @@ function renderLanding() {
 beforeEach(() => {
   localStorage.clear();
   sessionStorage.clear();
+  document.documentElement.lang = "en";
+  document.documentElement.dir = "ltr";
+});
+
+afterEach(() => {
+  document.documentElement.lang = "en";
+  document.documentElement.dir = "ltr";
 });
 
 describe("Landing", () => {
@@ -311,11 +318,16 @@ describe("Landing", () => {
     expect(localStorage.getItem("web-theme")).toBe("dark");
   });
 
-  it("switches the interface language and persists the choice", async () => {
+  it("lists every supported language and persists the selection", async () => {
     const user = userEvent.setup();
     renderLanding();
 
-    await user.click(screen.getByRole("button", { name: "Switch language" }));
+    const select = screen.getByLabelText("Switch language");
+    expect(select).toHaveValue("en");
+    expect(screen.getAllByRole("option")).toHaveLength(12);
+    expect(screen.getByRole("option", { name: "العربية" })).toHaveValue("ar");
+
+    await user.selectOptions(select, "vi");
 
     expect(
       await screen.findByRole("heading", { name: "Mở các tab đã lưu" }),
@@ -325,6 +337,22 @@ describe("Landing", () => {
     );
     expect(screen.getByRole("button", { name: "Tiếp tục" })).toBeInTheDocument();
     expect(localStorage.getItem("web-language")).toBe("vi");
+  });
+
+  it("switches the document to right-to-left for Arabic", async () => {
+    const user = userEvent.setup();
+    renderLanding();
+
+    await user.selectOptions(screen.getByLabelText("Switch language"), "ar");
+
+    expect(document.documentElement.lang).toBe("ar");
+    expect(document.documentElement.dir).toBe("rtl");
+    expect(
+      await screen.findByRole("heading", {
+        name: "افتح علامات التبويب المحفوظة",
+      }),
+    ).toBeInTheDocument();
+    expect(localStorage.getItem("web-language")).toBe("ar");
   });
 
   it("prefills a remembered key and shows the remember state", () => {

@@ -163,7 +163,7 @@ export function App() {
               onClick={cycleTheme}
               aria-label={themeLabel}
               title={themeLabel}
-              className="ml-auto rounded-md border border-neutral-300 bg-white p-2 text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800"
+              className="ms-auto rounded-md border border-neutral-300 bg-white p-2 text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800"
             >
               <ThemeIcon aria-hidden="true" className="h-4 w-4" />
             </button>

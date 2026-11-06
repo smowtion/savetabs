@@ -399,7 +399,7 @@ export function AdvancedActions({ settings, t }: AdvancedActionsProps) {
         >
           <p>{status.message}</p>
           {status.details !== undefined && status.details.length > 0 && (
-            <ul className="mt-1 list-disc pl-4 text-xs">
+            <ul className="mt-1 list-disc ps-4 text-xs">
               {status.details.map((detail, index) => (
                 <li key={`${index}-${detail}`}>{detail}</li>
               ))}

@@ -1,5 +1,7 @@
 import {
   createTranslator,
+  isLang,
+  localeDir,
   resolveLang,
   type Lang,
   type Translator,
@@ -10,8 +12,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
  * Language and translator for the web app.
  *
  * The first visit follows the browser language through
- * `resolveLang("auto", navigator.language)`. Choosing a language through the
- * header toggle stores it locally and wins on later visits.
+ * `resolveLang("auto", navigator.language)`. Choosing a language from the
+ * header menu stores it locally and wins on later visits. The document
+ * `lang` and `dir` attributes follow the active language, so Arabic renders
+ * the whole app right-to-left.
  */
 
 /** Local preference key; intentionally separate from extension settings. */
@@ -21,7 +25,6 @@ export type UseI18nResult = {
   lang: Lang;
   t: Translator;
   setLang: (lang: Lang) => void;
-  toggleLang: () => void;
 };
 
 function browserLanguage(): string {
@@ -31,7 +34,7 @@ function browserLanguage(): string {
 function readStoredLang(): Lang | null {
   try {
     const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
-    return stored === "en" || stored === "vi" ? stored : null;
+    return isLang(stored) ? stored : null;
   } catch {
     return null;
   }
@@ -53,6 +56,7 @@ export function useI18n(): UseI18nResult {
 
   useEffect(() => {
     document.documentElement.lang = lang;
+    document.documentElement.dir = localeDir(lang);
   }, [lang]);
 
   const setLang = useCallback((next: Lang) => {
@@ -60,9 +64,5 @@ export function useI18n(): UseI18nResult {
     storeLang(next);
   }, []);
 
-  const toggleLang = useCallback(() => {
-    setLang(lang === "en" ? "vi" : "en");
-  }, [lang, setLang]);
-
-  return { lang, t, setLang, toggleLang };
+  return { lang, t, setLang };
 }

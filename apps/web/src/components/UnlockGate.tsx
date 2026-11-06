@@ -160,7 +160,7 @@ export function UnlockGate({ onUnlocked }: UnlockGateProps) {
               />
               <span>{t("web.login.rememberLabel")}</span>
             </label>
-            <p className="mt-1 pl-6 text-xs text-neutral-500 dark:text-neutral-400">
+            <p className="mt-1 ps-6 text-xs text-neutral-500 dark:text-neutral-400">
               {t("web.login.rememberWarning")}
             </p>
           </div>

@@ -172,8 +172,8 @@ export function ShortcutsInfo({ t }: ShortcutsInfoProps) {
             {t("settings.shortcuts.tableCaption")}
           </caption>
           <thead>
-            <tr className="text-left text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
-              <th scope="col" className="py-1 pr-4 font-medium">
+            <tr className="text-start text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+              <th scope="col" className="py-1 pe-4 font-medium">
                 {t("settings.shortcuts.commandHeader")}
               </th>
               <th scope="col" className="py-1 font-medium">
@@ -189,7 +189,7 @@ export function ShortcutsInfo({ t }: ShortcutsInfoProps) {
               >
                 <th
                   scope="row"
-                  className="py-2 pr-4 text-left font-normal text-neutral-900 dark:text-neutral-100"
+                  className="py-2 pe-4 text-start font-normal text-neutral-900 dark:text-neutral-100"
                 >
                   {commandLabel(t, name)}
                 </th>

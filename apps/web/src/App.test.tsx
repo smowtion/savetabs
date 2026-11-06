@@ -52,6 +52,8 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals();
   delete document.documentElement.dataset.theme;
+  document.documentElement.lang = "en";
+  document.documentElement.dir = "ltr";
 });
 
 describe("App routing", () => {
@@ -113,6 +115,29 @@ describe("App routing", () => {
       screen.getByRole("heading", { name: "What the sync server stores" }),
     ).toBeInTheDocument();
     expect(screen.getByText(/support@azcom\.dev/)).toBeInTheDocument();
+  });
+
+  it("keeps the privacy policy in English after Arabic is selected", async () => {
+    const user = userEvent.setup();
+
+    renderApp("/");
+    await user.selectOptions(screen.getByLabelText("Switch language"), "ar");
+
+    const privacyLink = screen
+      .getAllByRole("link")
+      .find((link) => link.getAttribute("href") === "/privacy");
+    expect(privacyLink).toBeDefined();
+    await user.click(privacyLink as HTMLElement);
+
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Privacy policy" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("What the sync server stores")).toBeInTheDocument();
+    expect(
+      screen.getByText(/English version prevails/i),
+    ).toBeInTheDocument();
+    expect(document.documentElement.lang).toBe("en");
+    expect(document.documentElement.dir).toBe("ltr");
   });
 
   it("has every privacy translation in both languages", () => {

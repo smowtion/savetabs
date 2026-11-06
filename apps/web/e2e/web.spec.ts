@@ -234,6 +234,15 @@ test("serves the privacy policy with its data-handling details", async ({
   await expect(page.getByText("support@azcom.dev")).toBeVisible();
 });
 
+test("Arabic stays within a 360px viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto("/");
+  await page.getByLabel(/language/i).selectOption("ar");
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth),
+  ).toBeLessThanOrEqual(360);
+});
+
 test("ships the Cloudflare Pages security headers", async () => {
   const headersPath = fileURLToPath(new URL("../dist/_headers", import.meta.url));
   const headers = await readFile(headersPath, "utf8");

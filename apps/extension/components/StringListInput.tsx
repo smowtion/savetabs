@@ -95,7 +95,7 @@ export function StringListInput({
           {value.map((item) => (
             <li
               key={item}
-              className="inline-flex items-center gap-1 rounded-full bg-neutral-100 py-0.5 pl-2 pr-1 text-xs text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
+              className="inline-flex items-center gap-1 rounded-full bg-neutral-100 py-0.5 ps-2 pe-1 text-xs text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
             >
               <span>{item}</span>
               <button
@@ -146,7 +146,7 @@ export function StringListInput({
       {hint !== null && (
         <p
           role="alert"
-          className="max-w-72 text-right text-xs text-red-600 dark:text-red-400"
+          className="max-w-72 text-end text-xs text-red-600 dark:text-red-400"
         >
           {hint}
         </p>

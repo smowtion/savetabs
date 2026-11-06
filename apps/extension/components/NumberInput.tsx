@@ -88,13 +88,13 @@ export function NumberInput({
             event.currentTarget.blur();
           }
         }}
-        className="w-24 rounded-md border border-neutral-300 bg-white px-2 py-1.5 text-right text-sm text-neutral-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 disabled:cursor-not-allowed disabled:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:disabled:bg-neutral-800"
+        className="w-24 rounded-md border border-neutral-300 bg-white px-2 py-1.5 text-end text-sm text-neutral-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 disabled:cursor-not-allowed disabled:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:disabled:bg-neutral-800"
       />
       {invalid && (
         <p
           id={errorId}
           role="alert"
-          className="max-w-56 text-right text-xs text-red-600 dark:text-red-400"
+          className="max-w-56 text-end text-xs text-red-600 dark:text-red-400"
         >
           {invalidMessage}
         </p>

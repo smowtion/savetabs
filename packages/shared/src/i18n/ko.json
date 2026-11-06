@@ -765,47 +765,6 @@
         "store": "Chrome Web Store"
       }
     },
-    "privacy": {
-      "back": "Back to SaveTabs",
-      "title": "Privacy policy",
-      "intro": "SaveTabs keeps your saved tab sessions on your device. If you turn on end-to-end encrypted sync, an encrypted copy is stored on the sync server. This page lists exactly what that copy contains and what never leaves your browser.",
-      "sections": {
-        "data": {
-          "title": "What the sync server stores",
-          "lead": "The sync server stores the following data for your key:",
-          "authId": "A public account id derived from your sync key. It appears in API URLs and cannot be turned back into the key.",
-          "authKeyHash": "A SHA-256 hash of the bearer credential derived from your sync key. The hash verifies requests and cannot be reversed into the credential.",
-          "blobs": "Encrypted session blobs: AES-GCM 256 ciphertext encoded as base64url, with a session id, update timestamp and byte size.",
-          "tombstones": "Deletion tombstones: a deleted session id and its deletion time. Tombstones sync deletions to your other devices and are pruned during later deletions once they are 30 days old.",
-          "timestamps": "Timestamps for when a sync key was first seen and last uploaded.",
-          "footer": "URLs, page titles, favicons and all other session data travel only inside the encrypted blobs. The server cannot read them, and we never receive your sync key. The server also keeps short-lived abuse-prevention rate-limit records keyed by client IP address and authId, plus daily aggregate request and key-registration counters; none of these contain URLs or page titles."
-        },
-        "e2ee": {
-          "title": "End-to-end encryption",
-          "body": "Encryption and decryption happen in your browser with the Web Crypto API. Session blobs use AES-GCM 256, and the encryption key is derived from your sync key with HKDF-SHA256. The key stays in your browser; the web app keeps it in this tab's session storage, or in local storage when you choose Remember on this device. Only ciphertext is uploaded. Without your key, the server and anyone else who obtains a blob cannot read it."
-        },
-        "incognito": {
-          "title": "Private and incognito sessions",
-          "body": "Sessions saved from private or incognito windows are marked local-only by the extension. They are never uploaded to the sync server and never appear in the web app."
-        },
-        "keyLoss": {
-          "title": "If you lose your sync key",
-          "body": "There is no account, email address or password to reset. The sync key is the only credential that can decrypt synced sessions. If you lose it, the encrypted data on the server cannot be recovered. Keep a safe copy; you can reveal and copy the key in the extension under Settings → Sync."
-        },
-        "delete": {
-          "title": "Deleting your data",
-          "body": "Local sessions stay in your browser until you delete them in the extension; clearing the extension's data or uninstalling it also removes them. To delete all cloud data for a sync key, open the extension, go to Settings → Sync and choose Delete cloud data. This removes the encrypted sessions, deletion tombstones and the key record for that sync key, and turns sync off so local sessions are not uploaded again. Rotating the sync key also deletes the data stored under the old key; if that deletion fails, import the old key and use Delete cloud data."
-        },
-        "analytics": {
-          "title": "No analytics or third parties",
-          "body": "The web app and extension contain no analytics, tracking pixels, advertising or third-party scripts. The web app loads only its own code and styles and uses no external fonts."
-        },
-        "contact": {
-          "title": "Contact",
-          "body": "Questions about this policy can be sent to support@azcom.dev."
-        }
-      }
-    },
     "sessions": {
       "title": "저장된 세션",
       "searchLabel": "세션 검색",

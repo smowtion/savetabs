@@ -1,4 +1,5 @@
-import { KeyRound, Languages, Monitor, Moon, Sun } from "lucide-react";
+import { LOCALES, type Lang } from "@savetabs/shared";
+import { KeyRound, Monitor, Moon, Sun } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { AccountCta } from "../components/landing/AccountCta";
@@ -35,8 +36,12 @@ const THEME_ICONS: Record<
   dark: Moon,
 };
 
+/** Native language menu styled to match the other header controls. */
+const LANGUAGE_SELECT_CLASS =
+  "h-9 min-w-0 max-w-28 cursor-pointer rounded-lg border border-neutral-300 bg-white px-1 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800";
+
 export default function Landing() {
-  const { lang, t, toggleLang } = useI18n();
+  const { lang, t, setLang } = useI18n();
   const { preference, toggleTheme } = useTheme();
 
   const ThemeIcon = THEME_ICONS[preference];
@@ -55,16 +60,19 @@ export default function Landing() {
             SaveTabs
           </span>
 
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={toggleLang}
+          <div className="flex min-w-0 items-center gap-2">
+            <select
               aria-label={t("web.language.toggle")}
-              className={HEADER_CONTROL_CLASS}
+              value={lang}
+              onChange={(event) => setLang(event.target.value as Lang)}
+              className={LANGUAGE_SELECT_CLASS}
             >
-              <Languages aria-hidden="true" size={16} />
-              <span aria-hidden="true">{lang === "en" ? "VI" : "EN"}</span>
-            </button>
+              {LOCALES.map((locale) => (
+                <option key={locale.code} value={locale.code}>
+                  {locale.name}
+                </option>
+              ))}
+            </select>
             <button
               type="button"
               onClick={toggleTheme}

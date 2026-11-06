@@ -804,7 +804,8 @@
           "title": "Contact",
           "body": "Questions about this policy can be sent to support@azcom.dev."
         }
-      }
+      },
+      "notice": "This policy is published in English. The English version prevails."
     },
     "sessions": {
       "title": "Saved sessions",

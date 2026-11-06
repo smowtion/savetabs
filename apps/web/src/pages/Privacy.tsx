@@ -1,7 +1,7 @@
+import { createTranslator } from "@savetabs/shared";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
-
-import { useI18n } from "../hooks/useI18n";
 
 /**
  * Privacy policy for the web app and the browser extension.
@@ -12,9 +12,16 @@ import { useI18n } from "../hooks/useI18n";
  * and where the "delete all cloud data" action lives, because the store
  * listings link here.
  *
+ * The policy is published in English only. Other locales link here and read
+ * the English text, so the page pins the English translator regardless of the
+ * language chosen elsewhere in the app, and says that English prevails.
+ *
  * All strings come from the shared dictionaries, and the page loads no
  * third-party resources so the production CSP stays limited to 'self'.
  */
+
+/** The policy is not translated; every visitor reads the English version. */
+const t = createTranslator("en");
 
 /** Sections rendered in order; `data` adds the stored-items bullet list. */
 const SECTIONS = [
@@ -40,17 +47,30 @@ const BODY_TEXT_CLASS =
   "mt-2 text-pretty text-sm leading-6 text-neutral-600 dark:text-neutral-400";
 
 export default function Privacy() {
-  const { t } = useI18n();
+  // The page is English-only, so it also resets the document attributes when
+  // the visitor arrives from a right-to-left locale through client routing.
+  useEffect(() => {
+    document.documentElement.lang = "en";
+    document.documentElement.dir = "ltr";
+  }, []);
 
   return (
-    <div className="flex min-h-screen flex-col bg-neutral-50 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
+    <div
+      lang="en"
+      dir="ltr"
+      className="flex min-h-screen flex-col bg-neutral-50 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100"
+    >
       <header className="border-b border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950">
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
           <Link
             to="/"
             className="inline-flex items-center gap-2 text-sm font-medium text-indigo-700 underline-offset-4 hover:underline dark:text-indigo-400"
           >
-            <ArrowLeft aria-hidden="true" size={16} />
+            <ArrowLeft
+              aria-hidden="true"
+              size={16}
+              className="rtl:rotate-180"
+            />
             {t("web.privacy.back")}
           </Link>
           <span className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight">
@@ -69,6 +89,12 @@ export default function Privacy() {
         <p className="mt-3 text-pretty text-base text-neutral-600 dark:text-neutral-400">
           {t("web.privacy.intro")}
         </p>
+        <p
+          role="note"
+          className="mt-4 rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400"
+        >
+          {t("web.privacy.notice")}
+        </p>
 
         <div className="mt-10 space-y-9">
           {SECTIONS.map((section) => (
@@ -85,7 +111,7 @@ export default function Privacy() {
                   <p className={BODY_TEXT_CLASS}>
                     {t("web.privacy.sections.data.lead")}
                   </p>
-                  <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-neutral-600 dark:text-neutral-400">
+                  <ul className="mt-3 list-disc space-y-2 ps-5 text-sm leading-6 text-neutral-600 dark:text-neutral-400">
                     {DATA_ITEMS.map((item) => (
                       <li key={item}>
                         {t(`web.privacy.sections.data.${item}`)}

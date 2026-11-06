@@ -88,7 +88,7 @@ describe("i18n", () => {
     expect(resolveLang("ko", "de-DE")).toBe("ko");
   });
 
-  it("keeps the policy page in English for locales that do not translate it", () => {
+  it("stores the policy only in English and Vietnamese", () => {
     const privacyKeys = ALL_EN_KEYS.filter((key) =>
       key.startsWith("web.privacy."),
     );
@@ -97,12 +97,19 @@ describe("i18n", () => {
       (locale) => locale !== "en" && locale !== "vi",
     );
 
+    expect(english("web.privacy.title")).toBe("Privacy policy");
+    expect(english("web.privacy.notice")).toContain("English version prevails");
+    // Vietnamese ships a full translation of the policy.
+    expect(missingKeys("vi", privacyKeys)).toEqual([]);
+
+    // Every other locale omits the policy because the page pins English, so
+    // a stale English copy cannot drift from the canonical text.
     expect(englishOnlyLocales.length).toBeGreaterThan(0);
     for (const locale of englishOnlyLocales) {
-      const translator = createTranslator(locale);
-      for (const key of privacyKeys) {
-        expect(translator(key), `${locale}:${key}`).toBe(english(key));
-      }
+      expect(missingKeys(locale, privacyKeys), locale).toEqual(privacyKeys);
+      expect(createTranslator(locale)("web.privacy.title")).toBe(
+        "web.privacy.title",
+      );
     }
   });
 

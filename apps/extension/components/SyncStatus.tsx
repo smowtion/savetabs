@@ -264,7 +264,7 @@ export function SyncStatus({ t, enabled }: SyncStatusProps) {
               </p>
               <ul
                 aria-label={t("settings.sync.syncErrorsTitle")}
-                className="mt-1 list-disc pl-5"
+                className="mt-1 list-disc ps-5"
               >
                 {result.errors.map((error, index) => (
                   <li key={`${index}-${error}`}>{error}</li>

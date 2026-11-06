@@ -45,7 +45,7 @@ export function Accordion({
           aria-expanded={open}
           aria-controls={panelId}
           onClick={() => onToggle(!open)}
-          className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
+          className="flex w-full items-start gap-3 px-4 py-3 text-start transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
         >
           <ChevronDown
             aria-hidden="true"
