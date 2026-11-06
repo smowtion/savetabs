@@ -266,6 +266,40 @@ describe("i18n", () => {
     expect(missingKeys("vi", sessionKeys)).toEqual([]);
   });
 
+  it("covers the extension account card strings in both languages", () => {
+    const accountKeys = [
+      "settings.account.title",
+      "settings.account.description",
+      "settings.account.emailLabel",
+      "settings.account.emailPlaceholder",
+      "settings.account.passwordLabel",
+      "settings.account.signIn",
+      "settings.account.signingIn",
+      "settings.account.createAccount",
+      "settings.account.creatingAccount",
+      "settings.account.useKeyInstead",
+      "settings.account.useAccount",
+      "settings.account.keyOnlyHint",
+      "settings.account.signOut",
+      "settings.account.signedOut",
+      "settings.account.signOutFailed",
+      "settings.account.verified",
+      "settings.account.unverified",
+      "settings.account.passwordTooShort",
+      "settings.account.signInFailed",
+      "settings.account.signUpFailed",
+      "settings.account.loadFailed",
+      "settings.account.recoveryTitle",
+      "settings.account.recoveryMessage",
+      "settings.account.recoveryKeyLabel",
+      "settings.account.recoveryConfirm",
+      "settings.account.recoveryContinue",
+    ];
+
+    expect(missingKeys("en", accountKeys)).toEqual([]);
+    expect(missingKeys("vi", accountKeys)).toEqual([]);
+  });
+
   it("covers the setting control strings in both languages", () => {
     const controlKeys = [
       "options.tooltip",

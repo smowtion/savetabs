@@ -28,6 +28,7 @@ import {
 } from "../lib/sync/key-store";
 import { rotateSyncKey } from "../lib/sync/sync-lifecycle";
 import { syncNow } from "../lib/sync/sync-service";
+import { AccountCard } from "./AccountCard";
 import { SyncStatus } from "./SyncStatus";
 
 const ROTATE_CONFIRMATION = "ROTATE";
@@ -237,6 +238,7 @@ export function SyncSection({ t, syncEnabled = false }: SyncSectionProps) {
 
   return (
     <div className="mb-4 flex flex-col gap-3 border-b border-neutral-200 pb-4 dark:border-neutral-800">
+      <AccountCard t={t} />
       <SyncStatus t={t} enabled={syncEnabled} />
       <div>
         <h3 className="text-sm font-semibold">{t("settings.sync.keyTitle")}</h3>
