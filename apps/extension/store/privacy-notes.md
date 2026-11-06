@@ -69,6 +69,12 @@ Raw tokens exist only in the user's browser or in the email we send. The
 sync-key tables (ciphertext blobs, tombstones, key hashes) are unchanged by
 accounts; an account points at one sync key through `auth_id`.
 
+Accounts that never verify their email address are deleted by a scheduled
+cleanup 30 days after signup, whether or not a sync key was linked. The
+deletion removes the account row, its tokens, verification/reset rows and
+email-send counters. The sync key, its encrypted blobs and tombstones are not
+deleted.
+
 ## Encryption details
 
 - The sync key is 128 random bits rendered as `ST-…` Crockford Base32.

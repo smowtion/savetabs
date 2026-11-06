@@ -28,7 +28,7 @@ SaveTabs turns the tabs in a window into a saved session you can restore later. 
 - Private/incognito sessions are marked local-only and never uploaded.
 - Optional end-to-end encrypted sync across devices using a generated sync key, or an optional account with an email and password that makes sync easier to set up. URLs and titles are encrypted in your browser with AES-GCM 256; the server stores only ciphertext.
 - Accounts are optional: the server stores your email, a password-derived proof hash, the key-derivation salt and iteration count, the wrapped sync key, hashed session and email tokens, and daily email counters. Your password, sync key and session contents never reach the server. Your recovery key is your sync key, so losing both your password and your recovery key makes cloud data unrecoverable.
-- English and Vietnamese interface; light, dark, and system themes.
+- Interface in English, Vietnamese, and ten more locales; light, dark, and system themes.
 - No content scripts, no third-party analytics, trackers, or remote code.
 
 ### Privacy summary
@@ -61,7 +61,7 @@ SaveTabs lưu các tab đang mở thành một phiên để bạn khôi phục s
 - Phiên từ cửa sổ riêng tư/ẩn danh được đánh dấu chỉ lưu cục bộ và không bao giờ tải lên.
 - Đồng bộ mã hoá đầu-cuối tuỳ chọn giữa các thiết bị bằng khoá đồng bộ được tạo tự động, hoặc bằng tài khoản tuỳ chọn với email và mật khẩu giúp thiết lập đồng bộ dễ hơn. URL và tiêu đề được mã hoá ngay trong trình duyệt bằng AES-GCM 256; máy chủ chỉ lưu bản mã.
 - Tài khoản là tuỳ chọn: máy chủ lưu email, mã băm bằng chứng dẫn xuất từ mật khẩu, muối và số vòng lặp KDF, khoá đồng bộ đã được bọc, token phiên và token email đã băm, cùng bộ đếm email theo ngày. Mật khẩu, khoá đồng bộ và nội dung phiên không bao giờ tới máy chủ. Khoá khôi phục chính là khoá đồng bộ, nên nếu mất cả mật khẩu lẫn khoá khôi phục thì dữ liệu đám mây không thể khôi phục.
-- Giao diện tiếng Anh và tiếng Việt; giao diện sáng, tối và theo hệ thống.
+- Giao diện bằng tiếng Anh, tiếng Việt và mười ngôn ngữ khác; giao diện sáng, tối và theo hệ thống.
 - Không content script, không công cụ phân tích, trình theo dõi hay mã từ xa của bên thứ ba.
 
 ### Tóm tắt quyền riêng tư

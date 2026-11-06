@@ -21,7 +21,8 @@ optional end-to-end encrypted (E2EE) sync.
   across devices. The password unlocks the wrapped sync key locally; the server
   stores the email, a password-derived proof hash, KDF salt and iterations, the
   wrapped sync key, hashed session and email tokens, and daily email counters.
-  A recovery key (the sync key) is shown once when an account is linked.
+  A recovery key (the sync key) is shown when an account is linked and can be
+  viewed later from the account page.
 - Sessions saved from private or incognito windows stay local-only.
 - Interface in English, Vietnamese, and ten more locales; light, dark, and
   system themes.
