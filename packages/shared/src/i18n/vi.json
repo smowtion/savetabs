@@ -375,7 +375,9 @@
           "hi": "Tiếng Hindi",
           "ar": "Tiếng Ả Rập",
           "pt": "Tiếng Bồ Đào Nha",
-          "ru": "Tiếng Nga"
+          "ru": "Tiếng Nga",
+          "ja": "Tiếng Nhật",
+          "fr": "Tiếng Pháp"
         }
       },
       "duplicates": {

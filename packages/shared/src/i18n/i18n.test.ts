@@ -25,7 +25,18 @@ function requiredKeys(locale: string): string[] {
 
 describe("i18n", () => {
   it("registers the supported locales with their direction", () => {
-    expect(LANGS).toEqual(["en", "vi", "zh-CN", "es", "hi", "ar", "pt", "ru"]);
+    expect(LANGS).toEqual([
+      "en",
+      "vi",
+      "zh-CN",
+      "es",
+      "hi",
+      "ar",
+      "pt",
+      "ru",
+      "ja",
+      "fr",
+    ]);
     expect(LOCALES.map((locale) => locale.name)).toEqual([
       "English",
       "Tiếng Việt",
@@ -35,6 +46,8 @@ describe("i18n", () => {
       "العربية",
       "Português",
       "Русский",
+      "日本語",
+      "Français",
     ]);
     for (const locale of LOCALES) expect(localeDir(locale.code)).toBe(locale.dir);
     expect(localeDir("ar")).toBe("rtl");
@@ -53,6 +66,8 @@ describe("i18n", () => {
     expect(resolveLang("auto", "ar-EG")).toBe("ar");
     expect(resolveLang("auto", "pt-BR")).toBe("pt");
     expect(resolveLang("auto", "ru-RU")).toBe("ru");
+    expect(resolveLang("auto", "ja-JP")).toBe("ja");
+    expect(resolveLang("auto", "fr-CA")).toBe("fr");
     expect(resolveLang("auto", "xx")).toBe("en");
   });
 
@@ -65,13 +80,17 @@ describe("i18n", () => {
     expect(resolveLang("ru", "en-US")).toBe("ru");
   });
 
-  it("keeps the policy page in English for Hindi, Arabic, Portuguese and Russian", () => {
+  it("keeps the policy page in English for locales that do not translate it", () => {
     const privacyKeys = ALL_EN_KEYS.filter((key) =>
       key.startsWith("web.privacy."),
     );
     const english = createTranslator("en");
+    const englishOnlyLocales = LANGS.filter(
+      (locale) => locale !== "en" && locale !== "vi",
+    );
 
-    for (const locale of ["hi", "ar", "pt", "ru"] as const) {
+    expect(englishOnlyLocales.length).toBeGreaterThan(0);
+    for (const locale of englishOnlyLocales) {
       const translator = createTranslator(locale);
       for (const key of privacyKeys) {
         expect(translator(key), `${locale}:${key}`).toBe(english(key));
@@ -93,7 +112,9 @@ describe("i18n", () => {
   it("honors explicit language overrides", () => {
     expect(resolveLang("vi", "en-US")).toBe("vi");
     expect(resolveLang("en", "vi-VN")).toBe("en");
-    expect(resolveLang("auto", "fr-FR")).toBe("en");
+    expect(resolveLang("ja", "en-US")).toBe("ja");
+    expect(resolveLang("fr", "en-US")).toBe("fr");
+    expect(resolveLang("auto", "th-TH")).toBe("en");
   });
 
   it("falls back to the key itself for missing translations", () => {

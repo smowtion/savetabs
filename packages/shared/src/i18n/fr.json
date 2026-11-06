@@ -1,0 +1,853 @@
+{
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "copy": "Copier",
+    "confirm": "Confirmer",
+    "restore": "Restaurer",
+    "settings": "Paramètres",
+    "openSessions": "Ouvrir les sessions",
+    "syncNow": "Synchroniser maintenant",
+    "retry": "Réessayer",
+    "loading": "Chargement…",
+    "error": "Une erreur est survenue",
+    "empty": "Rien pour l'instant",
+    "tabsCount": "{count} onglets"
+  },
+  "settings": {
+    "general": {
+      "label": "Général",
+      "description": "Apparence, langue et préférences de nombre d'onglets.",
+      "theme": {
+        "label": "Thème",
+        "description": "Choisissez le mode clair, sombre ou suivez l'apparence du système."
+      },
+      "language": {
+        "label": "Langue",
+        "description": "Choisissez la langue d'affichage ou suivez automatiquement la langue du navigateur."
+      },
+      "showBadgeCount": {
+        "label": "Afficher le badge du nombre d'onglets",
+        "description": "Affichez le nombre d'onglets ouverts sur l'icône de la barre d'outils."
+      },
+      "confirmThreshold": {
+        "label": "Confirmer avant de fermer de nombreux onglets",
+        "description": "Demander confirmation lorsque l'enregistrement fermerait au moins ce nombre d'onglets. Définissez 0 pour désactiver."
+      }
+    },
+    "tabs": {
+      "label": "Onglets",
+      "description": "Choisissez les onglets enregistrés et ce qui se passe après l'enregistrement.",
+      "saveAllWindows": {
+        "label": "Enregistrer toutes les fenêtres",
+        "description": "Inclure les onglets de toutes les fenêtres du navigateur, pas seulement la fenêtre actuelle."
+      },
+      "closeAfterSave": {
+        "label": "Fermer les onglets après l'enregistrement",
+        "description": "Fermer les onglets enregistrés une fois la session stockée."
+      },
+      "skipAudible": {
+        "label": "Ignorer les onglets qui jouent de l'audio",
+        "description": "Laisser ouverts les onglets qui jouent actuellement du son."
+      },
+      "excludedDomains": {
+        "label": "Domaines exclus",
+        "description": "Les onglets de ces domaines ne sont jamais enregistrés ni fermés. Un domaine par ligne."
+      },
+      "includeFileUrls": {
+        "label": "Inclure les URL de fichiers locaux",
+        "description": "Autoriser l'enregistrement des onglets pointant vers des fichiers de cet ordinateur. Nécessite l'autorisation d'accès aux fichiers."
+      }
+    },
+    "duplicates": {
+      "label": "Doublons",
+      "description": "Contrôlez la gestion des onglets et URL répétés.",
+      "removeOnSave": {
+        "label": "Supprimer les onglets en double",
+        "description": "Fermer les onglets répétés et ne conserver qu'une copie de chaque URL dans la session."
+      },
+      "matchMode": {
+        "label": "Correspondance des doublons",
+        "description": "Mode de comparaison des URL : exacte, en ignorant le fragment #, ou en ignorant les paramètres de requête."
+      },
+      "skipAlreadySaved": {
+        "label": "Ignorer les onglets déjà enregistrés",
+        "description": "Ne pas enregistrer les URL qui existent déjà dans une autre session."
+      }
+    },
+    "pinned": {
+      "label": "Onglets épinglés",
+      "description": "Décidez si les onglets épinglés sont enregistrés ou restaurés.",
+      "skipOnSave": {
+        "label": "Ignorer les onglets épinglés lors de l'enregistrement",
+        "description": "Laisser les onglets épinglés ouverts et hors des nouvelles sessions."
+      },
+      "restoreAsPinned": {
+        "label": "Restaurer les onglets épinglés en tant que tels",
+        "description": "Rouvrir les onglets épinglés enregistrés comme épinglés lors de la restauration d'une session."
+      }
+    },
+    "open": {
+      "label": "Ouverture des sessions",
+      "description": "Configurez ce qui se passe lorsque vous ouvrez l'extension et les sessions.",
+      "toolbarAction": {
+        "label": "Action du bouton de la barre d'outils",
+        "description": "Ce qui se passe au clic sur l'icône : ouvrir le popup, enregistrer immédiatement les onglets ou ouvrir la page des sessions."
+      },
+      "openSessionsAfterSave": {
+        "label": "Ouvrir la page des sessions après l'enregistrement",
+        "description": "Afficher la session enregistrée dans la page des sessions juste après l'enregistrement."
+      },
+      "reuseSessionsTab": {
+        "label": "Réutiliser l'onglet des sessions",
+        "description": "Ouvrir les sessions dans un onglet de sessions existant au lieu d'en créer un nouveau."
+      }
+    },
+    "urlDisplay": {
+      "label": "Affichage des URL",
+      "description": "Choisissez comment les onglets et sessions enregistrés sont affichés.",
+      "mode": {
+        "label": "Mode d'affichage des URL",
+        "description": "Afficher les onglets enregistrés par titre, par domaine ou avec l'URL complète."
+      },
+      "showFavicons": {
+        "label": "Afficher les favicons",
+        "description": "Afficher le favicon de chaque site dans les listes de sessions."
+      },
+      "showTabCount": {
+        "label": "Afficher le nombre d'onglets",
+        "description": "Afficher le nombre d'onglets contenus dans chaque session."
+      }
+    },
+    "restore": {
+      "label": "Restauration",
+      "description": "Définissez comment les sessions restaurées s'ouvrent dans votre navigateur.",
+      "targetWindow": {
+        "label": "Fenêtre cible de restauration",
+        "description": "Ouvrir les onglets restaurés dans la fenêtre actuelle ou dans une nouvelle fenêtre."
+      },
+      "openInBackground": {
+        "label": "Ouvrir les onglets restaurés en arrière-plan",
+        "description": "Restaurer les onglets sans changer le focus de l'onglet actuel."
+      },
+      "skipExisting": {
+        "label": "Ignorer les onglets déjà ouverts",
+        "description": "Ne pas rouvrir les URL déjà ouvertes dans le navigateur."
+      }
+    },
+    "clipboard": {
+      "label": "Presse-papiers",
+      "description": "Choisissez le format utilisé lors de la copie des onglets.",
+      "format": {
+        "label": "Format de copie",
+        "description": "Format utilisé lors de la copie des onglets d'une session : URL simples, liens Markdown ou titres avec URL."
+      }
+    },
+    "contextMenu": {
+      "label": "Menu contextuel",
+      "description": "Choisissez les actions qui apparaissent dans le menu clic droit.",
+      "enabled": {
+        "label": "Activer les éléments du menu contextuel",
+        "description": "Afficher les actions SaveTabs dans le menu contextuel du navigateur."
+      },
+      "saveTab": {
+        "label": "Enregistrer l'onglet actuel",
+        "description": "Ajouter un élément de menu contextuel qui enregistre l'onglet actuel."
+      },
+      "saveWindow": {
+        "label": "Enregistrer la fenêtre actuelle",
+        "description": "Ajouter un élément de menu contextuel qui enregistre tous les onglets de la fenêtre actuelle."
+      },
+      "saveSelection": {
+        "label": "Enregistrer les onglets sélectionnés",
+        "description": "Ajouter un élément de menu contextuel qui enregistre les onglets sélectionnés."
+      }
+    },
+    "memory": {
+      "label": "Économiseur de mémoire",
+      "description": "Libérez de la mémoire en mettant automatiquement en veille les onglets inactifs.",
+      "autoDiscard": {
+        "label": "Mettre automatiquement en veille les onglets inactifs",
+        "description": "Libérer de la mémoire en mettant en veille les onglets inactifs depuis le délai ci-dessous."
+      },
+      "timeoutMinutes": {
+        "label": "Délai d'inactivité",
+        "description": "Nombre de minutes d'inactivité avant qu'un onglet puisse être mis en veille."
+      },
+      "keepAudible": {
+        "label": "Conserver les onglets qui jouent de l'audio",
+        "description": "Ne jamais mettre en veille les onglets qui jouent du son."
+      },
+      "keepPinned": {
+        "label": "Conserver les onglets épinglés",
+        "description": "Ne jamais mettre en veille les onglets épinglés."
+      },
+      "discardNow": "Mettre en veille maintenant",
+      "discardNowSuccess": "{count} onglets mis en veille.",
+      "discardNowFailed": "Impossible de mettre les onglets en veille : {message}"
+    },
+    "shortcuts": {
+      "label": "Raccourcis",
+      "description": "Affichez les raccourcis clavier attribués à SaveTabs.",
+      "tableCaption": "Raccourcis clavier de SaveTabs",
+      "commandHeader": "Commande",
+      "bindingHeader": "Raccourci",
+      "notSet": "Non défini",
+      "instructions": "Pour modifier un raccourci, ouvrez la page des raccourcis ci-dessous et modifiez le raccourci de SaveTabs.",
+      "pagePathLabel": "Chemin de la page des raccourcis",
+      "copyPath": "Copier le chemin",
+      "copySuccess": "Chemin copié dans le presse-papiers.",
+      "copyFailed": "Impossible de copier le chemin.",
+      "commandLabel": {
+        "save-tabs": "Enregistrer tous les onglets de la fenêtre actuelle",
+        "open-sessions": "Ouvrir la page des sessions",
+        "discard-now": "Mettre en veille les onglets inactifs maintenant"
+      }
+    },
+    "incognito": {
+      "label": "Navigation privée",
+      "description": "Contrôlez la gestion des fenêtres privées.",
+      "includeInSaveAll": {
+        "label": "Inclure les fenêtres de navigation privée",
+        "description": "Inclure les fenêtres privées lors de l'enregistrement de toutes les fenêtres. Nécessite l'autorisation d'accès à la navigation privée."
+      },
+      "status": {
+        "label": "Accès à la navigation privée",
+        "allowed": "Autorisé",
+        "denied": "Non autorisé"
+      },
+      "deniedNote": "Ce paramètre est désactivé car SaveTabs n'est pas autorisé dans les fenêtres de navigation privée.",
+      "enableInstructions": "Pour autoriser l'accès, ouvrez la page des extensions ci-dessous, ouvrez les détails de SaveTabs et autorisez l'extension dans les fenêtres privées.",
+      "pagePathLabel": "Chemin de la page des extensions",
+      "copyPath": "Copier le chemin",
+      "copySuccess": "Chemin copié dans le presse-papiers.",
+      "copyFailed": "Impossible de copier le chemin."
+    },
+    "sync": {
+      "label": "Synchronisation",
+      "description": "Sauvegardez et restaurez vos sessions avec un chiffrement de bout en bout.",
+      "enabled": {
+        "label": "Activer la synchronisation chiffrée de bout en bout",
+        "description": "Sauvegarder les sessions dans votre compte de synchronisation avec un chiffrement de bout en bout."
+      },
+      "autoUpload": {
+        "label": "Téléverser automatiquement les modifications",
+        "description": "Téléverser automatiquement les sessions nouvelles et modifiées."
+      },
+      "autoDownload": {
+        "label": "Télécharger automatiquement les modifications",
+        "description": "Télécharger et fusionner automatiquement les sessions enregistrées sur d'autres appareils."
+      },
+      "keyTitle": "Votre clé de synchronisation",
+      "keyLabel": "Valeur de la clé de synchronisation",
+      "keyMaskedHint": "La clé reste masquée car elle est le seul identifiant de vos données chiffrées.",
+      "revealKey": "Afficher la clé",
+      "hideKey": "Masquer la clé",
+      "copyKey": "Copier la clé",
+      "copied": "Clé copiée dans le presse-papiers.",
+      "copyFailed": "Impossible de copier la clé.",
+      "importLabel": "Importer une clé",
+      "importPlaceholder": "Collez votre clé ST-…",
+      "invalidKey": "Cette clé SaveTabs n'est pas valide.",
+      "importPrompt": "Téléverser les sessions locales avec cette nouvelle clé ?",
+      "importPromptHint": "Recommandé. Les sessions locales seront chiffrées et téléversées avec la nouvelle clé.",
+      "importUpload": "Téléverser les sessions locales",
+      "importSkip": "Ignorer le téléversement",
+      "importSuccess": "Clé importée. Les sessions locales seront téléversées avec cette clé.",
+      "importSkipped": "Clé importée. Les sessions locales ne seront pas téléversées.",
+      "rotateKey": "Renouveler la clé",
+      "rotateTitle": "Renouveler la clé de synchronisation",
+      "rotateWarning": "Le renouvellement crée une nouvelle clé et tente de supprimer les données cloud chiffrées avec l'ancienne clé. Les sessions locales seront téléversées avec la nouvelle clé.",
+      "rotateConfirmLabel": "Saisissez ROTATE pour confirmer",
+      "rotateConfirmPlaceholder": "ROTATE",
+      "rotateConfirm": "Créer une nouvelle clé",
+      "rotateSuccess": "Nouvelle clé créée. Les sessions locales seront téléversées avec celle-ci.",
+      "rotateSuccessRevoked": "Nouvelle clé créée. Les anciennes données cloud ont été supprimées. Les sessions locales seront téléversées avec la nouvelle clé.",
+      "rotateSuccessRevokeFailed": "Nouvelle clé créée, mais les anciennes données cloud n'ont pas pu être supprimées. Les sessions locales seront téléversées avec la nouvelle clé.",
+      "loseKeyWarning": "Si vous perdez cette clé, vos données synchronisées ne pourront pas être récupérées.",
+      "onlyCredentialWarning": "Cette clé est le seul identifiant de vos données synchronisées. Toute personne qui la possède peut lire, modifier ou supprimer ces données.",
+      "actionFailed": "L'action a échoué : {message}",
+      "statusTitle": "État de la synchronisation",
+      "statusOn": "La synchronisation est activée.",
+      "statusOff": "La synchronisation est désactivée. Les données cloud sont conservées jusqu'à leur suppression.",
+      "lastSyncLabel": "Dernière synchronisation",
+      "neverSynced": "Jamais",
+      "pendingLabel": "Téléversements en attente",
+      "syncing": "Synchronisation…",
+      "syncResult": "{uploaded} téléversés, {downloaded} téléchargés, {deleted} supprimés.",
+      "syncErrorsTitle": "Certains éléments n'ont pas pu être synchronisés :",
+      "authError": "La clé de synchronisation a été refusée ou les données cloud ne peuvent pas être déchiffrées. Réimportez ou renouvelez votre clé.",
+      "deleteCloud": "Supprimer les données cloud",
+      "deleteCloudTitle": "Supprimer les données cloud ?",
+      "deleteCloudMessage": "Cela supprime toutes les sessions synchronisées stockées sur le serveur pour cette clé, puis désactive la synchronisation pour que vos sessions locales ne soient plus téléversées. Les sessions locales restent sur cet appareil. Cette action est irréversible.",
+      "deleteCloudConfirm": "Supprimer les données cloud",
+      "deleteCloudSuccess": "Données cloud supprimées. La synchronisation a été désactivée pour que les sessions locales ne soient plus téléversées. Vous pouvez la réactiver plus tard.",
+      "enableConfirmTitle": "Activer la synchronisation chiffrée ?",
+      "enableConfirmMessage": "Assurez-vous d'avoir sauvegardé votre clé de synchronisation. C'est le seul moyen de récupérer les données synchronisées. Vous pouvez l'afficher et la copier dans la section Synchronisation.",
+      "enableConfirm": "Activer la synchronisation",
+      "accountPasswordLabel": "Mot de passe du compte",
+      "accountPasswordHint": "Requis pour mettre à jour la clé liée à votre compte.",
+      "accountPasswordRequired": "Saisissez le mot de passe de votre compte pour changer la clé de synchronisation.",
+      "keyRelinkFailed": "Impossible de mettre à jour la clé du compte. Votre clé de synchronisation n'a pas été modifiée."
+    },
+    "account": {
+      "title": "Compte",
+      "description": "Connectez-vous pour récupérer votre clé de synchronisation sur n'importe quel appareil. Vos données restent chiffrées de bout en bout.",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Mot de passe",
+      "signIn": "Se connecter",
+      "signingIn": "Connexion…",
+      "createAccount": "Créer un compte",
+      "creatingAccount": "Création du compte…",
+      "useKeyInstead": "Utiliser une clé à la place",
+      "useAccount": "Utiliser un compte",
+      "keyOnlyHint": "La synchronisation reste basée sur la clé. Votre clé est gérée ci-dessous.",
+      "signOut": "Se déconnecter",
+      "signedOut": "Déconnecté. Votre clé et vos paramètres de synchronisation sont inchangés.",
+      "signOutFailed": "Impossible de vous déconnecter. Réessayez.",
+      "verified": "Vérifié",
+      "unverified": "E-mail non vérifié",
+      "passwordTooShort": "Utilisez un mot de passe d'au moins 12 caractères.",
+      "signInFailed": "Impossible de vous connecter. Vérifiez votre e-mail et votre mot de passe.",
+      "signUpFailed": "Impossible de créer votre compte. Réessayez.",
+      "loadFailed": "Impossible de charger votre compte.",
+      "recoveryTitle": "Enregistrez votre clé de récupération",
+      "recoveryMessage": "Cette clé est le seul moyen de récupérer vos sessions chiffrées. Elle ne sera plus affichée.",
+      "recoveryKeyLabel": "Votre clé",
+      "recoveryConfirm": "Je l'ai enregistrée",
+      "recoveryContinue": "Continuer",
+      "changePassword": "Changer le mot de passe",
+      "currentPasswordLabel": "Mot de passe actuel",
+      "newPasswordLabel": "Nouveau mot de passe",
+      "changePasswordSubmit": "Changer le mot de passe",
+      "changePasswordSubmitting": "Modification du mot de passe…",
+      "changePasswordSuccess": "Mot de passe modifié. Les autres sessions ont été déconnectées.",
+      "changePasswordFailed": "Impossible de modifier votre mot de passe. Vérifiez votre mot de passe actuel.",
+      "uploadPromptTitle": "Téléverser les sessions locales ?",
+      "uploadPrompt": "Téléverser ces sessions dans ce compte ?",
+      "uploadPromptUpload": "Téléverser les sessions",
+      "uploadPromptSkip": "Conserver en local uniquement"
+    },
+    "advanced": {
+      "label": "Avancé",
+      "description": "Actions d'importation, d'exportation, de réinitialisation et de maintenance.",
+      "storageUsage": "Stockage utilisé : {sessions} sessions, {tabs} onglets",
+      "storageNearLimit": "Le stockage local est presque plein. Exportez ou supprimez des sessions pour libérer de l'espace.",
+      "exportSettings": "Exporter les paramètres",
+      "importSettings": "Importer les paramètres",
+      "exportSessions": "Exporter les sessions",
+      "importSessions": "Importer les sessions",
+      "resetToDefaults": "Rétablir les valeurs par défaut",
+      "clearSessions": "Effacer les sessions locales",
+      "sessionsPlaintextWarning": "Les exports de sessions contiennent des titres et URL en clair. Stockez le fichier dans un endroit sûr.",
+      "exportSuccess": "{filename} exporté.",
+      "importSettingsSuccess": "Paramètres importés.",
+      "importSettingsSyncStaysOff": "La synchronisation reste désactivée après l'importation des paramètres. Activez-la depuis l'interrupteur ; ce processus confirme votre clé.",
+      "importSettingsFailed": "Échec de l'importation des paramètres :",
+      "importSessionsSuccess": "{added} sessions importées et {updated} mises à jour.",
+      "importSessionsPartial": "{added} sessions importées et {updated} mises à jour. Certaines sessions n'ont pas pu être enregistrées :",
+      "importSessionsFailed": "Échec de l'importation des sessions :",
+      "actionFailed": "L'action a échoué : {message}",
+      "resetTitle": "Réinitialiser tous les paramètres ?",
+      "resetMessage": "Tous les paramètres reviennent à leurs valeurs par défaut. Les sessions enregistrées ne sont pas affectées.",
+      "resetConfirm": "Réinitialiser les paramètres",
+      "resetSuccess": "Paramètres réinitialisés aux valeurs par défaut.",
+      "clearTitle": "Supprimer toutes les sessions locales ?",
+      "clearMessage": "Toutes les sessions enregistrées sur cet appareil seront supprimées définitivement. Les sessions synchronisées dans le cloud ne sont pas supprimées et pourront être téléchargées à nouveau lors de la prochaine synchronisation. Exportez d'abord une sauvegarde si nécessaire.",
+      "clearConfirm": "Supprimer les sessions",
+      "clearSuccess": "Toutes les sessions locales ont été supprimées."
+    },
+    "option": {
+      "general": {
+        "theme": {
+          "system": "Système",
+          "light": "Clair",
+          "dark": "Sombre"
+        },
+        "language": {
+          "auto": "Automatique",
+          "en": "Anglais",
+          "vi": "Vietnamien",
+          "zh-CN": "Chinois (simplifié)",
+          "es": "Espagnol",
+          "hi": "Hindi",
+          "ar": "Arabe",
+          "pt": "Portugais",
+          "ru": "Russe",
+          "ja": "Japonais",
+          "fr": "Français"
+        }
+      },
+      "duplicates": {
+        "matchMode": {
+          "exact": "URL exacte",
+          "ignore-hash": "Ignorer #fragment",
+          "ignore-query": "Ignorer ?query"
+        }
+      },
+      "open": {
+        "toolbarAction": {
+          "popup": "Ouvrir le popup",
+          "save": "Enregistrer les onglets maintenant",
+          "sessions": "Ouvrir la page des sessions"
+        }
+      },
+      "urlDisplay": {
+        "mode": {
+          "title": "Titre",
+          "domain": "Domaine",
+          "full-url": "URL complète"
+        }
+      },
+      "restore": {
+        "targetWindow": {
+          "current": "Fenêtre actuelle",
+          "new": "Nouvelle fenêtre"
+        }
+      },
+      "clipboard": {
+        "format": {
+          "plain-urls": "URL simples",
+          "markdown": "Liens Markdown",
+          "titled": "Titres avec URL"
+        }
+      },
+      "memory": {
+        "timeoutMinutes": {
+          "5": "5 minutes",
+          "15": "15 minutes",
+          "30": "30 minutes",
+          "60": "60 minutes",
+          "120": "120 minutes"
+        }
+      }
+    }
+  },
+  "options": {
+    "search": "Rechercher dans les paramètres",
+    "searchPlaceholder": "Rechercher dans les paramètres…",
+    "expandAll": "Tout développer",
+    "collapseAll": "Tout réduire",
+    "categories": "Catégories de paramètres",
+    "settingCount": "{count} paramètres",
+    "saved": "Enregistré",
+    "noResults": "Aucun paramètre ne correspond à votre recherche.",
+    "tooltip": "Plus d'informations sur {setting}",
+    "memoryUnsupported": "La mise en veille des onglets n'est pas disponible dans ce navigateur.",
+    "stringList": {
+      "placeholder": "Ajouter un domaine…",
+      "add": "Ajouter",
+      "remove": "Supprimer {item}"
+    },
+    "validation": {
+      "numberRange": "Saisissez un nombre entier entre {min} et {max}.",
+      "maxItems": "Vous pouvez ajouter au maximum {count} éléments.",
+      "duplicateEntry": "Cette entrée est déjà dans la liste.",
+      "emptyEntry": "Saisissez une valeur avant de l'ajouter."
+    },
+    "theme": {
+      "system": "Système",
+      "light": "Clair",
+      "dark": "Sombre",
+      "toggle": "Thème : {theme}"
+    }
+  },
+  "contextMenu": {
+    "saveTab": "Enregistrer cet onglet",
+    "saveWindow": "Enregistrer tous les onglets de cette fenêtre",
+    "saveSelection": "Enregistrer les onglets sélectionnés"
+  },
+  "popup": {
+    "saveTabs": "Enregistrer {count} onglets",
+    "openSessions": "Ouvrir la page des sessions",
+    "syncOn": "Synchronisation activée",
+    "syncOff": "Synchronisation désactivée",
+    "discardOff": "Mise en veille auto : désactivée",
+    "discardStatus": "Mise en veille auto : {minutes} min · {count} mis en veille aujourd'hui",
+    "recentTitle": "Sessions récentes",
+    "empty": "Aucune session enregistrée pour le moment.",
+    "restoreSession": "Restaurer {time}",
+    "loadFailed": "Impossible de charger les données du popup."
+  },
+  "update": {
+    "title": "Mise à jour disponible",
+    "message": "SaveTabs {version} est prêt à être installé.",
+    "action": "Voir dans la boutique"
+  },
+  "sessions": {
+    "title": "Sessions enregistrées",
+    "searchLabel": "Rechercher des sessions",
+    "searchPlaceholder": "Rechercher des sessions…",
+    "saveWindow": "Enregistrer la fenêtre",
+    "saveConfirmTitle": "Enregistrer et fermer les onglets ?",
+    "saveConfirmMessage": "L'enregistrement fermera {count} onglets. Continuer ?",
+    "saveConfirm": "Enregistrer et fermer",
+    "invalidResponse": "L'extension a renvoyé une réponse inattendue.",
+    "empty": "Aucune session pour le moment. Enregistrez vos onglets ouverts avec le bouton Enregistrer la fenêtre.",
+    "noResults": "Aucune session ne correspond à votre recherche.",
+    "private": "Privée",
+    "moreActions": "Plus d'actions",
+    "rename": "Renommer",
+    "exportSession": "Exporter la session JSON",
+    "renameLabel": "Nom de la session",
+    "renameSuccess": "Session renommée.",
+    "restoreSuccess": "{count} onglets restaurés.",
+    "saveSuccess": "{count} onglets enregistrés.",
+    "saveOverflow": "{saved} onglets enregistrés ; {overflow} laissés ouverts (limite de session).",
+    "saveEmpty": "Aucun onglet à enregistrer.",
+    "copySuccess": "{count} onglets copiés dans le presse-papiers.",
+    "copyFailed": "Impossible de copier les onglets.",
+    "exportSuccess": "{filename} exporté.",
+    "deleteTitle": "Supprimer cette session ?",
+    "deleteMessage": "Cette session sera supprimée définitivement. Cette action est irréversible.",
+    "deleteConfirm": "Supprimer la session",
+    "deleteSuccess": "Session supprimée.",
+    "sessionMissing": "Cette session n'existe plus.",
+    "actionFailed": "L'action a échoué : {message}",
+    "loadFailed": "Impossible de charger les sessions enregistrées.",
+    "noTabs": "Cette session ne contient aucun onglet.",
+    "expand": "Afficher les onglets",
+    "collapse": "Masquer les onglets",
+    "time": {
+      "justNow": "À l'instant",
+      "minutesAgo": "Il y a {count} minutes",
+      "hoursAgo": "Il y a {count} heures",
+      "daysAgo": "Il y a {count} jours"
+    }
+  },
+  "web": {
+    "signup": {
+      "title": "Créez votre compte",
+      "description": "Sauvegardez vos sessions enregistrées avec un chiffrement de bout en bout et ouvrez-les sur n'importe quel appareil. Tout est chiffré dans votre navigateur.",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Mot de passe",
+      "passwordHint": "Utilisez au moins 12 caractères.",
+      "confirmLabel": "Confirmer le mot de passe",
+      "submit": "Créer un compte",
+      "submitting": "Création du compte…",
+      "passwordTooShort": "Utilisez un mot de passe d'au moins 12 caractères.",
+      "passwordMismatch": "Les mots de passe ne correspondent pas.",
+      "error": "Impossible de créer votre compte. Réessayez.",
+      "recoveryTitle": "Enregistrez votre clé de récupération",
+      "recoveryMessage": "Cette clé est le seul moyen de récupérer vos sessions chiffrées. Elle ne sera plus affichée.",
+      "recoveryKeyLabel": "Votre clé",
+      "recoveryConfirm": "Je l'ai enregistrée",
+      "continue": "Continuer",
+      "back": "Retour à SaveTabs"
+    },
+    "login": {
+      "title": "Se connecter",
+      "description": "Saisissez votre e-mail et votre mot de passe pour déverrouiller vos sessions chiffrées sur cet appareil.",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Mot de passe",
+      "rememberLabel": "Se souvenir sur cet appareil",
+      "rememberWarning": "Utilisez uniquement cette option sur un appareil de confiance. La clé reste dans ce navigateur jusqu'à ce que vous l'effaciez.",
+      "submit": "Se connecter",
+      "submitting": "Connexion…",
+      "error": "Impossible de vous connecter. Vérifiez votre e-mail et votre mot de passe, puis réessayez.",
+      "recoveryLink": "Mot de passe oublié ? Utilisez votre clé de récupération",
+      "createAccount": "Créer un compte",
+      "back": "Retour à SaveTabs"
+    },
+    "recover": {
+      "title": "Réinitialisez votre mot de passe",
+      "description": "Saisissez votre clé de récupération et choisissez un nouveau mot de passe. Tout est chiffré dans votre navigateur.",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "you@example.com",
+      "keyLabel": "Clé de récupération",
+      "keyPlaceholder": "ST-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-X",
+      "passwordLabel": "Nouveau mot de passe",
+      "passwordHint": "Utilisez au moins 12 caractères.",
+      "confirmLabel": "Confirmer le nouveau mot de passe",
+      "submit": "Réinitialiser le mot de passe",
+      "submitting": "Réinitialisation du mot de passe…",
+      "passwordTooShort": "Utilisez un mot de passe d'au moins 12 caractères.",
+      "passwordMismatch": "Les mots de passe ne correspondent pas.",
+      "error": "Impossible de réinitialiser votre mot de passe. Vérifiez votre e-mail et votre clé de récupération, puis réessayez.",
+      "cancel": "Retour à la connexion"
+    },
+    "verify": {
+      "title": "Vérification de l'e-mail",
+      "checking": "Vérification de votre e-mail…",
+      "successTitle": "E-mail vérifié",
+      "success": "Votre adresse e-mail est vérifiée. Vous pouvez fermer cette page et revenir à SaveTabs.",
+      "expiredTitle": "Lien expiré",
+      "expired": "Ce lien de vérification est invalide ou a expiré. Connectez-vous et demandez un nouvel e-mail.",
+      "errorTitle": "Échec de la vérification",
+      "error": "Impossible de vérifier votre e-mail. Réessayez plus tard.",
+      "back": "Retour à SaveTabs"
+    },
+    "account": {
+      "title": "Votre compte",
+      "description": "Gérez votre compte, votre mot de passe et votre clé de récupération.",
+      "emailLabel": "E-mail",
+      "verified": "Vérifié",
+      "unverified": "Votre adresse e-mail n'est pas encore vérifiée.",
+      "resend": "Renvoyer l'e-mail de vérification",
+      "resending": "Envoi…",
+      "resendSuccess": "E-mail de vérification envoyé.",
+      "resendFailed": "Impossible d'envoyer l'e-mail de vérification. Réessayez plus tard.",
+      "changePasswordTitle": "Changer le mot de passe",
+      "changePasswordDescription": "Saisissez votre mot de passe actuel et choisissez-en un nouveau. Tout est chiffré dans votre navigateur.",
+      "currentPasswordLabel": "Mot de passe actuel",
+      "newPasswordLabel": "Nouveau mot de passe",
+      "confirmPasswordLabel": "Confirmer le nouveau mot de passe",
+      "passwordHint": "Utilisez au moins 12 caractères.",
+      "passwordTooShort": "Utilisez un mot de passe d'au moins 12 caractères.",
+      "passwordMismatch": "Les mots de passe ne correspondent pas.",
+      "passwordRequired": "Saisissez votre mot de passe.",
+      "changePasswordSubmit": "Changer le mot de passe",
+      "changePasswordSubmitting": "Modification du mot de passe…",
+      "passwordChanged": "Mot de passe modifié.",
+      "passwordChangeFailed": "Impossible de modifier votre mot de passe. Vérifiez votre mot de passe actuel et réessayez.",
+      "noVault": "Ce compte n'a pas encore de clé de synchronisation associée.",
+      "recoveryKeyTitle": "Clé de récupération",
+      "recoveryKeyDescription": "Saisissez à nouveau votre mot de passe pour afficher la clé de récupération de ce compte.",
+      "passwordLabel": "Mot de passe",
+      "viewKeySubmit": "Afficher la clé de récupération",
+      "viewKeySubmitting": "Vérification…",
+      "viewKeyLabel": "Votre clé de récupération",
+      "viewKeyFailed": "Impossible d'afficher la clé de récupération. Vérifiez votre mot de passe et réessayez.",
+      "hideKey": "Masquer",
+      "logout": "Se déconnecter",
+      "deleteTitle": "Supprimer le compte",
+      "deleteDescription": "La suppression de votre compte supprime votre e-mail et vos identifiants. Vos sessions chiffrées restent sur le serveur de synchronisation, sauf si vous supprimez aussi les données cloud.",
+      "deletePasswordLabel": "Votre mot de passe",
+      "deleteCloudLabel": "Supprimer aussi les données cloud synchronisées avec ce compte",
+      "deleteCloudHint": "Cela supprime toutes les sessions chiffrées stockées pour la clé de synchronisation de ce compte. Cette action est irréversible.",
+      "deleteSubmit": "Supprimer le compte",
+      "deleteConfirmTitle": "Supprimer votre compte ?",
+      "deleteConfirmMessage": "Votre compte et vos identifiants seront supprimés définitivement. Cette action est irréversible. Votre clé de synchronisation continue de fonctionner sur cet appareil.",
+      "deleteCloudConfirmMessage": "Votre compte, vos identifiants et les données cloud de sa clé de synchronisation seront supprimés définitivement. Cette action est irréversible.",
+      "deleteConfirm": "Supprimer le compte",
+      "deleteDeleting": "Suppression du compte…",
+      "deleteFailed": "Impossible de supprimer votre compte. Vérifiez votre mot de passe et réessayez.",
+      "loadFailed": "Impossible de charger votre compte.",
+      "home": "Accueil",
+      "sessionsLink": "Sessions enregistrées",
+      "unlockTitle": "Déverrouiller avec votre mot de passe",
+      "unlockDescription": "Votre compte est connecté sur cet appareil, mais la clé de synchronisation est verrouillée. Saisissez votre mot de passe pour ouvrir vos sessions enregistrées.",
+      "unlockAccount": "Connecté en tant que {email}",
+      "unlockSubmit": "Déverrouiller",
+      "unlockSubmitting": "Déverrouillage…",
+      "unlockError": "Impossible de déverrouiller vos sessions. Vérifiez votre mot de passe et réessayez."
+    },
+    "landing": {
+      "title": "Ouvrez vos onglets enregistrés",
+      "description": "Saisissez votre clé de synchronisation pour afficher vos sessions enregistrées. Tout est déchiffré dans votre navigateur.",
+      "keyLabel": "Clé de synchronisation",
+      "keyPlaceholder": "ST-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-X",
+      "continue": "Continuer",
+      "invalidKey": "Cette clé de synchronisation n'est pas valide. Vérifiez-la et réessayez.",
+      "loseKeyWarning": "Votre clé de synchronisation est le seul moyen de déchiffrer vos sessions. Si vous la perdez, vos données enregistrées ne pourront pas être récupérées.",
+      "rememberLabel": "Se souvenir sur cet appareil",
+      "rememberWarning": "Utilisez uniquement cette option sur un appareil de confiance. La clé reste dans ce navigateur jusqu'à ce que vous l'effaciez.",
+      "privacyLink": "Politique de confidentialité",
+      "header": {
+        "account": "Compte"
+      },
+      "hero": {
+        "title": "Enregistrez chaque onglet. Retrouvez-les plus tard.",
+        "description": "SaveTabs enregistre une fenêtre entière du navigateur comme une seule session, ferme les onglets et les rouvre lorsque vous en avez besoin. Il fonctionne dans votre navigateur et conserve vos sessions sur votre appareil.",
+        "chrome": "Ajouter à Chrome",
+        "firefox": "Firefox",
+        "comingSoon": "Bientôt disponible",
+        "noAccount": "Aucun compte requis. L'utilisation locale fonctionne sans inscription.",
+        "mockup": {
+          "save": "Enregistrer 12 onglets",
+          "sessions": "Sessions récentes",
+          "sessionOne": "Références de design",
+          "sessionTwo": "Liste de lecture",
+          "restore": "Restaurer",
+          "sync": "Synchronisation activée"
+        }
+      },
+      "howItWorks": {
+        "title": "Comment ça marche",
+        "steps": {
+          "save": {
+            "title": "Enregistrer une fenêtre",
+            "body": "Ouvrez l'extension et enregistrez tous les onglets de la fenêtre actuelle en une seule session."
+          },
+          "close": {
+            "title": "Les onglets se ferment",
+            "body": "SaveTabs ferme les onglets enregistrés pour garder votre navigateur dégagé."
+          },
+          "restore": {
+            "title": "Restaurer plus tard",
+            "body": "Ouvrez la session pour ramener tous les onglets enregistrés dans une nouvelle fenêtre."
+          }
+        }
+      },
+      "privacy": {
+        "title": "Confidentialité",
+        "items": {
+          "e2ee": {
+            "title": "Chiffrement de bout en bout",
+            "body": "Les sessions sont chiffrées dans votre navigateur avant d'être téléversées. Le serveur stocke un texte chiffré qu'il ne peut pas lire."
+          },
+          "keyOnly": {
+            "title": "Votre clé, vos données",
+            "body": "La synchronisation repose sur votre clé de synchronisation. Aucun compte n'est requis et la clé ne quitte jamais votre navigateur."
+          },
+          "localFirst": {
+            "title": "Local d'abord",
+            "body": "Sans synchronisation, chaque session reste dans le stockage de l'extension de votre navigateur."
+          },
+          "privateWindows": {
+            "title": "Les fenêtres privées restent locales",
+            "body": "Les sessions enregistrées depuis des fenêtres privées ou de navigation privée ne sont jamais téléversées."
+          }
+        },
+        "link": "Lire la politique de confidentialité"
+      },
+      "features": {
+        "title": "Fonctionnalités",
+        "items": {
+          "search": {
+            "title": "Rechercher des sessions",
+            "body": "Retrouvez une session enregistrée par son nom ou par les onglets qu'elle contient."
+          },
+          "rename": {
+            "title": "Renommer les sessions",
+            "body": "Donnez à une session un nom clair pour la retrouver facilement plus tard."
+          },
+          "exportImport": {
+            "title": "Exporter et importer",
+            "body": "Déplacez des sessions entre navigateurs avec un fichier JSON."
+          },
+          "autoDiscard": {
+            "title": "Mise en veille automatique",
+            "body": "Mettez en veille les onglets inactifs après un délai de votre choix, tout en gardant ouverts les onglets épinglés et ceux qui jouent de l'audio."
+          },
+          "sync": {
+            "title": "Synchronisation multi-appareils",
+            "body": "Synchronisez les sessions chiffrées entre vos appareils avec votre clé de synchronisation."
+          },
+          "privateWindows": {
+            "title": "Fenêtres privées",
+            "body": "Les sessions des fenêtres privées restent sur l'appareil et ne sont jamais téléversées."
+          }
+        }
+      },
+      "account": {
+        "title": "Gardez vos sessions sur chaque appareil",
+        "description": "Un compte permet à un nouvel appareil de déverrouiller vos sessions avec seulement votre e-mail et votre mot de passe. Votre clé de synchronisation chiffre toujours tout, et le serveur ne la voit jamais.",
+        "create": "Créer un compte",
+        "signIn": "Se connecter",
+        "useKey": "ou utilisez une clé de synchronisation"
+      },
+      "install": {
+        "title": "Installation et dépannage",
+        "items": {
+          "install": {
+            "title": "Installer",
+            "body": "Ouvrez la fiche du Chrome Web Store, choisissez Ajouter à Chrome et épinglez SaveTabs à la barre d'outils. Firefox n'est pas encore publié."
+          },
+          "uninstall": {
+            "title": "Désinstaller",
+            "body": "Supprimez SaveTabs depuis la page des extensions de votre navigateur. Les sessions enregistrées restent dans le stockage du navigateur jusqu'à l'effacement des données de l'extension."
+          },
+          "troubleshooting": {
+            "title": "Dépannage",
+            "body": "Si l'enregistrement ou la restauration échoue, vérifiez que SaveTabs est activé et rechargez la page. Réessayez ensuite avec une seule fenêtre."
+          }
+        }
+      },
+      "footer": {
+        "privacy": "Confidentialité",
+        "store": "Chrome Web Store"
+      }
+    },
+    "privacy": {
+      "back": "Back to SaveTabs",
+      "title": "Privacy policy",
+      "intro": "SaveTabs keeps your saved tab sessions on your device. If you turn on end-to-end encrypted sync, an encrypted copy is stored on the sync server. This page lists exactly what that copy contains and what never leaves your browser.",
+      "sections": {
+        "data": {
+          "title": "What the sync server stores",
+          "lead": "The sync server stores the following data for your key:",
+          "authId": "A public account id derived from your sync key. It appears in API URLs and cannot be turned back into the key.",
+          "authKeyHash": "A SHA-256 hash of the bearer credential derived from your sync key. The hash verifies requests and cannot be reversed into the credential.",
+          "blobs": "Encrypted session blobs: AES-GCM 256 ciphertext encoded as base64url, with a session id, update timestamp and byte size.",
+          "tombstones": "Deletion tombstones: a deleted session id and its deletion time. Tombstones sync deletions to your other devices and are pruned during later deletions once they are 30 days old.",
+          "timestamps": "Timestamps for when a sync key was first seen and last uploaded.",
+          "footer": "URLs, page titles, favicons and all other session data travel only inside the encrypted blobs. The server cannot read them, and we never receive your sync key. The server also keeps short-lived abuse-prevention rate-limit records keyed by client IP address and authId, plus daily aggregate request and key-registration counters; none of these contain URLs or page titles."
+        },
+        "e2ee": {
+          "title": "End-to-end encryption",
+          "body": "Encryption and decryption happen in your browser with the Web Crypto API. Session blobs use AES-GCM 256, and the encryption key is derived from your sync key with HKDF-SHA256. The key stays in your browser; the web app keeps it in this tab's session storage, or in local storage when you choose Remember on this device. Only ciphertext is uploaded. Without your key, the server and anyone else who obtains a blob cannot read it."
+        },
+        "incognito": {
+          "title": "Private and incognito sessions",
+          "body": "Sessions saved from private or incognito windows are marked local-only by the extension. They are never uploaded to the sync server and never appear in the web app."
+        },
+        "keyLoss": {
+          "title": "If you lose your sync key",
+          "body": "There is no account, email address or password to reset. The sync key is the only credential that can decrypt synced sessions. If you lose it, the encrypted data on the server cannot be recovered. Keep a safe copy; you can reveal and copy the key in the extension under Settings → Sync."
+        },
+        "delete": {
+          "title": "Deleting your data",
+          "body": "Local sessions stay in your browser until you delete them in the extension; clearing the extension's data or uninstalling it also removes them. To delete all cloud data for a sync key, open the extension, go to Settings → Sync and choose Delete cloud data. This removes the encrypted sessions, deletion tombstones and the key record for that sync key, and turns sync off so local sessions are not uploaded again. Rotating the sync key also deletes the data stored under the old key; if that deletion fails, import the old key and use Delete cloud data."
+        },
+        "analytics": {
+          "title": "No analytics or third parties",
+          "body": "The web app and extension contain no analytics, tracking pixels, advertising or third-party scripts. The web app loads only its own code and styles and uses no external fonts."
+        },
+        "contact": {
+          "title": "Contact",
+          "body": "Questions about this policy can be sent to support@azcom.dev."
+        }
+      }
+    },
+    "sessions": {
+      "title": "Sessions enregistrées",
+      "searchLabel": "Rechercher des sessions",
+      "searchPlaceholder": "Rechercher des sessions…",
+      "noResults": "Aucune session ne correspond à votre recherche.",
+      "empty": "Aucune session pour le moment. Enregistrez des onglets avec l'extension SaveTabs, puis rouvrez cette page.",
+      "unknownKeyTitle": "Aucune donnée synchronisée pour cette clé",
+      "unknownKey": "Cette clé de synchronisation n'a aucune session synchronisée. Vérifiez que vous l'avez saisie correctement ou changez de clé.",
+      "restore": "Restaurer",
+      "restoreHint": "La restauration ouvre chaque onglet dans un nouvel onglet du navigateur. Autorisez les popups si votre navigateur le demande.",
+      "restoreSuccess": "{count} onglets ouverts.",
+      "popupBlocked": "Le navigateur a bloqué {count} onglets. Autorisez les popups pour ce site ou ouvrez les onglets un par un.",
+      "copy": "Copier",
+      "copySuccess": "{count} onglets copiés dans le presse-papiers.",
+      "copyFailed": "Impossible de copier les onglets.",
+      "export": "Exporter JSON",
+      "exportSuccess": "{filename} exporté.",
+      "exportFailed": "Impossible d'exporter la session : {message}",
+      "delete": "Supprimer",
+      "deleteTitle": "Supprimer cette session ?",
+      "deleteMessage": "Cette session sera supprimée définitivement. Cette action est irréversible.",
+      "deleteConfirm": "Supprimer la session",
+      "deleteSuccess": "Session supprimée.",
+      "deleteFailed": "Impossible de supprimer la session : {message}",
+      "authError": "Votre clé de synchronisation a été refusée. Saisissez à nouveau votre clé pour continuer.",
+      "changeKey": "Changer de clé",
+      "forgetKey": "Oublier la clé",
+      "forgetKeyTitle": "Oublier la clé de synchronisation ?",
+      "forgetKeyMessage": "La clé est supprimée de ce navigateur. Vos données synchronisées restent sur le serveur et pourront être rouvertes en saisissant la clé plus tard.",
+      "forgetKeyConfirm": "Oublier la clé",
+      "home": "Accueil",
+      "privacy": "Confidentialité",
+      "decryptError": "Certaines sessions n'ont pas pu être déchiffrées et ont été ignorées ({count}).",
+      "loadFailed": "Impossible de charger vos sessions enregistrées.",
+      "noTabs": "Cette session ne contient aucun onglet."
+    },
+    "language": {
+      "toggle": "Changer de langue"
+    },
+    "theme": {
+      "toggle": "Changer de thème",
+      "system": "Système",
+      "light": "Clair",
+      "dark": "Sombre"
+    }
+  }
+}

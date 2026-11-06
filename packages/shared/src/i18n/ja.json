@@ -1,0 +1,853 @@
+{
+  "common": {
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "copy": "コピー",
+    "confirm": "確認",
+    "restore": "復元",
+    "settings": "設定",
+    "openSessions": "セッションを開く",
+    "syncNow": "今すぐ同期",
+    "retry": "再試行",
+    "loading": "読み込み中…",
+    "error": "問題が発生しました",
+    "empty": "まだ何もありません",
+    "tabsCount": "{count} 個のタブ"
+  },
+  "settings": {
+    "general": {
+      "label": "一般",
+      "description": "外観、言語、タブ数の設定。",
+      "theme": {
+        "label": "テーマ",
+        "description": "ライト、ダーク、またはシステムの外観に合わせるかを選択します。"
+      },
+      "language": {
+        "label": "言語",
+        "description": "表示言語を選択するか、ブラウザの言語に自動的に合わせます。"
+      },
+      "showBadgeCount": {
+        "label": "タブ数のバッジを表示",
+        "description": "ツールバーのアイコンに開いているタブの数を表示します。"
+      },
+      "confirmThreshold": {
+        "label": "多数のタブを閉じる前に確認",
+        "description": "保存によってこの数以上のタブが閉じられる場合に確認を求めます。0 にすると無効になります。"
+      }
+    },
+    "tabs": {
+      "label": "タブ",
+      "description": "保存するタブと、保存後の動作を選択します。",
+      "saveAllWindows": {
+        "label": "すべてのウィンドウを保存",
+        "description": "現在のウィンドウだけでなく、すべてのブラウザウィンドウのタブを含めます。"
+      },
+      "closeAfterSave": {
+        "label": "保存後にタブを閉じる",
+        "description": "セッションの保存後に、保存したタブを閉じます。"
+      },
+      "skipAudible": {
+        "label": "音声を再生中のタブをスキップ",
+        "description": "現在音声を再生しているタブは開いたままにします。"
+      },
+      "excludedDomains": {
+        "label": "除外ドメイン",
+        "description": "これらのドメインのタブは保存も閉じることもされません。1 行に 1 ドメインを入力してください。"
+      },
+      "includeFileUrls": {
+        "label": "ローカルファイルの URL を含める",
+        "description": "このコンピューター上のファイルを指すタブの保存を許可します。ファイルへのアクセス権限が必要です。"
+      }
+    },
+    "duplicates": {
+      "label": "重複",
+      "description": "繰り返しのタブと URL の処理方法を制御します。",
+      "removeOnSave": {
+        "label": "重複したタブを削除",
+        "description": "繰り返しのタブを閉じ、セッション内の各 URL のコピーを 1 つだけ残します。"
+      },
+      "matchMode": {
+        "label": "重複の照合方法",
+        "description": "URL を比較する方法: 完全一致、ハッシュフラグメントを無視、クエリパラメーターを無視。"
+      },
+      "skipAlreadySaved": {
+        "label": "すでに保存済みのタブをスキップ",
+        "description": "別のセッションにすでに存在する URL は保存しません。"
+      }
+    },
+    "pinned": {
+      "label": "ピン留めしたタブ",
+      "description": "ピン留めしたタブを保存するか復元するかを選択します。",
+      "skipOnSave": {
+        "label": "保存時にピン留めしたタブをスキップ",
+        "description": "ピン留めしたタブを開いたままにし、新しいセッションに含めません。"
+      },
+      "restoreAsPinned": {
+        "label": "ピン留めしたタブをピン留めとして復元",
+        "description": "セッションを復元するときに、保存したピン留めタブをピン留めとして再び開きます。"
+      }
+    },
+    "open": {
+      "label": "セッションを開く動作",
+      "description": "拡張機能とセッションを開いたときの動作を設定します。",
+      "toolbarAction": {
+        "label": "ツールバーボタンの動作",
+        "description": "ツールバーのアイコンをクリックしたときの動作: ポップアップを開く、すぐにタブを保存する、セッションページを開く。"
+      },
+      "openSessionsAfterSave": {
+        "label": "保存後にセッションページを開く",
+        "description": "保存直後に、保存したセッションをセッションページに表示します。"
+      },
+      "reuseSessionsTab": {
+        "label": "セッションのタブを再利用",
+        "description": "新しいタブを作成せず、既存のセッションタブでセッションを開きます。"
+      }
+    },
+    "urlDisplay": {
+      "label": "URL の表示",
+      "description": "保存したタブとセッションの表示方法を選択します。",
+      "mode": {
+        "label": "URL 表示モード",
+        "description": "保存したタブをタイトル、ドメイン、または完全な URL で表示します。"
+      },
+      "showFavicons": {
+        "label": "ファビコンを表示",
+        "description": "セッションの一覧に各サイトのファビコンを表示します。"
+      },
+      "showTabCount": {
+        "label": "タブ数を表示",
+        "description": "各セッションに含まれるタブの数を表示します。"
+      }
+    },
+    "restore": {
+      "label": "復元",
+      "description": "復元したセッションをブラウザで開く方法を設定します。",
+      "targetWindow": {
+        "label": "復元先のウィンドウ",
+        "description": "復元したタブを現在のウィンドウで開くか、新しいウィンドウで開きます。"
+      },
+      "openInBackground": {
+        "label": "復元したタブをバックグラウンドで開く",
+        "description": "現在のタブからフォーカスを切り替えずにタブを復元します。"
+      },
+      "skipExisting": {
+        "label": "すでに開いているタブをスキップ",
+        "description": "ブラウザですでに開いている URL は再度開きません。"
+      }
+    },
+    "clipboard": {
+      "label": "クリップボード",
+      "description": "タブをコピーするときの形式を選択します。",
+      "format": {
+        "label": "コピー形式",
+        "description": "セッションのタブをコピーするときの形式: URL のみ、Markdown リンク、タイトルと URL。"
+      }
+    },
+    "contextMenu": {
+      "label": "コンテキストメニュー",
+      "description": "右クリックメニューに表示する操作を選択します。",
+      "enabled": {
+        "label": "コンテキストメニューの項目を有効にする",
+        "description": "ブラウザのコンテキストメニューに SaveTabs の操作を表示します。"
+      },
+      "saveTab": {
+        "label": "現在のタブを保存",
+        "description": "現在のタブを保存するコンテキストメニュー項目を追加します。"
+      },
+      "saveWindow": {
+        "label": "現在のウィンドウを保存",
+        "description": "現在のウィンドウのすべてのタブを保存するコンテキストメニュー項目を追加します。"
+      },
+      "saveSelection": {
+        "label": "選択したタブを保存",
+        "description": "選択したタブを保存するコンテキストメニュー項目を追加します。"
+      }
+    },
+    "memory": {
+      "label": "メモリセーバー",
+      "description": "非アクティブなタブを自動的に破棄してメモリを解放します。",
+      "autoDiscard": {
+        "label": "非アクティブなタブを自動的に破棄",
+        "description": "以下のタイムアウトの間非アクティブだったタブを破棄してメモリを解放します。"
+      },
+      "timeoutMinutes": {
+        "label": "非アクティブのタイムアウト",
+        "description": "タブを破棄できるようになるまでに、何分間非アクティブである必要があるかを指定します。"
+      },
+      "keepAudible": {
+        "label": "音声を再生中のタブを保持",
+        "description": "音声を再生しているタブは破棄しません。"
+      },
+      "keepPinned": {
+        "label": "ピン留めしたタブを保持",
+        "description": "ピン留めしたタブは破棄しません。"
+      },
+      "discardNow": "今すぐ破棄",
+      "discardNowSuccess": "{count} 個のタブを破棄しました。",
+      "discardNowFailed": "タブを破棄できませんでした: {message}"
+    },
+    "shortcuts": {
+      "label": "ショートカット",
+      "description": "SaveTabs に割り当てられたキーボードショートカットを表示します。",
+      "tableCaption": "SaveTabs のキーボードショートカット",
+      "commandHeader": "コマンド",
+      "bindingHeader": "ショートカット",
+      "notSet": "未設定",
+      "instructions": "ショートカットを変更するには、下のショートカットページを開き、SaveTabs のショートカットを編集してください。",
+      "pagePathLabel": "ショートカットページのパス",
+      "copyPath": "パスをコピー",
+      "copySuccess": "パスをクリップボードにコピーしました。",
+      "copyFailed": "パスをコピーできませんでした。",
+      "commandLabel": {
+        "save-tabs": "現在のウィンドウのすべてのタブを保存",
+        "open-sessions": "セッションページを開く",
+        "discard-now": "非アクティブなタブを今すぐ破棄"
+      }
+    },
+    "incognito": {
+      "label": "シークレット",
+      "description": "プライベートウィンドウの扱いを制御します。",
+      "includeInSaveAll": {
+        "label": "シークレットウィンドウを含める",
+        "description": "すべてのウィンドウを保存するときに、プライベートウィンドウを含めます。シークレットへのアクセス権限が必要です。"
+      },
+      "status": {
+        "label": "シークレットでのアクセス",
+        "allowed": "許可",
+        "denied": "許可されていません"
+      },
+      "deniedNote": "SaveTabs がシークレットウィンドウで許可されていないため、この設定は無効です。",
+      "enableInstructions": "アクセスを許可するには、下の拡張機能ページを開き、SaveTabs の詳細を開いて、プライベートウィンドウで拡張機能を許可してください。",
+      "pagePathLabel": "拡張機能ページのパス",
+      "copyPath": "パスをコピー",
+      "copySuccess": "パスをクリップボードにコピーしました。",
+      "copyFailed": "パスをコピーできませんでした。"
+    },
+    "sync": {
+      "label": "同期",
+      "description": "エンドツーエンド暗号化でセッションをバックアップおよび復元します。",
+      "enabled": {
+        "label": "エンドツーエンド暗号化同期を有効にする",
+        "description": "エンドツーエンド暗号化でセッションを同期アカウントにバックアップします。"
+      },
+      "autoUpload": {
+        "label": "変更を自動的にアップロード",
+        "description": "新規および変更されたセッションを自動的にアップロードします。"
+      },
+      "autoDownload": {
+        "label": "変更を自動的にダウンロード",
+        "description": "他のデバイスで保存されたセッションを自動的にダウンロードしてマージします。"
+      },
+      "keyTitle": "同期キー",
+      "keyLabel": "同期キーの値",
+      "keyMaskedHint": "このキーは暗号化データの唯一の認証情報であるため、非表示になっています。",
+      "revealKey": "キーを表示",
+      "hideKey": "キーを隠す",
+      "copyKey": "キーをコピー",
+      "copied": "キーをクリップボードにコピーしました。",
+      "copyFailed": "キーをコピーできませんでした。",
+      "importLabel": "キーをインポート",
+      "importPlaceholder": "ST-… キーを貼り付けてください",
+      "invalidKey": "有効な SaveTabs キーではありません。",
+      "importPrompt": "この新しいキーでローカルセッションをアップロードしますか？",
+      "importPromptHint": "推奨。ローカルセッションは新しいキーで暗号化されてアップロードされます。",
+      "importUpload": "ローカルセッションをアップロード",
+      "importSkip": "アップロードをスキップ",
+      "importSuccess": "キーをインポートしました。ローカルセッションはこのキーでアップロードされます。",
+      "importSkipped": "キーをインポートしました。ローカルセッションはアップロードされません。",
+      "rotateKey": "キーをローテーション",
+      "rotateTitle": "同期キーをローテーション",
+      "rotateWarning": "ローテーションすると新しいキーが作成され、古いキーで暗号化されたクラウドデータの削除が試みられます。ローカルセッションは新しいキーでアップロードされます。",
+      "rotateConfirmLabel": "確認のため ROTATE と入力",
+      "rotateConfirmPlaceholder": "ROTATE",
+      "rotateConfirm": "新しいキーを作成",
+      "rotateSuccess": "新しいキーを作成しました。ローカルセッションはこのキーでアップロードされます。",
+      "rotateSuccessRevoked": "新しいキーを作成しました。古いクラウドデータは削除されました。ローカルセッションは新しいキーでアップロードされます。",
+      "rotateSuccessRevokeFailed": "新しいキーを作成しましたが、古いクラウドデータを削除できませんでした。ローカルセッションは新しいキーでアップロードされます。",
+      "loseKeyWarning": "このキーを紛失すると、同期済みデータを復元できません。",
+      "onlyCredentialWarning": "このキーは同期済みデータの唯一の認証情報です。キーを持つ人は誰でもそのデータを読み取り、変更、削除できます。",
+      "actionFailed": "操作に失敗しました: {message}",
+      "statusTitle": "同期状態",
+      "statusOn": "同期はオンです。",
+      "statusOff": "同期はオフです。クラウドデータは削除するまで保持されます。",
+      "lastSyncLabel": "最終同期",
+      "neverSynced": "なし",
+      "pendingLabel": "アップロード待ち",
+      "syncing": "同期中…",
+      "syncResult": "アップロード {uploaded}、ダウンロード {downloaded}、削除 {deleted}。",
+      "syncErrorsTitle": "一部の項目を同期できませんでした:",
+      "authError": "同期キーが拒否されたか、クラウドデータを復号できません。キーを再インポートするか、ローテーションしてください。",
+      "deleteCloud": "クラウドデータを削除",
+      "deleteCloudTitle": "クラウドデータを削除しますか？",
+      "deleteCloudMessage": "このキーのサーバー上の同期済みセッションがすべて削除され、ローカルセッションが再度アップロードされないように同期がオフになります。ローカルセッションはこのデバイスに残ります。この操作は元に戻せません。",
+      "deleteCloudConfirm": "クラウドデータを削除",
+      "deleteCloudSuccess": "クラウドデータを削除しました。ローカルセッションが再度アップロードされないように同期をオフにしました。後で同期を再度有効にできます。",
+      "enableConfirmTitle": "暗号化同期を有効にしますか？",
+      "enableConfirmMessage": "同期キーを保存したことを確認してください。同期済みデータを復元する唯一の方法です。同期セクションで表示およびコピーできます。",
+      "enableConfirm": "同期を有効にする",
+      "accountPasswordLabel": "アカウントのパスワード",
+      "accountPasswordHint": "アカウントにリンクされたキーを更新するために必要です。",
+      "accountPasswordRequired": "同期キーを変更するには、アカウントのパスワードを入力してください。",
+      "keyRelinkFailed": "アカウントのキーを更新できませんでした。同期キーは変更されていません。"
+    },
+    "account": {
+      "title": "アカウント",
+      "description": "サインインすると、どのデバイスでも同期キーを復元できます。データはエンドツーエンドで暗号化されたままです。",
+      "emailLabel": "メールアドレス",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "パスワード",
+      "signIn": "サインイン",
+      "signingIn": "サインイン中…",
+      "createAccount": "アカウントを作成",
+      "creatingAccount": "アカウントを作成中…",
+      "useKeyInstead": "代わりにキーを使用",
+      "useAccount": "アカウントを使用",
+      "keyOnlyHint": "同期はキーのみで続行されます。キーは以下で管理されます。",
+      "signOut": "サインアウト",
+      "signedOut": "サインアウトしました。同期キーと同期設定は変更されていません。",
+      "signOutFailed": "サインアウトできませんでした。もう一度お試しください。",
+      "verified": "確認済み",
+      "unverified": "メールアドレス未確認",
+      "passwordTooShort": "12 文字以上のパスワードを使用してください。",
+      "signInFailed": "サインインできませんでした。メールアドレスとパスワードを確認してください。",
+      "signUpFailed": "アカウントを作成できませんでした。もう一度お試しください。",
+      "loadFailed": "アカウントを読み込めませんでした。",
+      "recoveryTitle": "リカバリーキーを保存",
+      "recoveryMessage": "このキーは暗号化されたセッションを復元する唯一の方法です。再度表示されることはありません。",
+      "recoveryKeyLabel": "あなたのキー",
+      "recoveryConfirm": "保存しました",
+      "recoveryContinue": "続行",
+      "changePassword": "パスワードを変更",
+      "currentPasswordLabel": "現在のパスワード",
+      "newPasswordLabel": "新しいパスワード",
+      "changePasswordSubmit": "パスワードを変更",
+      "changePasswordSubmitting": "パスワードを変更中…",
+      "changePasswordSuccess": "パスワードを変更しました。他のセッションはサインアウトされました。",
+      "changePasswordFailed": "パスワードを変更できませんでした。現在のパスワードを確認してください。",
+      "uploadPromptTitle": "ローカルセッションをアップロードしますか？",
+      "uploadPrompt": "これらのセッションをこのアカウントにアップロードしますか？",
+      "uploadPromptUpload": "セッションをアップロード",
+      "uploadPromptSkip": "ローカルのみ保持"
+    },
+    "advanced": {
+      "label": "詳細",
+      "description": "インポート、エクスポート、リセット、メンテナンスの操作。",
+      "storageUsage": "使用ストレージ: {sessions} セッション、{tabs} タブ",
+      "storageNearLimit": "ローカルストレージがほぼ満杯です。容量を空けるにはセッションをエクスポートまたは削除してください。",
+      "exportSettings": "設定をエクスポート",
+      "importSettings": "設定をインポート",
+      "exportSessions": "セッションをエクスポート",
+      "importSessions": "セッションをインポート",
+      "resetToDefaults": "デフォルトにリセット",
+      "clearSessions": "ローカルセッションを消去",
+      "sessionsPlaintextWarning": "セッションのエクスポートにはタイトルと URL が平文で含まれます。ファイルは安全な場所に保管してください。",
+      "exportSuccess": "{filename} をエクスポートしました。",
+      "importSettingsSuccess": "設定をインポートしました。",
+      "importSettingsSyncStaysOff": "設定のインポート後も同期はオフのままです。トグルから有効にしてください。そのフローでキーが確認されます。",
+      "importSettingsFailed": "設定のインポートに失敗しました:",
+      "importSessionsSuccess": "{added} 件のセッションをインポートし、{updated} 件を更新しました。",
+      "importSessionsPartial": "{added} 件のセッションをインポートし、{updated} 件を更新しました。一部のセッションを保存できませんでした:",
+      "importSessionsFailed": "セッションのインポートに失敗しました:",
+      "actionFailed": "操作に失敗しました: {message}",
+      "resetTitle": "すべての設定をリセットしますか？",
+      "resetMessage": "すべての設定がデフォルトに戻ります。保存済みセッションは影響を受けません。",
+      "resetConfirm": "設定をリセット",
+      "resetSuccess": "設定をデフォルトにリセットしました。",
+      "clearTitle": "すべてのローカルセッションを削除しますか？",
+      "clearMessage": "このデバイスに保存されているすべてのセッションが完全に削除されます。クラウドに同期されたセッションは削除されず、次回の同期で再度ダウンロードされる場合があります。必要に応じて先にバックアップをエクスポートしてください。",
+      "clearConfirm": "セッションを削除",
+      "clearSuccess": "すべてのローカルセッションを削除しました。"
+    },
+    "option": {
+      "general": {
+        "theme": {
+          "system": "システム",
+          "light": "ライト",
+          "dark": "ダーク"
+        },
+        "language": {
+          "auto": "自動",
+          "en": "英語",
+          "vi": "ベトナム語",
+          "zh-CN": "中国語（簡体字）",
+          "es": "スペイン語",
+          "hi": "ヒンディー語",
+          "ar": "アラビア語",
+          "pt": "ポルトガル語",
+          "ru": "ロシア語",
+          "ja": "日本語",
+          "fr": "フランス語"
+        }
+      },
+      "duplicates": {
+        "matchMode": {
+          "exact": "URL の完全一致",
+          "ignore-hash": "#フラグメントを無視",
+          "ignore-query": "?クエリを無視"
+        }
+      },
+      "open": {
+        "toolbarAction": {
+          "popup": "ポップアップを開く",
+          "save": "今すぐタブを保存",
+          "sessions": "セッションページを開く"
+        }
+      },
+      "urlDisplay": {
+        "mode": {
+          "title": "タイトル",
+          "domain": "ドメイン",
+          "full-url": "完全な URL"
+        }
+      },
+      "restore": {
+        "targetWindow": {
+          "current": "現在のウィンドウ",
+          "new": "新しいウィンドウ"
+        }
+      },
+      "clipboard": {
+        "format": {
+          "plain-urls": "URL のみ",
+          "markdown": "Markdown リンク",
+          "titled": "タイトルと URL"
+        }
+      },
+      "memory": {
+        "timeoutMinutes": {
+          "5": "5 分",
+          "15": "15 分",
+          "30": "30 分",
+          "60": "60 分",
+          "120": "120 分"
+        }
+      }
+    }
+  },
+  "options": {
+    "search": "設定を検索",
+    "searchPlaceholder": "設定を検索…",
+    "expandAll": "すべて展開",
+    "collapseAll": "すべて折りたたむ",
+    "categories": "設定カテゴリ",
+    "settingCount": "{count} 件の設定",
+    "saved": "保存しました",
+    "noResults": "検索に一致する設定はありません。",
+    "tooltip": "{setting} の詳細情報",
+    "memoryUnsupported": "このブラウザではタブの破棄を利用できません。",
+    "stringList": {
+      "placeholder": "ドメインを追加…",
+      "add": "追加",
+      "remove": "{item} を削除"
+    },
+    "validation": {
+      "numberRange": "{min} ～ {max} の整数を入力してください。",
+      "maxItems": "追加できる項目は最大 {count} 件です。",
+      "duplicateEntry": "この項目はすでにリストにあります。",
+      "emptyEntry": "追加する前に値を入力してください。"
+    },
+    "theme": {
+      "system": "システム",
+      "light": "ライト",
+      "dark": "ダーク",
+      "toggle": "テーマ: {theme}"
+    }
+  },
+  "contextMenu": {
+    "saveTab": "このタブを保存",
+    "saveWindow": "このウィンドウのすべてのタブを保存",
+    "saveSelection": "選択したタブを保存"
+  },
+  "popup": {
+    "saveTabs": "{count} 個のタブを保存",
+    "openSessions": "セッションページを開く",
+    "syncOn": "同期オン",
+    "syncOff": "同期オフ",
+    "discardOff": "自動破棄: オフ",
+    "discardStatus": "自動破棄: {minutes} 分 · 今日 {count} 個破棄",
+    "recentTitle": "最近のセッション",
+    "empty": "保存されたセッションはまだありません。",
+    "restoreSession": "{time} に復元",
+    "loadFailed": "ポップアップのデータを読み込めませんでした。"
+  },
+  "update": {
+    "title": "アップデートがあります",
+    "message": "SaveTabs {version} をインストールできます。",
+    "action": "ストアで表示"
+  },
+  "sessions": {
+    "title": "保存済みセッション",
+    "searchLabel": "セッションを検索",
+    "searchPlaceholder": "セッションを検索…",
+    "saveWindow": "ウィンドウを保存",
+    "saveConfirmTitle": "タブを保存して閉じますか？",
+    "saveConfirmMessage": "保存すると {count} 個のタブが閉じられます。続行しますか？",
+    "saveConfirm": "保存して閉じる",
+    "invalidResponse": "拡張機能から予期しない応答が返されました。",
+    "empty": "セッションはまだありません。「ウィンドウを保存」ボタンで開いているタブを保存してください。",
+    "noResults": "検索に一致するセッションはありません。",
+    "private": "プライベート",
+    "moreActions": "その他の操作",
+    "rename": "名前を変更",
+    "exportSession": "セッションの JSON をエクスポート",
+    "renameLabel": "セッション名",
+    "renameSuccess": "セッション名を変更しました。",
+    "restoreSuccess": "{count} 個のタブを復元しました。",
+    "saveSuccess": "{count} 個のタブを保存しました。",
+    "saveOverflow": "{saved} 個のタブを保存しました。{overflow} 個は開いたままです（セッション上限）。",
+    "saveEmpty": "保存するタブがありません。",
+    "copySuccess": "{count} 個のタブをクリップボードにコピーしました。",
+    "copyFailed": "タブをコピーできませんでした。",
+    "exportSuccess": "{filename} をエクスポートしました。",
+    "deleteTitle": "このセッションを削除しますか？",
+    "deleteMessage": "このセッションは完全に削除されます。この操作は元に戻せません。",
+    "deleteConfirm": "セッションを削除",
+    "deleteSuccess": "セッションを削除しました。",
+    "sessionMissing": "そのセッションはもう存在しません。",
+    "actionFailed": "操作に失敗しました: {message}",
+    "loadFailed": "保存済みセッションを読み込めませんでした。",
+    "noTabs": "このセッションにはタブがありません。",
+    "expand": "タブを表示",
+    "collapse": "タブを隠す",
+    "time": {
+      "justNow": "たった今",
+      "minutesAgo": "{count} 分前",
+      "hoursAgo": "{count} 時間前",
+      "daysAgo": "{count} 日前"
+    }
+  },
+  "web": {
+    "signup": {
+      "title": "アカウントを作成",
+      "description": "保存したセッションをエンドツーエンド暗号化でバックアップし、どのデバイスでも開けます。すべてはブラウザ内で暗号化されます。",
+      "emailLabel": "メールアドレス",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "パスワード",
+      "passwordHint": "12 文字以上で入力してください。",
+      "confirmLabel": "パスワードの確認",
+      "submit": "アカウントを作成",
+      "submitting": "アカウントを作成中…",
+      "passwordTooShort": "12 文字以上のパスワードを使用してください。",
+      "passwordMismatch": "パスワードが一致しません。",
+      "error": "アカウントを作成できませんでした。もう一度お試しください。",
+      "recoveryTitle": "リカバリーキーを保存",
+      "recoveryMessage": "このキーは暗号化されたセッションを復元する唯一の方法です。再度表示されることはありません。",
+      "recoveryKeyLabel": "あなたのキー",
+      "recoveryConfirm": "保存しました",
+      "continue": "続行",
+      "back": "SaveTabs に戻る"
+    },
+    "login": {
+      "title": "サインイン",
+      "description": "メールアドレスとパスワードを入力して、このデバイスで暗号化されたセッションのロックを解除します。",
+      "emailLabel": "メールアドレス",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "パスワード",
+      "rememberLabel": "このデバイスに記憶する",
+      "rememberWarning": "信頼できるデバイスでのみ使用してください。キーは消去するまでこのブラウザに残ります。",
+      "submit": "サインイン",
+      "submitting": "サインイン中…",
+      "error": "サインインできませんでした。メールアドレスとパスワードを確認して、もう一度お試しください。",
+      "recoveryLink": "パスワードをお忘れですか？リカバリーキーを使用",
+      "createAccount": "アカウントを作成",
+      "back": "SaveTabs に戻る"
+    },
+    "recover": {
+      "title": "パスワードをリセット",
+      "description": "リカバリーキーを入力し、新しいパスワードを選択します。すべてはブラウザ内で暗号化されます。",
+      "emailLabel": "メールアドレス",
+      "emailPlaceholder": "you@example.com",
+      "keyLabel": "リカバリーキー",
+      "keyPlaceholder": "ST-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-X",
+      "passwordLabel": "新しいパスワード",
+      "passwordHint": "12 文字以上で入力してください。",
+      "confirmLabel": "新しいパスワードの確認",
+      "submit": "パスワードをリセット",
+      "submitting": "パスワードをリセット中…",
+      "passwordTooShort": "12 文字以上のパスワードを使用してください。",
+      "passwordMismatch": "パスワードが一致しません。",
+      "error": "パスワードをリセットできませんでした。メールアドレスとリカバリーキーを確認して、もう一度お試しください。",
+      "cancel": "サインインに戻る"
+    },
+    "verify": {
+      "title": "メールアドレスの確認",
+      "checking": "メールアドレスを確認中…",
+      "successTitle": "メールアドレスを確認しました",
+      "success": "メールアドレスが確認されました。このページを閉じて SaveTabs に戻れます。",
+      "expiredTitle": "リンクの有効期限切れ",
+      "expired": "この確認リンクは無効か、有効期限が切れています。サインインして、新しいメールをリクエストしてください。",
+      "errorTitle": "確認に失敗しました",
+      "error": "メールアドレスを確認できませんでした。後でもう一度お試しください。",
+      "back": "SaveTabs に戻る"
+    },
+    "account": {
+      "title": "アカウント",
+      "description": "アカウント、パスワード、リカバリーキーを管理します。",
+      "emailLabel": "メールアドレス",
+      "verified": "確認済み",
+      "unverified": "メールアドレスはまだ確認されていません。",
+      "resend": "確認メールを再送",
+      "resending": "送信中…",
+      "resendSuccess": "確認メールを送信しました。",
+      "resendFailed": "確認メールを送信できませんでした。後でもう一度お試しください。",
+      "changePasswordTitle": "パスワードを変更",
+      "changePasswordDescription": "現在のパスワードを入力し、新しいパスワードを選択します。すべてはブラウザ内で暗号化されます。",
+      "currentPasswordLabel": "現在のパスワード",
+      "newPasswordLabel": "新しいパスワード",
+      "confirmPasswordLabel": "新しいパスワードの確認",
+      "passwordHint": "12 文字以上で入力してください。",
+      "passwordTooShort": "12 文字以上のパスワードを使用してください。",
+      "passwordMismatch": "パスワードが一致しません。",
+      "passwordRequired": "パスワードを入力してください。",
+      "changePasswordSubmit": "パスワードを変更",
+      "changePasswordSubmitting": "パスワードを変更中…",
+      "passwordChanged": "パスワードを変更しました。",
+      "passwordChangeFailed": "パスワードを変更できませんでした。現在のパスワードを確認して、もう一度お試しください。",
+      "noVault": "このアカウントにはまだ同期キーがリンクされていません。",
+      "recoveryKeyTitle": "リカバリーキー",
+      "recoveryKeyDescription": "このアカウントのリカバリーキーを表示するには、パスワードを再入力してください。",
+      "passwordLabel": "パスワード",
+      "viewKeySubmit": "リカバリーキーを表示",
+      "viewKeySubmitting": "確認中…",
+      "viewKeyLabel": "あなたのリカバリーキー",
+      "viewKeyFailed": "リカバリーキーを表示できませんでした。パスワードを確認して、もう一度お試しください。",
+      "hideKey": "隠す",
+      "logout": "サインアウト",
+      "deleteTitle": "アカウントを削除",
+      "deleteDescription": "アカウントを削除すると、メールアドレスとサインイン情報が削除されます。クラウドデータも削除しない限り、暗号化されたセッションは同期サーバーに残ります。",
+      "deletePasswordLabel": "パスワード",
+      "deleteCloudLabel": "このアカウントと同期したクラウドデータも削除する",
+      "deleteCloudHint": "このアカウントの同期キーに保存されているすべての暗号化セッションが削除されます。この操作は元に戻せません。",
+      "deleteSubmit": "アカウントを削除",
+      "deleteConfirmTitle": "アカウントを削除しますか？",
+      "deleteConfirmMessage": "アカウントとサインイン情報は完全に削除されます。この操作は元に戻せません。同期キーはこのデバイスで引き続き機能します。",
+      "deleteCloudConfirmMessage": "アカウント、サインイン情報、およびその同期キーのクラウドデータが完全に削除されます。この操作は元に戻せません。",
+      "deleteConfirm": "アカウントを削除",
+      "deleteDeleting": "アカウントを削除中…",
+      "deleteFailed": "アカウントを削除できませんでした。パスワードを確認して、もう一度お試しください。",
+      "loadFailed": "アカウントを読み込めませんでした。",
+      "home": "ホーム",
+      "sessionsLink": "保存済みセッション",
+      "unlockTitle": "パスワードでロックを解除",
+      "unlockDescription": "このデバイスではアカウントにサインインしていますが、同期キーがロックされています。パスワードを入力して保存済みセッションを開いてください。",
+      "unlockAccount": "{email} としてサインイン中",
+      "unlockSubmit": "ロックを解除",
+      "unlockSubmitting": "ロックを解除中…",
+      "unlockError": "セッションのロックを解除できませんでした。パスワードを確認して、もう一度お試しください。"
+    },
+    "landing": {
+      "title": "保存したタブを開く",
+      "description": "同期キーを入力して、保存済みセッションを表示します。すべてはブラウザ内で復号されます。",
+      "keyLabel": "同期キー",
+      "keyPlaceholder": "ST-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-X",
+      "continue": "続行",
+      "invalidKey": "その同期キーは無効です。確認して、もう一度お試しください。",
+      "loseKeyWarning": "同期キーはセッションを復号する唯一の方法です。紛失すると、保存済みデータを復元できません。",
+      "rememberLabel": "このデバイスに記憶する",
+      "rememberWarning": "信頼できるデバイスでのみ使用してください。キーは消去するまでこのブラウザに残ります。",
+      "privacyLink": "プライバシーポリシー",
+      "header": {
+        "account": "アカウント"
+      },
+      "hero": {
+        "title": "すべてのタブを保存。あとで取り戻せます。",
+        "description": "SaveTabs はブラウザのウィンドウ全体を 1 つのセッションとして保存し、タブを閉じて、必要になったときに再び開きます。ブラウザ内で動作し、セッションはデバイスに保存されます。",
+        "chrome": "Chrome に追加",
+        "firefox": "Firefox",
+        "comingSoon": "近日公開",
+        "noAccount": "アカウントは不要です。ローカルでの利用はサインアップなしで可能です。",
+        "mockup": {
+          "save": "12 個のタブを保存",
+          "sessions": "最近のセッション",
+          "sessionOne": "デザインの参考資料",
+          "sessionTwo": "読みたいものリスト",
+          "restore": "復元",
+          "sync": "同期オン"
+        }
+      },
+      "howItWorks": {
+        "title": "使い方",
+        "steps": {
+          "save": {
+            "title": "ウィンドウを保存",
+            "body": "拡張機能を開き、現在のウィンドウのすべてのタブを 1 つのセッションとして保存します。"
+          },
+          "close": {
+            "title": "タブが閉じる",
+            "body": "SaveTabs は保存したタブを閉じるので、ブラウザをすっきり保てます。"
+          },
+          "restore": {
+            "title": "あとで復元",
+            "body": "セッションを開くと、保存したすべてのタブが新しいウィンドウで再び開きます。"
+          }
+        }
+      },
+      "privacy": {
+        "title": "プライバシー",
+        "items": {
+          "e2ee": {
+            "title": "エンドツーエンド暗号化",
+            "body": "セッションはアップロード前にブラウザ内で暗号化されます。サーバーは読めない暗号文を保存します。"
+          },
+          "keyOnly": {
+            "title": "あなたのキー、あなたのデータ",
+            "body": "同期は同期キーで動作します。アカウントは不要で、キーがブラウザから出ることはありません。"
+          },
+          "localFirst": {
+            "title": "ローカル優先",
+            "body": "同期をしない場合、すべてのセッションはブラウザの拡張機能ストレージに残ります。"
+          },
+          "privateWindows": {
+            "title": "プライベートウィンドウはローカルに保存",
+            "body": "プライベートウィンドウやシークレットウィンドウから保存したセッションはアップロードされません。"
+          }
+        },
+        "link": "プライバシーポリシーを読む"
+      },
+      "features": {
+        "title": "機能",
+        "items": {
+          "search": {
+            "title": "セッションを検索",
+            "body": "名前や含まれるタブから保存済みセッションを検索します。"
+          },
+          "rename": {
+            "title": "セッションの名前を変更",
+            "body": "セッションにわかりやすい名前を付けて、後で見つけやすくします。"
+          },
+          "exportImport": {
+            "title": "エクスポートとインポート",
+            "body": "JSON ファイルでセッションをブラウザ間で移行します。"
+          },
+          "autoDiscard": {
+            "title": "自動破棄",
+            "body": "選択したタイムアウト後にアイドル状態のタブを破棄します。ピン留めしたタブと音声を再生中のタブは開いたままにします。"
+          },
+          "sync": {
+            "title": "複数デバイス間の同期",
+            "body": "同期キーで暗号化されたセッションをデバイス間で同期します。"
+          },
+          "privateWindows": {
+            "title": "プライベートウィンドウ",
+            "body": "プライベートウィンドウのセッションはデバイスに残り、アップロードされません。"
+          }
+        }
+      },
+      "account": {
+        "title": "すべてのデバイスでセッションを保つ",
+        "description": "アカウントがあれば、新しいデバイスでメールアドレスとパスワードだけでセッションのロックを解除できます。同期キーがすべてを暗号化し、サーバーがキーを目にすることはありません。",
+        "create": "アカウントを作成",
+        "signIn": "サインイン",
+        "useKey": "または同期キーを使用"
+      },
+      "install": {
+        "title": "インストールとトラブルシューティング",
+        "items": {
+          "install": {
+            "title": "インストール",
+            "body": "Chrome Web Store のページを開き、「Chrome に追加」を選択して、SaveTabs をツールバーにピン留めします。Firefox 版はまだ公開されていません。"
+          },
+          "uninstall": {
+            "title": "アンインストール",
+            "body": "ブラウザの拡張機能ページから SaveTabs を削除します。保存済みセッションは、拡張機能のデータを消去するまでブラウザのストレージに残ります。"
+          },
+          "troubleshooting": {
+            "title": "トラブルシューティング",
+            "body": "保存や復元に失敗する場合は、SaveTabs が有効になっていることを確認し、ページを再読み込みしてください。その後、1 つのウィンドウでもう一度お試しください。"
+          }
+        }
+      },
+      "footer": {
+        "privacy": "プライバシー",
+        "store": "Chrome Web Store"
+      }
+    },
+    "privacy": {
+      "back": "Back to SaveTabs",
+      "title": "Privacy policy",
+      "intro": "SaveTabs keeps your saved tab sessions on your device. If you turn on end-to-end encrypted sync, an encrypted copy is stored on the sync server. This page lists exactly what that copy contains and what never leaves your browser.",
+      "sections": {
+        "data": {
+          "title": "What the sync server stores",
+          "lead": "The sync server stores the following data for your key:",
+          "authId": "A public account id derived from your sync key. It appears in API URLs and cannot be turned back into the key.",
+          "authKeyHash": "A SHA-256 hash of the bearer credential derived from your sync key. The hash verifies requests and cannot be reversed into the credential.",
+          "blobs": "Encrypted session blobs: AES-GCM 256 ciphertext encoded as base64url, with a session id, update timestamp and byte size.",
+          "tombstones": "Deletion tombstones: a deleted session id and its deletion time. Tombstones sync deletions to your other devices and are pruned during later deletions once they are 30 days old.",
+          "timestamps": "Timestamps for when a sync key was first seen and last uploaded.",
+          "footer": "URLs, page titles, favicons and all other session data travel only inside the encrypted blobs. The server cannot read them, and we never receive your sync key. The server also keeps short-lived abuse-prevention rate-limit records keyed by client IP address and authId, plus daily aggregate request and key-registration counters; none of these contain URLs or page titles."
+        },
+        "e2ee": {
+          "title": "End-to-end encryption",
+          "body": "Encryption and decryption happen in your browser with the Web Crypto API. Session blobs use AES-GCM 256, and the encryption key is derived from your sync key with HKDF-SHA256. The key stays in your browser; the web app keeps it in this tab's session storage, or in local storage when you choose Remember on this device. Only ciphertext is uploaded. Without your key, the server and anyone else who obtains a blob cannot read it."
+        },
+        "incognito": {
+          "title": "Private and incognito sessions",
+          "body": "Sessions saved from private or incognito windows are marked local-only by the extension. They are never uploaded to the sync server and never appear in the web app."
+        },
+        "keyLoss": {
+          "title": "If you lose your sync key",
+          "body": "There is no account, email address or password to reset. The sync key is the only credential that can decrypt synced sessions. If you lose it, the encrypted data on the server cannot be recovered. Keep a safe copy; you can reveal and copy the key in the extension under Settings → Sync."
+        },
+        "delete": {
+          "title": "Deleting your data",
+          "body": "Local sessions stay in your browser until you delete them in the extension; clearing the extension's data or uninstalling it also removes them. To delete all cloud data for a sync key, open the extension, go to Settings → Sync and choose Delete cloud data. This removes the encrypted sessions, deletion tombstones and the key record for that sync key, and turns sync off so local sessions are not uploaded again. Rotating the sync key also deletes the data stored under the old key; if that deletion fails, import the old key and use Delete cloud data."
+        },
+        "analytics": {
+          "title": "No analytics or third parties",
+          "body": "The web app and extension contain no analytics, tracking pixels, advertising or third-party scripts. The web app loads only its own code and styles and uses no external fonts."
+        },
+        "contact": {
+          "title": "Contact",
+          "body": "Questions about this policy can be sent to support@azcom.dev."
+        }
+      }
+    },
+    "sessions": {
+      "title": "保存済みセッション",
+      "searchLabel": "セッションを検索",
+      "searchPlaceholder": "セッションを検索…",
+      "noResults": "検索に一致するセッションはありません。",
+      "empty": "セッションはまだありません。SaveTabs 拡張機能でタブを保存してから、このページをもう一度開いてください。",
+      "unknownKeyTitle": "このキーの同期データはありません",
+      "unknownKey": "この同期キーには同期済みセッションがありません。正しく入力したか確認するか、別のキーに変更してください。",
+      "restore": "復元",
+      "restoreHint": "復元すると、各タブが新しいブラウザタブで開きます。ブラウザから求められた場合はポップアップを許可してください。",
+      "restoreSuccess": "{count} 個のタブを開きました。",
+      "popupBlocked": "ブラウザが {count} 個のタブをブロックしました。このサイトのポップアップを許可するか、タブを個別に開いてください。",
+      "copy": "コピー",
+      "copySuccess": "{count} 個のタブをクリップボードにコピーしました。",
+      "copyFailed": "タブをコピーできませんでした。",
+      "export": "JSON をエクスポート",
+      "exportSuccess": "{filename} をエクスポートしました。",
+      "exportFailed": "セッションをエクスポートできませんでした: {message}",
+      "delete": "削除",
+      "deleteTitle": "このセッションを削除しますか？",
+      "deleteMessage": "このセッションは完全に削除されます。この操作は元に戻せません。",
+      "deleteConfirm": "セッションを削除",
+      "deleteSuccess": "セッションを削除しました。",
+      "deleteFailed": "セッションを削除できませんでした: {message}",
+      "authError": "同期キーが拒否されました。続行するにはキーを再入力してください。",
+      "changeKey": "キーを変更",
+      "forgetKey": "キーを忘れる",
+      "forgetKeyTitle": "同期キーを忘れますか？",
+      "forgetKeyMessage": "キーがこのブラウザから削除されます。同期済みデータはサーバーに残り、後でキーを入力して再度開くことができます。",
+      "forgetKeyConfirm": "キーを忘れる",
+      "home": "ホーム",
+      "privacy": "プライバシー",
+      "decryptError": "一部のセッションを復号できなかったため、スキップしました（{count}）。",
+      "loadFailed": "保存済みセッションを読み込めませんでした。",
+      "noTabs": "このセッションにはタブがありません。"
+    },
+    "language": {
+      "toggle": "言語を切り替え"
+    },
+    "theme": {
+      "toggle": "テーマを変更",
+      "system": "システム",
+      "light": "ライト",
+      "dark": "ダーク"
+    }
+  }
+}

@@ -375,7 +375,9 @@
           "hi": "Hindi",
           "ar": "Árabe",
           "pt": "Portugués",
-          "ru": "Ruso"
+          "ru": "Ruso",
+          "ja": "Japonés",
+          "fr": "Francés"
         }
       },
       "duplicates": {
