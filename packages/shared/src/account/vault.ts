@@ -6,7 +6,7 @@ import { fromBase64Url, toBase64Url } from "../base64url";
  *
  * The worker stores only the ciphertext. A fresh random 12-byte IV is used for
  * every wrap, and the additional authenticated data binds the vault to one
- * account (`savetabs:vault:v1:<accountId>`), so a server cannot move a wrapped
+ * key (`savetabs:vault:v1:<authId>`), so a server cannot move a wrapped
  * key to another account without failing authentication.
  *
  * WebCrypto only, so this runs in extension pages, the web app and Workers.

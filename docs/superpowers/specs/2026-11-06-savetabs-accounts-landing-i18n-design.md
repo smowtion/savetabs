@@ -71,7 +71,7 @@ derived proof is sent.
 3. Client derives the wrapping key:
    `wrapKey = HKDF-SHA256(masterKey, salt="savetabs-v1", info="vault-wrap")`.
    The vault is `AES-GCM-256(wrapKey, IV)` over the 128-bit sync key, with AAD
-   `savetabs:vault:v1:<accountId>`; stored as `base64url(IV || ciphertext)`.
+   `savetabs:vault:v1:<authId>`; stored as `base64url(IV || ciphertext)`.
 4. The sync key is unchanged: HKDF with salt `savetabs-v1` still derives
    `authId`, `authKey`, `encKey`; session encryption and sync requests are
    untouched.
