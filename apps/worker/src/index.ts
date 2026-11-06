@@ -33,7 +33,7 @@ app.onError((error, c) => {
 
 /**
  * Cron entry point (see `[triggers]` in wrangler.toml). Runs the retention
- * sweep for accounts that never verified their address or linked a vault.
+ * sweep for accounts that never verified their email address.
  */
 async function scheduled(
   controller: ScheduledController,

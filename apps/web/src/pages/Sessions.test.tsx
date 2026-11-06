@@ -9,6 +9,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import App from "../App";
+import { saveAccountToken } from "../lib/account-session";
 import { deriveForWeb, loadKey, saveKeyForSession } from "../lib/key-session";
 import Sessions from "./Sessions";
 
@@ -50,6 +51,7 @@ const WEB_SESSION_KEYS = [
   "web.sessions.forgetKeyConfirm",
   "web.sessions.home",
   "web.sessions.privacy",
+  "web.sessions.account",
   "web.sessions.decryptError",
   "web.sessions.loadFailed",
   "web.sessions.noTabs",
@@ -500,6 +502,19 @@ describe("Sessions page", () => {
 
     expect(await screen.findByTestId("landing-page")).toBeInTheDocument();
     expect(loadKey()).toBeNull();
+  });
+
+  it("links to the account page when signed in", async () => {
+    saveAccountToken("account-token");
+    mockFetch(() => jsonResponse({ blobs: [] }));
+
+    renderSessions();
+
+    expect(await screen.findByText(/No sessions yet/i)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Account" })).toHaveAttribute(
+      "href",
+      "/account",
+    );
   });
 
   it("copies session tabs as plain URLs", async () => {

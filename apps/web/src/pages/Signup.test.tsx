@@ -26,7 +26,11 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
 import { loadAccountToken } from "../lib/account-session";
-import { loadKey, saveKeyForSession } from "../lib/key-session";
+import {
+  isKeyRemembered,
+  loadKey,
+  saveKeyForSession,
+} from "../lib/key-session";
 import Signup from "./Signup";
 
 const { createAccountClientMock } = vi.hoisted(() => ({
@@ -250,6 +254,21 @@ describe("Signup page", () => {
     expect(linkInput.authId).toBe(derived.authId);
     expect(linkInput.authKey).toBe(derived.authKey);
     expect(within(dialog).getByText(VALID_KEY)).toBeInTheDocument();
+  });
+
+  it("keeps a remembered device key remembered after signup", async () => {
+    saveKeyForSession(VALID_KEY, true);
+    const user = userEvent.setup();
+    useClient();
+    renderSignup();
+
+    await fillForm(user);
+    await submit(user);
+    await findRecoveryDialog();
+
+    expect(loadKey()).toBe(VALID_KEY);
+    expect(isKeyRemembered()).toBe(true);
+    expect(localStorage.getItem("savetabs.sync-key")).toBe(VALID_KEY);
   });
 
   it("navigates to the sessions page only after the recovery key is confirmed", async () => {

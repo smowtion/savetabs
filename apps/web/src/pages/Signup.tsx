@@ -40,7 +40,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { RecoveryKeyDialog } from "../components/RecoveryKeyDialog";
 import { useI18n } from "../hooks/useI18n";
 import { createAccountClient, saveAccountToken } from "../lib/account-session";
-import { loadKey, saveKeyForSession } from "../lib/key-session";
+import {
+  isKeyRemembered,
+  loadKey,
+  saveKeyForSession,
+} from "../lib/key-session";
 
 /** Minimum password length required before any derivation starts. */
 const MIN_PASSWORD_LENGTH = 12;
@@ -123,7 +127,9 @@ export default function Signup() {
       }
 
       saveAccountToken(session.token);
-      setRecoveryKey(saveKeyForSession(syncKey, false));
+      // Keep the existing "remember on this device" choice instead of
+      // clearing the persistent copy that was just loaded.
+      setRecoveryKey(saveKeyForSession(syncKey, isKeyRemembered()));
     } catch (cause) {
       setError(
         cause instanceof AccountApiError

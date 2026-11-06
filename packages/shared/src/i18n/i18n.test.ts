@@ -1,10 +1,36 @@
 import { describe, it, expect } from "vitest";
 import { SETTINGS_SCHEMA } from "../settings-schema";
+import ar from "./ar.json";
+import de from "./de.json";
 import en from "./en.json";
+import es from "./es.json";
+import fr from "./fr.json";
+import hi from "./hi.json";
 import { createTranslator, missingKeys, resolveLang } from "./index";
+import ja from "./ja.json";
+import ko from "./ko.json";
 import { LANGS, LOCALES, localeDir } from "./locales";
+import pt from "./pt.json";
+import ru from "./ru.json";
+import vi from "./vi.json";
+import zhCN from "./zh-CN.json";
 
 type JsonObject = { readonly [key: string]: string | JsonObject };
+
+const DICTIONARIES: Readonly<Record<string, JsonObject>> = {
+  en: en as JsonObject,
+  vi: vi as JsonObject,
+  "zh-CN": zhCN as JsonObject,
+  es: es as JsonObject,
+  hi: hi as JsonObject,
+  ar: ar as JsonObject,
+  pt: pt as JsonObject,
+  ru: ru as JsonObject,
+  ja: ja as JsonObject,
+  fr: fr as JsonObject,
+  de: de as JsonObject,
+  ko: ko as JsonObject,
+};
 
 /** Flatten a dictionary into dotted keys, matching the runtime flattening. */
 function flattenKeys(dictionary: JsonObject, prefix = ""): string[] {
@@ -14,7 +40,29 @@ function flattenKeys(dictionary: JsonObject, prefix = ""): string[] {
   });
 }
 
+/** Flatten a dictionary into dotted key/value pairs. */
+function flattenValues(
+  dictionary: JsonObject,
+  prefix = "",
+  out = new Map<string, string>(),
+): Map<string, string> {
+  for (const [key, value] of Object.entries(dictionary)) {
+    const path = prefix === "" ? key : `${prefix}.${key}`;
+    if (typeof value === "string") out.set(path, value);
+    else flattenValues(value, path, out);
+  }
+  return out;
+}
+
+/** Unique `{placeholder}` names in a string, sorted for set comparison. */
+function placeholders(value: string): string[] {
+  return [...value.matchAll(/\{([A-Za-z0-9_]+)\}/g)]
+    .map((match) => match[1]!)
+    .sort();
+}
+
 const ALL_EN_KEYS = flattenKeys(en as JsonObject);
+const EN_VALUES = flattenValues(en as JsonObject);
 
 /** Keys the policy page renders in English for every locale. */
 function requiredKeys(locale: string): string[] {
@@ -60,6 +108,19 @@ describe("i18n", () => {
   it("has every English key in every locale", () => {
     for (const locale of LANGS) {
       expect(missingKeys(locale, requiredKeys(locale)), locale).toEqual([]);
+    }
+  });
+
+  it("keeps the placeholder names identical to English in every locale", () => {
+    for (const locale of LANGS) {
+      const values = flattenValues(DICTIONARIES[locale] as JsonObject);
+      for (const key of requiredKeys(locale)) {
+        const translated = values.get(key);
+        expect(translated, `${locale}:${key}`).toBeTypeOf("string");
+        expect(placeholders(translated as string), `${locale}:${key}`).toEqual(
+          placeholders(EN_VALUES.get(key) as string),
+        );
+      }
     }
   });
 
@@ -122,6 +183,7 @@ describe("i18n", () => {
       "accountTokens",
       "processorResend",
       "recoveryLimit",
+      "unverifiedCleanup",
     ].map((key) => `web.privacy.account.${key}`);
 
     // English is authoritative; Vietnamese keeps a full translation.
@@ -420,6 +482,10 @@ describe("i18n", () => {
       "settings.account.signOutFailed",
       "settings.account.verified",
       "settings.account.unverified",
+      "settings.account.resendVerification",
+      "settings.account.resendingVerification",
+      "settings.account.resendVerificationSuccess",
+      "settings.account.resendVerificationFailed",
       "settings.account.passwordTooShort",
       "settings.account.signInFailed",
       "settings.account.signUpFailed",

@@ -309,6 +309,10 @@
       "signOutFailed": "We could not sign out. Try again.",
       "verified": "Verified",
       "unverified": "Email not verified",
+      "resendVerification": "Resend verification email",
+      "resendingVerification": "Sending…",
+      "resendVerificationSuccess": "Verification email sent.",
+      "resendVerificationFailed": "We could not send the verification email. Try again later.",
       "passwordTooShort": "Use a password with at least 12 characters.",
       "signInFailed": "We could not sign you in. Check your email and password.",
       "signUpFailed": "We could not create your account. Try again.",
@@ -552,6 +556,12 @@
       "submitting": "Signing in…",
       "error": "We could not sign you in. Check your email and password and try again.",
       "recoveryLink": "Forgot your password? Use your recovery key",
+      "resetLink": "Email me a reset link",
+      "resetHint": "For accounts without a linked sync key.",
+      "resetSubmit": "Email reset link",
+      "resetSubmitting": "Sending…",
+      "resetSuccess": "If that address has an account without a linked sync key, a reset link is on its way.",
+      "resetFailed": "We could not send the reset email. Try again.",
       "createAccount": "Create an account",
       "back": "Back to SaveTabs"
     },
@@ -571,6 +581,15 @@
       "passwordMismatch": "The passwords do not match.",
       "error": "We could not reset your password. Check your email and recovery key, then try again.",
       "cancel": "Back to sign in"
+    },
+    "reset": {
+      "description": "Enter your email and choose a new password. Everything is derived in your browser; the server never receives your password.",
+      "error": "We could not reset your password. The link may be invalid or expired.",
+      "invalidTokenTitle": "Reset link unavailable",
+      "invalidToken": "This reset link is invalid or has expired. Request a new link from the sign-in page.",
+      "successTitle": "Password reset",
+      "success": "Your password has been updated. Sign in with your new password.",
+      "login": "Go to sign in"
     },
     "verify": {
       "title": "Email verification",
@@ -812,7 +831,8 @@
         "accountVault": "Your sync key encrypted under a key derived from your password (AES-GCM-256, with the account id bound into the encrypted data). The server stores only the wrapped key and cannot decrypt it.",
         "accountTokens": "Hashed account session tokens valid for 30 days, hashed email-verification and password-reset tokens valid for 24 hours, and a daily email-send counter. Raw tokens exist only in your browser or in the email sent to you.",
         "processorResend": "Resend processes account email on our behalf. It receives your email address and the message content, never your password, sync key or session data.",
-        "recoveryLimit": "Your recovery key is your sync key. If you lose both your password and your recovery key, the encrypted cloud data cannot be recovered; no one at SaveTabs can reset it."
+        "recoveryLimit": "Your recovery key is your sync key. If you lose both your password and your recovery key, the encrypted cloud data cannot be recovered; no one at SaveTabs can reset it.",
+        "unverifiedCleanup": "Accounts that never verify their email address are deleted automatically 30 days after signup, together with their tokens and email counters. The linked sync key and its encrypted data are not deleted."
       },
       "notice": "This policy is published in English. The English version prevails."
     },
@@ -848,6 +868,7 @@
       "forgetKeyConfirm": "Forget key",
       "home": "Home",
       "privacy": "Privacy",
+      "account": "Account",
       "decryptError": "Some sessions could not be decrypted and were skipped ({count}).",
       "loadFailed": "Could not load your saved sessions.",
       "noTabs": "This session has no tabs."

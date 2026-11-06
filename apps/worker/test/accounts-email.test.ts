@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { Env } from "../src/env";
-import { sendEmail, verificationEmail } from "../src/accounts/email";
+import {
+  resetEmail,
+  sendEmail,
+  sendEmailSafely,
+  verificationEmail,
+} from "../src/accounts/email";
 import {
   createToken,
   hashToken,
@@ -119,6 +124,33 @@ describe("sendEmail", () => {
   });
 });
 
+describe("sendEmailSafely", () => {
+  it("logs and resolves when the provider request rejects", async () => {
+    const logged: unknown[][] = [];
+    const originalError = console.error;
+    console.error = (...args: unknown[]) => {
+      logged.push(args);
+    };
+
+    try {
+      await expect(
+        sendEmailSafely(
+          { RESEND_API_KEY: "re_test", RESEND_FROM: "x" } as Env,
+          { to: "a@b.c", subject: "s", html: "h", text: "t" },
+          async () => {
+            throw new Error("network down");
+          },
+        ),
+      ).resolves.toBeUndefined();
+    } finally {
+      console.error = originalError;
+    }
+
+    expect(logged).toHaveLength(1);
+    expect(logged[0]?.[0]).toBe("resend_send_rejected");
+  });
+});
+
 describe("verificationEmail", () => {
   const link = "https://savetabs.azcom.dev/verify?token=abc123";
 
@@ -130,9 +162,59 @@ describe("verificationEmail", () => {
     expect(message.text).toContain(link);
   });
 
-  it("accepts a locale even while the copy is English", () => {
-    expect(verificationEmail("vi", link)).toEqual(
-      verificationEmail("en", link),
-    );
+  it("localizes Vietnamese, Arabic and Japanese copy", () => {
+    const english = verificationEmail("en", link);
+
+    for (const locale of ["vi", "ar", "ja"]) {
+      const message = verificationEmail(locale, link);
+      expect(message.subject, locale).not.toBe(english.subject);
+      expect(message.text, locale).not.toBe(english.text);
+      expect(message.html, locale).toContain(link);
+      expect(message.text, locale).toContain(link);
+      // The 24-hour expiry promise survives localization.
+      expect(message.text, locale).toMatch(/24/);
+    }
+  });
+
+  it("falls back to English for an unknown locale", () => {
+    expect(verificationEmail("xx", link)).toEqual(verificationEmail("en", link));
+  });
+});
+
+describe("resetEmail", () => {
+  const link = "https://savetabs.azcom.dev/reset?token=abc123";
+
+  it("returns a subject, HTML and text containing the link", () => {
+    const message = resetEmail("en", link);
+
+    expect(message.subject.length).toBeGreaterThan(0);
+    expect(message.html).toContain(link);
+    expect(message.text).toContain(link);
+  });
+
+  it("localizes every supported locale and falls back to English", () => {
+    const english = resetEmail("en", link);
+
+    for (const locale of [
+      "vi",
+      "zh-CN",
+      "es",
+      "hi",
+      "ar",
+      "pt",
+      "ru",
+      "ja",
+      "fr",
+      "de",
+      "ko",
+    ]) {
+      const message = resetEmail(locale, link);
+      expect(message.subject, locale).not.toBe(english.subject);
+      expect(message.text, locale).not.toBe(english.text);
+      expect(message.html, locale).toContain(link);
+      expect(message.text, locale).toMatch(/24/);
+    }
+
+    expect(resetEmail("xx", link)).toEqual(english);
   });
 });

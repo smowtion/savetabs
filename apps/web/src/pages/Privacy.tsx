@@ -53,6 +53,7 @@ const ACCOUNT_ITEMS = [
   "accountTokens",
   "processorResend",
   "recoveryLimit",
+  "unverifiedCleanup",
 ] as const;
 
 const BODY_TEXT_CLASS =

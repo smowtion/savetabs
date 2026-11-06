@@ -8,6 +8,7 @@ import Account from "./pages/Account";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Privacy from "./pages/Privacy";
+import Reset from "./pages/Reset";
 import Sessions from "./pages/Sessions";
 import Signup from "./pages/Signup";
 import Verify from "./pages/Verify";
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/account" element={<Account />} />
         <Route path="/verify" element={<Verify />} />
+        <Route path="/reset" element={<Reset />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

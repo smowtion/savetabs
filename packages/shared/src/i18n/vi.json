@@ -309,6 +309,10 @@
       "signOutFailed": "Không thể đăng xuất. Hãy thử lại.",
       "verified": "Đã xác minh",
       "unverified": "Email chưa xác minh",
+      "resendVerification": "Gửi lại email xác minh",
+      "resendingVerification": "Đang gửi…",
+      "resendVerificationSuccess": "Đã gửi email xác minh.",
+      "resendVerificationFailed": "Không thể gửi email xác minh. Hãy thử lại sau.",
       "passwordTooShort": "Mật khẩu phải có ít nhất 12 ký tự.",
       "signInFailed": "Không thể đăng nhập. Hãy kiểm tra email và mật khẩu.",
       "signUpFailed": "Không thể tạo tài khoản. Hãy thử lại.",
@@ -552,6 +556,12 @@
       "submitting": "Đang đăng nhập…",
       "error": "Không thể đăng nhập. Hãy kiểm tra email và mật khẩu rồi thử lại.",
       "recoveryLink": "Quên mật khẩu? Dùng khóa khôi phục",
+      "resetLink": "Gửi liên kết đặt lại qua email",
+      "resetHint": "Dành cho tài khoản chưa liên kết khóa đồng bộ.",
+      "resetSubmit": "Gửi liên kết đặt lại",
+      "resetSubmitting": "Đang gửi…",
+      "resetSuccess": "Nếu địa chỉ đó có tài khoản chưa liên kết khóa đồng bộ, liên kết đặt lại sẽ được gửi tới.",
+      "resetFailed": "Không thể gửi email đặt lại. Hãy thử lại.",
       "createAccount": "Tạo tài khoản",
       "back": "Quay lại SaveTabs"
     },
@@ -571,6 +581,15 @@
       "passwordMismatch": "Mật khẩu xác nhận không khớp.",
       "error": "Không thể đặt lại mật khẩu. Hãy kiểm tra email và khóa khôi phục rồi thử lại.",
       "cancel": "Quay lại đăng nhập"
+    },
+    "reset": {
+      "description": "Nhập email và chọn mật khẩu mới. Mọi bước dẫn xuất diễn ra trong trình duyệt của bạn; máy chủ không bao giờ nhận mật khẩu.",
+      "error": "Không thể đặt lại mật khẩu. Liên kết có thể không hợp lệ hoặc đã hết hạn.",
+      "invalidTokenTitle": "Không thể dùng liên kết đặt lại",
+      "invalidToken": "Liên kết đặt lại không hợp lệ hoặc đã hết hạn. Hãy yêu cầu liên kết mới từ trang đăng nhập.",
+      "successTitle": "Đã đặt lại mật khẩu",
+      "success": "Mật khẩu đã được cập nhật. Hãy đăng nhập bằng mật khẩu mới.",
+      "login": "Đi tới đăng nhập"
     },
     "verify": {
       "title": "Xác minh email",
@@ -812,7 +831,8 @@
         "accountVault": "Khóa đồng bộ của bạn được mã hóa bằng một khóa dẫn xuất từ mật khẩu (AES-GCM-256, ràng buộc với mã tài khoản trong dữ liệu mã hóa). Máy chủ chỉ lưu khóa đã được bọc và không thể giải mã.",
         "accountTokens": "Mã băm của token phiên đăng nhập có hiệu lực 30 ngày, token xác minh email và đặt lại mật khẩu có hiệu lực 24 giờ, cùng bộ đếm số email gửi mỗi ngày. Token gốc chỉ tồn tại trong trình duyệt của bạn hoặc trong email được gửi tới bạn.",
         "processorResend": "Resend xử lý email tài khoản thay cho chúng tôi. Dịch vụ này nhận địa chỉ email và nội dung thư, không bao giờ nhận mật khẩu, khóa đồng bộ hay dữ liệu phiên của bạn.",
-        "recoveryLimit": "Khóa khôi phục của bạn chính là khóa đồng bộ. Nếu bạn mất cả mật khẩu lẫn khóa khôi phục, dữ liệu đám mây đã mã hóa không thể khôi phục; không ai tại SaveTabs có thể đặt lại."
+        "recoveryLimit": "Khóa khôi phục của bạn chính là khóa đồng bộ. Nếu bạn mất cả mật khẩu lẫn khóa khôi phục, dữ liệu đám mây đã mã hóa không thể khôi phục; không ai tại SaveTabs có thể đặt lại.",
+        "unverifiedCleanup": "Tài khoản không xác minh địa chỉ email sẽ tự động bị xóa sau 30 ngày kể từ khi đăng ký, cùng với token và bộ đếm email. Khóa đồng bộ đã liên kết và dữ liệu đã mã hóa của khóa đó không bị xóa."
       },
       "notice": "Chính sách này được công bố bằng tiếng Anh. Phiên bản tiếng Anh là bản có hiệu lực."
     },
@@ -848,6 +868,7 @@
       "forgetKeyConfirm": "Quên khóa",
       "home": "Trang chủ",
       "privacy": "Quyền riêng tư",
+      "account": "Tài khoản",
       "decryptError": "Một số phiên không thể giải mã và đã bị bỏ qua ({count}).",
       "loadFailed": "Không thể tải các phiên đã lưu.",
       "noTabs": "Phiên này không có tab nào."

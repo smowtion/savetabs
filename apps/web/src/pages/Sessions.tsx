@@ -292,6 +292,14 @@ export default function Sessions() {
               >
                 {t("web.sessions.privacy")}
               </Link>
+              {loadAccountToken() !== null ? (
+                <Link
+                  to="/account"
+                  className="text-indigo-700 underline-offset-4 hover:underline dark:text-indigo-400"
+                >
+                  {t("web.sessions.account")}
+                </Link>
+              ) : null}
               <button
                 type="button"
                 onClick={() => setForgetConfirmOpen(true)}

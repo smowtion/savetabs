@@ -378,6 +378,16 @@ export async function signOut(): Promise<void> {
 }
 
 /**
+ * Ask the server for a fresh verification email for the signed-in account.
+ *
+ * The caller passes the stored account token; the server rate-limits the send
+ * and still answers generically when the address is already verified.
+ */
+export async function resendVerification(token: string): Promise<void> {
+  await createAccountClient().resendVerification(token);
+}
+
+/**
  * Load the signed-in profile from the stored token. An expired or revoked
  * token (HTTP 401) is cleared and reported as signed out; other failures are
  * surfaced to the caller.

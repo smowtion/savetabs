@@ -39,8 +39,8 @@ name = "RATE_LIMITER_EMAIL"
 namespace_id = "1003"
 simple = { limit = 5, period = 60 }
 
-# Daily retention sweep for accounts that never verified their address and
-# never linked a vault (30-day TTL). Runs at 03:17 UTC.
+# Daily retention sweep for accounts that never verified their address
+# (30-day TTL, linked or not). Runs at 03:17 UTC.
 [triggers]
 crons = ["17 3 * * *"]
 

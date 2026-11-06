@@ -309,6 +309,10 @@
       "signOutFailed": "Abmelden war nicht möglich. Erneut versuchen.",
       "verified": "Bestätigt",
       "unverified": "E-Mail nicht bestätigt",
+      "resendVerification": "Bestätigungs-E-Mail erneut senden",
+      "resendingVerification": "Wird gesendet…",
+      "resendVerificationSuccess": "Bestätigungs-E-Mail gesendet.",
+      "resendVerificationFailed": "Die Bestätigungs-E-Mail konnte nicht gesendet werden. Versuche es später erneut.",
       "passwordTooShort": "Ein Passwort mit mindestens 12 Zeichen verwenden.",
       "signInFailed": "Anmeldung war nicht möglich. E-Mail und Passwort prüfen.",
       "signUpFailed": "Konto konnte nicht erstellt werden. Erneut versuchen.",
@@ -552,6 +556,12 @@
       "submitting": "Anmeldung…",
       "error": "Anmeldung war nicht möglich. E-Mail und Passwort prüfen und erneut versuchen.",
       "recoveryLink": "Passwort vergessen? Wiederherstellungsschlüssel verwenden",
+      "resetLink": "Mir einen Zurücksetzungslink senden",
+      "resetHint": "Für Konten ohne verknüpften Synchronisierungsschlüssel.",
+      "resetSubmit": "Link senden",
+      "resetSubmitting": "Wird gesendet…",
+      "resetSuccess": "Wenn zu dieser Adresse ein Konto ohne verknüpften Synchronisierungsschlüssel gehört, ist ein Zurücksetzungslink unterwegs.",
+      "resetFailed": "Die Zurücksetzungs-E-Mail konnte nicht gesendet werden. Versuche es erneut.",
       "createAccount": "Konto erstellen",
       "back": "Zurück zu SaveTabs"
     },
@@ -571,6 +581,15 @@
       "passwordMismatch": "Die Passwörter stimmen nicht überein.",
       "error": "Passwort konnte nicht zurückgesetzt werden. E-Mail und Wiederherstellungsschlüssel prüfen und erneut versuchen.",
       "cancel": "Zurück zur Anmeldung"
+    },
+    "reset": {
+      "description": "Gib deine E-Mail ein und wähle ein neues Passwort. Die Ableitung erfolgt in deinem Browser; der Server erhält dein Passwort nie.",
+      "error": "Das Passwort konnte nicht zurückgesetzt werden. Der Link ist möglicherweise ungültig oder abgelaufen.",
+      "invalidTokenTitle": "Zurücksetzungslink nicht verfügbar",
+      "invalidToken": "Dieser Zurücksetzungslink ist ungültig oder abgelaufen. Fordere auf der Anmeldeseite einen neuen Link an.",
+      "successTitle": "Passwort zurückgesetzt",
+      "success": "Dein Passwort wurde aktualisiert. Melde dich mit dem neuen Passwort an.",
+      "login": "Zur Anmeldung"
     },
     "verify": {
       "title": "E-Mail-Bestätigung",
@@ -797,6 +816,7 @@
       "forgetKeyConfirm": "Schlüssel vergessen",
       "home": "Startseite",
       "privacy": "Datenschutz",
+      "account": "Konto",
       "decryptError": "Einige Sitzungen konnten nicht entschlüsselt werden und wurden übersprungen ({count}).",
       "loadFailed": "Die gespeicherten Sitzungen konnten nicht geladen werden.",
       "noTabs": "Diese Sitzung enthält keine Tabs."

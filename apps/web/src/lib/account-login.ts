@@ -32,7 +32,11 @@ import {
 } from "@savetabs/shared";
 
 import { createAccountClient, saveAccountToken } from "./account-session";
-import { loadKey, saveKeyForSession } from "./key-session";
+import {
+  isKeyRemembered,
+  loadKey,
+  saveKeyForSession,
+} from "./key-session";
 
 export type SignInOutcome =
   | { kind: "signed-in" }
@@ -136,8 +140,9 @@ export async function recoverAccount(
       session.vault.wrappedKey,
       session.vault.authId,
     );
-    saveKeyForSession(formatKey(sessionRawKey));
+    // Recovery must not silently clear a "remember on this device" choice.
+    saveKeyForSession(formatKey(sessionRawKey), isKeyRemembered());
   } else {
-    saveKeyForSession(formatKey(rawKey));
+    saveKeyForSession(formatKey(rawKey), isKeyRemembered());
   }
 }

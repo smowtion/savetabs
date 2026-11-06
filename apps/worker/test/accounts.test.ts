@@ -659,7 +659,8 @@ describe("POST /v1/accounts/signup", () => {
 
     expect(sent).toHaveLength(1);
     expect(sent[0]?.to).toBe("mail@example.com");
-    expect(sent[0]?.subject.length).toBeGreaterThan(0);
+    // The request locale selects the signup verification copy.
+    expect(sent[0]?.subject).toBe("Xác minh email SaveTabs của bạn");
     expect(sent[0]?.html).toContain(`${env.WEB_ORIGIN}/verify?token=`);
     expect(sent[0]?.text).toContain(`${env.WEB_ORIGIN}/verify?token=`);
 
@@ -757,15 +758,20 @@ describe("account email rate limit", () => {
     path: string,
     body: unknown,
     limiter: NonNullable<Env["RATE_LIMITER_EMAIL"]>,
+    options: { token?: string; method?: string } = {},
   ): Promise<Response> {
+    const headers: Record<string, string> = {
+      "content-type": "application/json",
+      "cf-connecting-ip": requestIp(),
+    };
+    if (options.token !== undefined) {
+      headers.Authorization = `Bearer ${options.token}`;
+    }
     return await app.request(
       `${BASE_URL}${path}`,
       {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "cf-connecting-ip": requestIp(),
-        },
+        method: options.method ?? "POST",
+        headers,
         body: JSON.stringify(body),
       },
       resendEnv({ RATE_LIMITER_EMAIL: limiter }),
@@ -851,6 +857,98 @@ describe("account email rate limit", () => {
       "rate_limited",
     );
   });
+
+  it("charges login with the normalized email even when it is unknown", async () => {
+    const { seen, limiter } = fakeEmailLimiter(true);
+
+    const response = await requestWithLimiter(
+      "/v1/accounts/login",
+      { email: " Nobody@Example.com ", authHash: CLIENT_AUTH_HASH },
+      limiter,
+    );
+
+    expect(response.status).toBe(401);
+    expect(seen).toEqual(["email:nobody@example.com"]);
+  });
+
+  it("rate limits the sixth login within the window", async () => {
+    const email = `login-limit-${crypto.randomUUID()}@example.com`;
+    await seedAccount({ email });
+
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      const response = await post("/v1/accounts/login", {
+        email,
+        authHash: CLIENT_AUTH_HASH,
+      });
+      expect(response.status).toBe(200);
+    }
+
+    const blocked = await post("/v1/accounts/login", {
+      email,
+      authHash: CLIENT_AUTH_HASH,
+    });
+    expect(blocked.status).toBe(429);
+    expect(((await blocked.json()) as ErrorBody).error.code).toBe(
+      "rate_limited",
+    );
+  });
+
+  it("charges password changes with the authenticated account email", async () => {
+    const email = `limit-password-${crypto.randomUUID()}@example.com`;
+    await seedAccount({ email });
+    const session = await loginToken(email);
+    const { seen, limiter } = fakeEmailLimiter(true);
+
+    const response = await requestWithLimiter(
+      "/v1/accounts/password",
+      {
+        oldAuthHash: CLIENT_AUTH_HASH,
+        newAuthHash: OTHER_AUTH_HASH,
+        kdfSalt: OTHER_KDF_SALT,
+        kdfIterations: OTHER_KDF_ITERATIONS,
+        wrappedKey: "wrapped-new",
+      },
+      limiter,
+      { token: session },
+    );
+
+    expect(response.status).toBe(200);
+    expect(seen).toEqual([`email:${email}`]);
+  });
+
+  it("charges recovery with the email from the body", async () => {
+    const email = `limit-recover-${crypto.randomUUID()}@example.com`;
+    const authId = uniqueAuthId();
+    await seedAccount({ email, authId, wrappedKey: "wrapped-old" });
+    await seedKey(authId, KEY_A);
+    const { seen, limiter } = fakeEmailLimiter(true);
+
+    const response = await requestWithLimiter(
+      "/v1/accounts/recover",
+      recoveryBody(authId, KEY_A, { email }),
+      limiter,
+    );
+
+    expect(response.status).toBe(200);
+    expect(seen).toEqual([`email:${email}`]);
+  });
+
+  it("charges account deletion with the authenticated account email", async () => {
+    const email = `limit-delete-${crypto.randomUUID()}@example.com`;
+    await seedAccount({ email });
+    const session = await loginToken(email);
+    const { seen, limiter } = fakeEmailLimiter(true);
+
+    const response = await requestWithLimiter(
+      "/v1/accounts",
+      { authHash: CLIENT_AUTH_HASH },
+      limiter,
+      { token: session, method: "DELETE" },
+    );
+
+    expect(response.status).toBe(204);
+    expect(seen).toEqual([`email:${email}`]);
+  });
 });
 
 describe("daily email cap", () => {
@@ -921,6 +1019,66 @@ describe("daily email cap", () => {
     expect(response!.status).toBe(202);
     expect(await response!.json()).toEqual({ ok: true });
     expect(sent).toHaveLength(0);
+  });
+});
+
+describe("email provider failures", () => {
+  it("keeps the generic signup response when the provider rejects", async () => {
+    const originalFetch = globalThis.fetch;
+    const originalError = console.error;
+    const logged: unknown[][] = [];
+    console.error = (...args: unknown[]) => {
+      logged.push(args);
+    };
+    globalThis.fetch = (async () => {
+      throw new Error("network down");
+    }) as typeof fetch;
+
+    try {
+      const response = await app.request(
+        `${BASE_URL}/v1/accounts/signup`,
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "cf-connecting-ip": requestIp(),
+          },
+          body: JSON.stringify(
+            signupBody({ email: `offline-${crypto.randomUUID()}@example.com` }),
+          ),
+        },
+        resendEnv(),
+      );
+
+      expect(response.status).toBe(202);
+      expect(await response.json()).toEqual({ ok: true });
+    } finally {
+      globalThis.fetch = originalFetch;
+      console.error = originalError;
+    }
+
+    expect(
+      logged.some((args) => args[0] === "resend_send_rejected"),
+    ).toBe(true);
+  });
+
+  it("keeps the resend response when the provider rejects", async () => {
+    await seedAccount({ email: "offline-resend@example.com" });
+    const session = await loginToken("offline-resend@example.com");
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = (async () => {
+      throw new Error("network down");
+    }) as typeof fetch;
+
+    let response: Response | undefined;
+    try {
+      response = await appPost("/v1/accounts/resend-verification", {}, session);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+
+    expect(response!.status).toBe(202);
+    expect(await response!.json()).toEqual({ ok: true });
   });
 });
 
@@ -1234,6 +1392,8 @@ describe("POST /v1/accounts/resend-verification", () => {
     expect(await response!.json()).toEqual({ ok: true });
     expect(sent).toHaveLength(1);
     expect(sent[0]?.to).toBe("resend@example.com");
+    // Resends use the locale stored on the account, not the request.
+    expect(sent[0]?.subject).toBe("Xác minh email SaveTabs của bạn");
     expect(sent[0]?.text).toContain(`${env.WEB_ORIGIN}/verify?token=`);
 
     const emailedToken = verificationTokenFrom(sent[0]!);
@@ -1746,14 +1906,16 @@ describe("POST /v1/accounts/recover", () => {
 
 describe("POST /v1/accounts/reset-unlinked", () => {
   it("emails a 24-hour reset link to an account with no vault", async () => {
-    await seedAccount({ email: "Reset@Example.com " });
+    await seedAccount({ email: "Reset@Example.com ", locale: "vi" });
 
     const sent: SentEmail[] = [];
     let response: Response | undefined;
     await captureEmails(sent, async () => {
+      // The request locale is deliberately different: the stored account
+      // locale is what selects the reset copy.
       response = await appPost("/v1/accounts/reset-unlinked", {
         email: " Reset@Example.com",
-        locale: "vi",
+        locale: "en",
       });
     });
 
@@ -1761,7 +1923,7 @@ describe("POST /v1/accounts/reset-unlinked", () => {
     expect(await response!.json()).toEqual({ ok: true });
     expect(sent).toHaveLength(1);
     expect(sent[0]?.to).toBe("reset@example.com");
-    expect(sent[0]?.subject).toMatch(/reset/i);
+    expect(sent[0]?.subject).toBe("Đặt lại mật khẩu SaveTabs của bạn");
     expect(sent[0]?.html).toContain(`${env.WEB_ORIGIN}/reset?token=`);
     expect(sent[0]?.text).toContain(`${env.WEB_ORIGIN}/reset?token=`);
 

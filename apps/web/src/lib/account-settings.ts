@@ -19,6 +19,7 @@
 import {
   KDF_ITERATIONS,
   SyncClient,
+  SyncHttpError,
   deriveAuthHash,
   deriveKeys,
   deriveKdfSalt,
@@ -173,7 +174,16 @@ export async function deleteAccountWithPassword({
         session.vault.authId,
       );
       const { authId, authKey } = await deriveKeys(rawKey);
-      await new SyncClient(API_BASE, authId, authKey).deleteAll();
+      try {
+        await new SyncClient(API_BASE, authId, authKey).deleteAll();
+      } catch (error) {
+        // A retry after a partial delete finds no key row. The data is
+        // already gone, which is the desired state, so finish the account
+        // deletion instead of trapping the user in a failing retry loop.
+        if (!(error instanceof SyncHttpError && error.status === 404)) {
+          throw error;
+        }
+      }
     }
   }
 

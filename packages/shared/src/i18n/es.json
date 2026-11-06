@@ -309,6 +309,10 @@
       "signOutFailed": "No pudimos cerrar la sesión. Inténtalo de nuevo.",
       "verified": "Verificado",
       "unverified": "Correo sin verificar",
+      "resendVerification": "Reenviar correo de verificación",
+      "resendingVerification": "Enviando…",
+      "resendVerificationSuccess": "Correo de verificación enviado.",
+      "resendVerificationFailed": "No pudimos enviar el correo de verificación. Inténtalo más tarde.",
       "passwordTooShort": "Usa una contraseña de al menos 12 caracteres.",
       "signInFailed": "No pudimos iniciar tu sesión. Comprueba tu correo y contraseña.",
       "signUpFailed": "No pudimos crear tu cuenta. Inténtalo de nuevo.",
@@ -552,6 +556,12 @@
       "submitting": "Iniciando sesión…",
       "error": "No pudimos iniciar tu sesión. Comprueba tu correo y contraseña e inténtalo de nuevo.",
       "recoveryLink": "¿Olvidaste tu contraseña? Usa tu clave de recuperación",
+      "resetLink": "Enviarme un enlace de restablecimiento",
+      "resetHint": "Para cuentas sin una clave de sincronización vinculada.",
+      "resetSubmit": "Enviar enlace de restablecimiento",
+      "resetSubmitting": "Enviando…",
+      "resetSuccess": "Si esa dirección tiene una cuenta sin clave de sincronización vinculada, el enlace de restablecimiento está en camino.",
+      "resetFailed": "No pudimos enviar el correo de restablecimiento. Inténtalo de nuevo.",
       "createAccount": "Crear una cuenta",
       "back": "Volver a SaveTabs"
     },
@@ -571,6 +581,15 @@
       "passwordMismatch": "Las contraseñas no coinciden.",
       "error": "No pudimos restablecer tu contraseña. Comprueba tu correo y tu clave de recuperación e inténtalo de nuevo.",
       "cancel": "Volver a iniciar sesión"
+    },
+    "reset": {
+      "description": "Introduce tu correo y elige una nueva contraseña. Todo se deriva en tu navegador; el servidor nunca recibe tu contraseña.",
+      "error": "No pudimos restablecer tu contraseña. El enlace puede no ser válido o haber caducado.",
+      "invalidTokenTitle": "Enlace de restablecimiento no disponible",
+      "invalidToken": "Este enlace de restablecimiento no es válido o ha caducado. Solicita uno nuevo desde la página de inicio de sesión.",
+      "successTitle": "Contraseña restablecida",
+      "success": "Tu contraseña se ha actualizado. Inicia sesión con tu nueva contraseña.",
+      "login": "Ir al inicio de sesión"
     },
     "verify": {
       "title": "Verificación de correo",
@@ -797,6 +816,7 @@
       "forgetKeyConfirm": "Olvidar clave",
       "home": "Inicio",
       "privacy": "Privacidad",
+      "account": "Cuenta",
       "decryptError": "Algunas sesiones no se pudieron descifrar y se omitieron ({count}).",
       "loadFailed": "No se pudieron cargar tus sesiones guardadas.",
       "noTabs": "Esta sesión no tiene pestañas."

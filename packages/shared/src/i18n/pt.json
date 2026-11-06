@@ -309,6 +309,10 @@
       "signOutFailed": "Não foi possível sair. Tente novamente.",
       "verified": "Verificado",
       "unverified": "E-mail não verificado",
+      "resendVerification": "Reenviar e-mail de verificação",
+      "resendingVerification": "Enviando…",
+      "resendVerificationSuccess": "E-mail de verificação enviado.",
+      "resendVerificationFailed": "Não foi possível enviar o e-mail de verificação. Tente novamente mais tarde.",
       "passwordTooShort": "Use uma senha com pelo menos 12 caracteres.",
       "signInFailed": "Não foi possível entrar. Verifique seu e-mail e senha.",
       "signUpFailed": "Não foi possível criar sua conta. Tente novamente.",
@@ -552,6 +556,12 @@
       "submitting": "Entrando…",
       "error": "Não foi possível entrar. Verifique seu e-mail e senha e tente novamente.",
       "recoveryLink": "Esqueceu sua senha? Use sua chave de recuperação",
+      "resetLink": "Enviar-me um link de redefinição",
+      "resetHint": "Para contas sem uma chave de sincronização vinculada.",
+      "resetSubmit": "Enviar link de redefinição",
+      "resetSubmitting": "Enviando…",
+      "resetSuccess": "Se esse endereço tiver uma conta sem chave de sincronização vinculada, um link de redefinição está a caminho.",
+      "resetFailed": "Não foi possível enviar o e-mail de redefinição. Tente novamente.",
       "createAccount": "Criar uma conta",
       "back": "Voltar ao SaveTabs"
     },
@@ -571,6 +581,15 @@
       "passwordMismatch": "As senhas não coincidem.",
       "error": "Não foi possível redefinir sua senha. Verifique seu e-mail e sua chave de recuperação e tente novamente.",
       "cancel": "Voltar para entrar"
+    },
+    "reset": {
+      "description": "Introduza o seu e-mail e escolha uma nova senha. Tudo é derivado no seu navegador; o servidor nunca recebe a sua senha.",
+      "error": "Não foi possível redefinir a sua senha. O link pode ser inválido ou ter expirado.",
+      "invalidTokenTitle": "Link de redefinição indisponível",
+      "invalidToken": "Este link de redefinição é inválido ou expirou. Peça um novo link na página de início de sessão.",
+      "successTitle": "Senha redefinida",
+      "success": "A sua senha foi atualizada. Inicie sessão com a nova senha.",
+      "login": "Ir para o início de sessão"
     },
     "verify": {
       "title": "Verificação de e-mail",
@@ -797,6 +816,7 @@
       "forgetKeyConfirm": "Esquecer chave",
       "home": "Início",
       "privacy": "Privacidade",
+      "account": "Conta",
       "decryptError": "Algumas sessões não puderam ser descriptografadas e foram ignoradas ({count}).",
       "loadFailed": "Não foi possível carregar suas sessões salvas.",
       "noTabs": "Esta sessão não tem abas."

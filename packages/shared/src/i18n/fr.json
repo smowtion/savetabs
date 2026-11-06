@@ -309,6 +309,10 @@
       "signOutFailed": "Impossible de vous déconnecter. Réessayez.",
       "verified": "Vérifié",
       "unverified": "E-mail non vérifié",
+      "resendVerification": "Renvoyer l'e-mail de vérification",
+      "resendingVerification": "Envoi…",
+      "resendVerificationSuccess": "E-mail de vérification envoyé.",
+      "resendVerificationFailed": "Impossible d'envoyer l'e-mail de vérification. Réessayez plus tard.",
       "passwordTooShort": "Utilisez un mot de passe d'au moins 12 caractères.",
       "signInFailed": "Impossible de vous connecter. Vérifiez votre e-mail et votre mot de passe.",
       "signUpFailed": "Impossible de créer votre compte. Réessayez.",
@@ -552,6 +556,12 @@
       "submitting": "Connexion…",
       "error": "Impossible de vous connecter. Vérifiez votre e-mail et votre mot de passe, puis réessayez.",
       "recoveryLink": "Mot de passe oublié ? Utilisez votre clé de récupération",
+      "resetLink": "M'envoyer un lien de réinitialisation",
+      "resetHint": "Pour les comptes sans clé de synchronisation liée.",
+      "resetSubmit": "Envoyer le lien",
+      "resetSubmitting": "Envoi…",
+      "resetSuccess": "Si cette adresse possède un compte sans clé de synchronisation liée, un lien de réinitialisation est en route.",
+      "resetFailed": "Impossible d'envoyer l'e-mail de réinitialisation. Réessayez.",
       "createAccount": "Créer un compte",
       "back": "Retour à SaveTabs"
     },
@@ -571,6 +581,15 @@
       "passwordMismatch": "Les mots de passe ne correspondent pas.",
       "error": "Impossible de réinitialiser votre mot de passe. Vérifiez votre e-mail et votre clé de récupération, puis réessayez.",
       "cancel": "Retour à la connexion"
+    },
+    "reset": {
+      "description": "Saisissez votre e-mail et choisissez un nouveau mot de passe. Tout est dérivé dans votre navigateur ; le serveur ne reçoit jamais votre mot de passe.",
+      "error": "Impossible de réinitialiser votre mot de passe. Le lien est peut-être invalide ou expiré.",
+      "invalidTokenTitle": "Lien de réinitialisation indisponible",
+      "invalidToken": "Ce lien de réinitialisation est invalide ou expiré. Demandez-en un nouveau depuis la page de connexion.",
+      "successTitle": "Mot de passe réinitialisé",
+      "success": "Votre mot de passe a été mis à jour. Connectez-vous avec votre nouveau mot de passe.",
+      "login": "Aller à la connexion"
     },
     "verify": {
       "title": "Vérification de l'e-mail",
@@ -797,6 +816,7 @@
       "forgetKeyConfirm": "Oublier la clé",
       "home": "Accueil",
       "privacy": "Confidentialité",
+      "account": "Compte",
       "decryptError": "Certaines sessions n'ont pas pu être déchiffrées et ont été ignorées ({count}).",
       "loadFailed": "Impossible de charger vos sessions enregistrées.",
       "noTabs": "Cette session ne contient aucun onglet."

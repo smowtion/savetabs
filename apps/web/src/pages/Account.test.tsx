@@ -628,6 +628,49 @@ describe("Account page", () => {
     expect(await screen.findByTestId("landing-page")).toBeInTheDocument();
   });
 
+  it("treats an already-deleted cloud key as success on retry", async () => {
+    const user = userEvent.setup();
+    const material = await keyMaterial(PASSWORD);
+    const vault = await buildVault(material, STORED_KEY);
+    const login = vi
+      .fn<(input: LoginInput) => Promise<LoginResult>>()
+      .mockResolvedValue({ token: TOKEN, account: ACCOUNT, vault });
+    const deleteAccount = vi
+      .fn<(token: string, input: DeleteAccountInput) => Promise<void>>()
+      .mockResolvedValue(undefined);
+    useClient({ login, deleteAccount });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            error: { code: "not_found", message: "Sync key not found." },
+          }),
+          {
+            status: 404,
+            headers: { "Content-Type": "application/json" },
+          },
+        ),
+      ),
+    );
+    saveKeyForSession(STORED_KEY);
+    renderAccount();
+
+    const dialog = await openDeleteDialog(user, { deleteCloudData: true });
+    await user.click(
+      within(dialog).getByRole("button", { name: "Delete account" }),
+    );
+
+    // The retry finds no key row, but the account deletion still completes.
+    await waitFor(() =>
+      expect(deleteAccount).toHaveBeenCalledWith(TOKEN, {
+        authHash: material.authHash,
+      }),
+    );
+    expect(loadAccountToken()).toBeNull();
+    expect(await screen.findByTestId("landing-page")).toBeInTheDocument();
+  });
+
   it("has every account translation in both languages", () => {
     expect(missingKeys("en", ACCOUNT_TRANSLATION_KEYS)).toEqual([]);
     expect(missingKeys("vi", ACCOUNT_TRANSLATION_KEYS)).toEqual([]);

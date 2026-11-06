@@ -121,7 +121,7 @@ function testExecutionContext(): ExecutionContext {
 }
 
 describe("cleanupUnverifiedAccounts", () => {
-  it("removes only old unverified unlinked accounts", async () => {
+  it("removes old unverified accounts whether or not they linked a key", async () => {
     const now = Date.now();
     const old = await seedAccount({ createdAt: now - 31 * DAY_MS });
     const fresh = await seedAccount({ createdAt: now - DAY_MS });
@@ -136,23 +136,50 @@ describe("cleanupUnverifiedAccounts", () => {
 
     const deleted = await cleanupUnverifiedAccounts(env.DB, now);
 
-    expect(deleted).toBe(1);
+    expect(deleted).toBe(2);
     expect(await accountExists(old.id)).toBe(false);
     expect(await accountExists(fresh.id)).toBe(true);
-    expect(await accountExists(linked.id)).toBe(true);
+    // An unverified account loses its account record even after linking; the
+    // sync key and its encrypted data are a separate table and stay.
+    expect(await accountExists(linked.id)).toBe(false);
     expect(await accountExists(verified.id)).toBe(true);
   });
 
-  it("removes the tokens, verifications and send counters of expired accounts", async () => {
+  it("removes child rows of expired accounts but keeps sync data", async () => {
     const now = Date.now();
     const old = await seedAccount({ createdAt: now - 31 * DAY_MS });
+    const linked = await seedAccount({
+      linked: true,
+      createdAt: now - 31 * DAY_MS,
+    });
     const fresh = await seedAccount({ createdAt: now - DAY_MS });
     await seedChildRows(old.id, now);
+    await seedChildRows(linked.id, now);
     await seedChildRows(fresh.id, now);
+
+    const authId = `auth-${linked.id}`;
+    await env.DB.batch([
+      env.DB.prepare(
+        `INSERT INTO keys (auth_id, key_hash, created_at, last_seen_at)
+         VALUES (?, ?, ?, ?)`,
+      ).bind(authId, "ab".repeat(32), now, now),
+      env.DB.prepare(
+        `INSERT INTO sessions (auth_id, session_id, ciphertext, updated_at, size)
+         VALUES (?, ?, ?, ?, ?)`,
+      ).bind(authId, "session-1", new Uint8Array([1, 2, 3]), now, 3),
+      env.DB.prepare(
+        "INSERT INTO deletions (auth_id, session_id, deleted_at) VALUES (?, ?, ?)",
+      ).bind(authId, "session-2", now),
+    ]);
 
     await cleanupUnverifiedAccounts(env.DB, now);
 
     expect(await childRowCounts(old.id)).toEqual({
+      tokens: 0,
+      verifications: 0,
+      sends: 0,
+    });
+    expect(await childRowCounts(linked.id)).toEqual({
       tokens: 0,
       verifications: 0,
       sends: 0,
@@ -162,6 +189,26 @@ describe("cleanupUnverifiedAccounts", () => {
       verifications: 1,
       sends: 1,
     });
+
+    // The key record, encrypted sessions and tombstones are untouched.
+    const key = await env.DB.prepare(
+      "SELECT auth_id FROM keys WHERE auth_id = ?",
+    )
+      .bind(authId)
+      .first();
+    expect(key).not.toBeNull();
+    const session = await env.DB.prepare(
+      "SELECT session_id FROM sessions WHERE auth_id = ? AND session_id = ?",
+    )
+      .bind(authId, "session-1")
+      .first();
+    expect(session).not.toBeNull();
+    const deletion = await env.DB.prepare(
+      "SELECT session_id FROM deletions WHERE auth_id = ? AND session_id = ?",
+    )
+      .bind(authId, "session-2")
+      .first();
+    expect(deletion).not.toBeNull();
   });
 
   it("keeps accounts that reach the 30-day boundary exactly", async () => {

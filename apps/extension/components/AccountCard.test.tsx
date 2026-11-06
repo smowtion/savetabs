@@ -62,6 +62,7 @@ const { clientMock } = vi.hoisted(() => ({
     me: vi.fn(),
     linkKey: vi.fn(),
     changePassword: vi.fn(),
+    resendVerification: vi.fn(),
   },
 }));
 
@@ -367,6 +368,33 @@ describe("AccountCard", () => {
     expect(screen.getByText(EMAIL)).toBeInTheDocument();
     expect(screen.getByText("Verified")).toBeInTheDocument();
     expect(clientMock.me).toHaveBeenCalledWith(TOKEN);
+  });
+
+  it("resends the verification email and refreshes the profile", async () => {
+    await fakeBrowser.storage.local.set({
+      [EXTENSION_ACCOUNT_TOKEN_KEY]: TOKEN,
+    });
+    clientMock.me
+      .mockResolvedValueOnce({ ...ACCOUNT, emailVerified: false })
+      .mockResolvedValueOnce(ACCOUNT);
+    clientMock.resendVerification.mockResolvedValue({ ok: true });
+
+    renderCard();
+
+    expect(await screen.findByText("Email not verified")).toBeInTheDocument();
+
+    const user = userEvent.setup();
+    await user.click(
+      screen.getByRole("button", { name: "Resend verification email" }),
+    );
+
+    expect(clientMock.resendVerification).toHaveBeenCalledWith(TOKEN);
+    await waitFor(() =>
+      expect(screen.getByText("Verified")).toBeInTheDocument(),
+    );
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Verification email sent.",
+    );
   });
 
   it("lets the user continue with a key instead", async () => {

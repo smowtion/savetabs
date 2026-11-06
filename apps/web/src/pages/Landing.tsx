@@ -13,6 +13,7 @@ import { SiteFooter } from "../components/landing/SiteFooter";
 import { SyncKeyPanel } from "../components/landing/SyncKeyPanel";
 import { useI18n } from "../hooks/useI18n";
 import { useTheme, type WebThemePreference } from "../hooks/useTheme";
+import { loadAccountToken } from "../lib/account-session";
 
 /**
  * Public landing page.
@@ -43,6 +44,9 @@ const LANGUAGE_SELECT_CLASS =
 export default function Landing() {
   const { lang, t, setLang } = useI18n();
   const { preference, toggleTheme } = useTheme();
+  // A signed-in visitor goes straight to account settings; everyone else is
+  // sent to the sign-in page.
+  const accountPath = loadAccountToken() !== null ? "/account" : "/login";
 
   const ThemeIcon = THEME_ICONS[preference];
   const themeLabel = `${t("web.theme.toggle")}: ${t(
@@ -81,7 +85,7 @@ export default function Landing() {
             >
               <ThemeIcon aria-hidden="true" size={16} />
             </button>
-            <Link to="/login" className={HEADER_CONTROL_CLASS}>
+            <Link to={accountPath} className={HEADER_CONTROL_CLASS}>
               {t("web.landing.header.account")}
             </Link>
           </div>

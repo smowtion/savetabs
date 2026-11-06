@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { decodeSalt } from "@savetabs/shared/account/kdf";
 import {
   resetEmail,
-  sendEmail,
+  sendEmailSafely,
   verificationEmail,
 } from "../accounts/email";
 import { consumeEmailSend } from "../accounts/email-sends";
@@ -126,7 +126,10 @@ accountsRoutes.post("/accounts/signup", async (c) => {
       existing !== null &&
       (await consumeEmailSend(c.env.DB, existing.id, now))
     ) {
-      await sendEmail(c.env, { to: email, ...signupNotice(c.env.WEB_ORIGIN) });
+      await sendEmailSafely(c.env, {
+        to: email,
+        ...signupNotice(c.env.WEB_ORIGIN),
+      });
     }
     return c.json({ ok: true }, 202);
   }
@@ -144,7 +147,10 @@ accountsRoutes.post("/accounts/signup", async (c) => {
 
   if (await consumeEmailSend(c.env.DB, accountId, now)) {
     const link = `${c.env.WEB_ORIGIN}/verify?token=${token}`;
-    await sendEmail(c.env, { to: email, ...verificationEmail(locale, link) });
+    await sendEmailSafely(c.env, {
+      to: email,
+      ...verificationEmail(locale, link),
+    });
   }
 
   return c.json({ ok: true }, 202);
@@ -162,6 +168,11 @@ accountsRoutes.post("/accounts/login", async (c) => {
   if (typeof email !== "string" || typeof authHash !== "string") {
     return invalidRequest(c);
   }
+  const normalizedEmail = normalizeEmail(email);
+
+  // Charge before the lookup so unknown and known addresses cost the same.
+  const limited = await enforceEmailRateLimit(c, normalizedEmail);
+  if (limited !== null) return limited;
 
   const digest = await sha256Hex(authHash);
   const account = await c.env.DB.prepare(
@@ -169,7 +180,7 @@ accountsRoutes.post("/accounts/login", async (c) => {
             auth_id, locale, email_verified_at
        FROM accounts WHERE email = ?`,
   )
-    .bind(normalizeEmail(email))
+    .bind(normalizedEmail)
     .first<AccountRow>();
 
   if (account === null) {
@@ -288,7 +299,7 @@ accountsRoutes.post("/accounts/resend-verification", async (c) => {
   // budget can still suppress the send without changing that response.
   if (await consumeEmailSend(c.env.DB, auth.account.id, now)) {
     const link = `${c.env.WEB_ORIGIN}/verify?token=${token}`;
-    await sendEmail(c.env, {
+    await sendEmailSafely(c.env, {
       to: auth.account.email,
       ...verificationEmail(auth.account.locale, link),
     });
@@ -436,6 +447,11 @@ accountsRoutes.post("/accounts/password", async (c) => {
   if (!isValidIterations(kdfIterations)) return invalidRequest(c);
   if (!isNonEmptyString(wrappedKey)) return invalidRequest(c);
 
+  // The account is known here, so the proof check is charged against its
+  // mailbox: a wrong current password cannot be retried without limit.
+  const limited = await enforceEmailRateLimit(c, auth.account.email);
+  if (limited !== null) return limited;
+
   if (
     !timingSafeEqual(
       auth.account.auth_hash,
@@ -500,6 +516,11 @@ accountsRoutes.post("/accounts/recover", async (c) => {
   }
   if (!isValidIterations(kdfIterations)) return invalidRequest(c);
   if (!isNonEmptyString(wrappedKey)) return invalidRequest(c);
+
+  // Charge before the key and account lookups so a guessed address and a real
+  // one cost the same and neither can be probed without limit.
+  const limited = await enforceEmailRateLimit(c, normalizedEmail);
+  if (limited !== null) return limited;
 
   const keyHash = await sha256Hex(authKey);
   const [key, account] = await Promise.all([
@@ -571,12 +592,13 @@ accountsRoutes.post("/accounts/reset-unlinked", async (c) => {
   if (limited !== null) return limited;
 
   // Only an account with no linked vault may reset by email; a linked
-  // account's encrypted data is unreachable this way by construction.
+  // account's encrypted data is unreachable this way by construction. The
+  // message language follows the account's stored locale, not the request.
   const account = await c.env.DB.prepare(
-    "SELECT id FROM accounts WHERE email = ? AND auth_id IS NULL",
+    "SELECT id, locale FROM accounts WHERE email = ? AND auth_id IS NULL",
   )
     .bind(normalizedEmail)
-    .first<{ id: string }>();
+    .first<{ id: string; locale: string }>();
 
   if (account !== null) {
     const now = Date.now();
@@ -595,9 +617,9 @@ accountsRoutes.post("/accounts/reset-unlinked", async (c) => {
     // The daily budget can suppress delivery without changing the response.
     if (await consumeEmailSend(c.env.DB, account.id, now)) {
       c.executionCtx.waitUntil(
-        sendEmail(c.env, {
+        sendEmailSafely(c.env, {
           to: normalizedEmail,
-          ...resetEmail(locale, link),
+          ...resetEmail(account.locale, link),
         }),
       );
     }
@@ -682,6 +704,11 @@ accountsRoutes.delete("/accounts", async (c) => {
   if (typeof authHash !== "string" || !AUTH_HASH_PATTERN.test(authHash)) {
     return invalidRequest(c);
   }
+
+  // Deletion is a proof-checked action too; charge the account's mailbox so a
+  // stolen token cannot be used to guess the password without limit.
+  const limited = await enforceEmailRateLimit(c, auth.account.email);
+  if (limited !== null) return limited;
 
   if (!timingSafeEqual(auth.account.auth_hash, await sha256Hex(authHash))) {
     return proofRequired(c);

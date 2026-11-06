@@ -2,10 +2,12 @@
  * Retention for accounts that were never completed.
  *
  * Signup creates the account row before the email is verified, so an
- * abandoned signup would otherwise live forever. An account is only swept
- * when it never verified its address and never linked a vault, and even then
- * only after 30 days. Tokens, verification links and send counters are
- * removed explicitly because the schema has no foreign keys.
+ * abandoned signup would otherwise live forever. An account is swept when it
+ * never verified its address, whether or not it linked a vault, and even then
+ * only after 30 days. Deleting an account never touches the sync tables, so a
+ * linked key and its encrypted sessions survive. Tokens, verification links
+ * and send counters are removed explicitly because the schema has no foreign
+ * keys.
  */
 
 /** Abandoned signups older than this are deleted. */
@@ -15,11 +17,13 @@ const UNVERIFIED_ACCOUNT_TTL_MS =
 
 /** Accounts matching the sweep predicate, as a subquery for child deletes. */
 const EXPIRED_ACCOUNT_IDS = `SELECT id FROM accounts
-  WHERE email_verified_at IS NULL AND auth_id IS NULL AND created_at < ?`;
+  WHERE email_verified_at IS NULL AND created_at < ?`;
 
 /**
- * Delete unverified, unlinked accounts created before `now - 30 days`, plus
- * their `account_tokens`, `email_verifications` and `email_sends` rows.
+ * Delete unverified accounts created before `now - 30 days`, plus their
+ * `account_tokens`, `email_verifications` and `email_sends` rows. The linked
+ * sync key is deliberately left alone: a user who never proves mailbox
+ * control loses the account record, not their encrypted data.
  *
  * The statements run in one batch, so the child rows and the account they
  * belong to disappear together. Returns the number of accounts deleted.
@@ -49,7 +53,7 @@ export async function cleanupUnverifiedAccounts(
     db
       .prepare(
         `DELETE FROM accounts
-          WHERE email_verified_at IS NULL AND auth_id IS NULL
+          WHERE email_verified_at IS NULL
             AND created_at < ?`,
       )
       .bind(cutoff),

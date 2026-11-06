@@ -18,6 +18,8 @@ import { useEffect, useId, useState, type FormEvent } from "react";
 import {
   changePassword,
   getAccount,
+  loadAccountToken,
+  resendVerification,
   signIn,
   signOut,
   signUp,
@@ -93,6 +95,7 @@ export function AccountCard({ t }: AccountCardProps) {
   const [recoveryKey, setRecoveryKey] = useState<string | null>(null);
   const [keyOnly, setKeyOnly] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
+  const [resendingVerification, setResendingVerification] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   // Resolver for the "upload local sessions?" question. The session module
@@ -212,6 +215,33 @@ export function AccountCard({ t }: AccountCardProps) {
     }
   }
 
+  async function handleResendVerification(): Promise<void> {
+    if (pending !== null || resendingVerification) return;
+
+    setStatus(null);
+    setResendingVerification(true);
+    try {
+      const token = await loadAccountToken();
+      if (token === null) throw new Error("No account token is stored.");
+      await resendVerification(token);
+      // Reload the profile so the badge reflects a verification that
+      // completed elsewhere while the email was being resent.
+      const profile = await getAccount();
+      if (profile !== null) setAccount(profile);
+      setStatus({
+        kind: "success",
+        message: t("settings.account.resendVerificationSuccess"),
+      });
+    } catch {
+      setStatus({
+        kind: "error",
+        message: t("settings.account.resendVerificationFailed"),
+      });
+    } finally {
+      setResendingVerification(false);
+    }
+  }
+
   function beginPasswordChange(): void {
     setChangingPassword(true);
     setCurrentPassword("");
@@ -303,6 +333,18 @@ export function AccountCard({ t }: AccountCardProps) {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
+          {!account.emailVerified && (
+            <button
+              type="button"
+              disabled={pending !== null || resendingVerification}
+              onClick={() => void handleResendVerification()}
+              className={BUTTON_CLASS}
+            >
+              {resendingVerification
+                ? t("settings.account.resendingVerification")
+                : t("settings.account.resendVerification")}
+            </button>
+          )}
           <button
             type="button"
             disabled={pending !== null}

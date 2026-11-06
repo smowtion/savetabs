@@ -9,6 +9,7 @@ import {
   loadKey,
   saveKeyForSession,
 } from "../lib/key-session";
+import { saveAccountToken } from "../lib/account-session";
 import Landing from "./Landing";
 
 /** A syntactically valid key: ST- prefix plus 26 Crockford symbols. */
@@ -203,6 +204,17 @@ describe("Landing", () => {
         .getByRole("heading", { name: "Open your saved tabs" })
         .closest("section"),
     ).toHaveAttribute("id", "use-sync-key");
+  });
+
+  it("points the header account link at the account page when signed in", () => {
+    saveAccountToken("account-token");
+
+    renderLanding();
+
+    expect(screen.getByRole("link", { name: "Account" })).toHaveAttribute(
+      "href",
+      "/account",
+    );
   });
 
   it("keeps the key path available", () => {

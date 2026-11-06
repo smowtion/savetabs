@@ -19,6 +19,7 @@ import {
   type LoginInput,
   type LoginResult,
   type RecoverInput,
+  type RequestUnlinkedResetInput,
 } from "@savetabs/shared";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -74,6 +75,12 @@ const LOGIN_TRANSLATION_KEYS = [
   "web.login.submitting",
   "web.login.error",
   "web.login.recoveryLink",
+  "web.login.resetLink",
+  "web.login.resetHint",
+  "web.login.resetSubmit",
+  "web.login.resetSubmitting",
+  "web.login.resetSuccess",
+  "web.login.resetFailed",
   "web.login.createAccount",
   "web.login.back",
 ];
@@ -101,12 +108,16 @@ type LinkKeyMock = Mock<
   (token: string, input: LinkKeyInput) => Promise<AccountAck>
 >;
 type RecoverMock = Mock<(input: RecoverInput) => Promise<AccountAck>>;
+type RequestResetMock = Mock<
+  (input: RequestUnlinkedResetInput) => Promise<AccountAck>
+>;
 
 function useClient(
   stubs: {
     login?: LoginMock;
     linkKey?: LinkKeyMock;
     recover?: RecoverMock;
+    requestUnlinkedReset?: RequestResetMock;
   } = {},
 ) {
   const login =
@@ -126,14 +137,20 @@ function useClient(
     vi
       .fn<(input: RecoverInput) => Promise<AccountAck>>()
       .mockResolvedValue({ ok: true });
+  const requestUnlinkedReset =
+    stubs.requestUnlinkedReset ??
+    vi
+      .fn<(input: RequestUnlinkedResetInput) => Promise<AccountAck>>()
+      .mockResolvedValue({ ok: true });
 
   createAccountClientMock.mockReturnValue({
     login,
     linkKey,
     recover,
+    requestUnlinkedReset,
   } as unknown as AccountClient);
 
-  return { login, linkKey, recover };
+  return { login, linkKey, recover, requestUnlinkedReset };
 }
 
 function renderLogin() {
@@ -393,6 +410,57 @@ describe("Login page", () => {
     expect(within(dialog).getByText(EXISTING_KEY)).toBeInTheDocument();
   });
 
+  it("requests a reset link for an account without a vault", async () => {
+    const user = userEvent.setup();
+    const requestUnlinkedReset = vi
+      .fn<(input: RequestUnlinkedResetInput) => Promise<AccountAck>>()
+      .mockResolvedValue({ ok: true });
+    useClient({ requestUnlinkedReset });
+    renderLogin();
+
+    await user.click(
+      screen.getByRole("button", { name: "Email me a reset link" }),
+    );
+    await user.type(
+      screen.getByLabelText("Email", { selector: "#reset-request-email" }),
+      " Reset@Example.com ",
+    );
+    await user.click(screen.getByRole("button", { name: "Email reset link" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "reset link is on its way",
+    );
+    expect(requestUnlinkedReset).toHaveBeenCalledWith({
+      email: "reset@example.com",
+      locale: "en",
+    });
+  });
+
+  it("keeps reset-request failures generic", async () => {
+    const user = userEvent.setup();
+    const requestUnlinkedReset = vi
+      .fn<(input: RequestUnlinkedResetInput) => Promise<AccountAck>>()
+      .mockRejectedValue(
+        new AccountApiError(429, "rate_limited", "Too many requests."),
+      );
+    useClient({ requestUnlinkedReset });
+    renderLogin();
+
+    await user.click(
+      screen.getByRole("button", { name: "Email me a reset link" }),
+    );
+    await user.type(
+      screen.getByLabelText("Email", { selector: "#reset-request-email" }),
+      EMAIL,
+    );
+    await user.click(screen.getByRole("button", { name: "Email reset link" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "We could not send the reset email",
+    );
+    expect(screen.queryByText(/Too many requests/i)).not.toBeInTheDocument();
+  });
+
   it("shows one generic error for rejected credentials", async () => {
     const user = userEvent.setup();
     const login = vi
@@ -478,6 +546,47 @@ describe("Recovery form", () => {
     });
     expect(loadAccountToken()).toBe(TOKEN);
     expect(loadKey()).toBe(RECOVERY_KEY);
+  });
+
+  it("keeps a remembered key remembered after recovery", async () => {
+    const user = userEvent.setup();
+    saveKeyForSession(EXISTING_KEY, true);
+    const derived = await deriveKeys(parseKey(RECOVERY_KEY));
+    const material = await keyMaterial(NEW_PASSWORD);
+    const recover = vi
+      .fn<(input: RecoverInput) => Promise<AccountAck>>()
+      .mockResolvedValue({ ok: true });
+    const login = vi
+      .fn<(input: LoginInput) => Promise<LoginResult>>()
+      .mockResolvedValue({
+        token: TOKEN,
+        account: { ...ACCOUNT, authId: derived.authId },
+        vault: {
+          wrappedKey: await wrapSyncKey(
+            material.wrapKey,
+            parseKey(RECOVERY_KEY),
+            derived.authId,
+          ),
+          kdfSalt: encodeSalt(material.salt),
+          kdfIterations: KDF_ITERATIONS,
+          authId: derived.authId,
+        },
+      });
+    useClient({ recover, login });
+    renderLogin();
+
+    await openRecovery(user);
+    await fillRecovery(user);
+    await submitRecovery(user);
+
+    await screen.findByRole(
+      "heading",
+      { name: "Saved sessions" },
+      { timeout: 10_000 },
+    );
+
+    expect(loadKey()).toBe(RECOVERY_KEY);
+    expect(isKeyRemembered()).toBe(true);
   });
 
   it("rejects a new password shorter than 12 characters", async () => {

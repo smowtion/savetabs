@@ -41,6 +41,7 @@ const PRIVACY_TRANSLATION_KEYS = [
   "web.privacy.account.accountTokens",
   "web.privacy.account.processorResend",
   "web.privacy.account.recoveryLimit",
+  "web.privacy.account.unverifiedCleanup",
 ];
 
 function renderApp(path: string) {

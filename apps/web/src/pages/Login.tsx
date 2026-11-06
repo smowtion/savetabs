@@ -15,6 +15,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { LoginForm, type LoginFormValues } from "../components/LoginForm";
 import { RecoveryForm, type RecoveryFormValues } from "../components/RecoveryForm";
 import { RecoveryKeyDialog } from "../components/RecoveryKeyDialog";
+import { ResetRequestForm } from "../components/ResetRequestForm";
 import { useI18n } from "../hooks/useI18n";
 import { recoverAccount, signInWithPassword } from "../lib/account-login";
 
@@ -46,6 +47,7 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [recoveryKey, setRecoveryKey] = useState<string | null>(null);
+  const [resetRequestOpen, setResetRequestOpen] = useState(false);
 
   const isRecover = mode === "recover";
 
@@ -73,6 +75,7 @@ export default function Login() {
   function openLogin(): void {
     setRecovery(EMPTY_RECOVERY);
     setMode("login");
+    setResetRequestOpen(false);
     clearError();
   }
 
@@ -184,16 +187,32 @@ export default function Login() {
             onCancel={openLogin}
           />
         ) : (
-          <LoginForm
-            values={login}
-            error={error}
-            submitting={submitting}
-            onEmailChange={(value) => updateLogin({ email: value })}
-            onPasswordChange={(value) => updateLogin({ password: value })}
-            onRememberChange={(value) => updateLogin({ remember: value })}
-            onSubmit={(event) => void handleLogin(event)}
-            onRecover={openRecovery}
-          />
+          <>
+            <LoginForm
+              values={login}
+              error={error}
+              submitting={submitting}
+              onEmailChange={(value) => updateLogin({ email: value })}
+              onPasswordChange={(value) => updateLogin({ password: value })}
+              onRememberChange={(value) => updateLogin({ remember: value })}
+              onSubmit={(event) => void handleLogin(event)}
+              onRecover={openRecovery}
+            />
+            {resetRequestOpen ? (
+              <ResetRequestForm
+                defaultEmail={login.email}
+                onCancel={() => setResetRequestOpen(false)}
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={() => setResetRequestOpen(true)}
+                className="mt-4 w-full text-center text-sm font-medium text-indigo-600 underline-offset-4 hover:underline dark:text-indigo-400"
+              >
+                {t("web.login.resetLink")}
+              </button>
+            )}
+          </>
         )}
 
         <p className="mt-6 text-center text-sm">
