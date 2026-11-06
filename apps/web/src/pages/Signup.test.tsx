@@ -2,9 +2,11 @@ import {
   AccountApiError,
   KDF_ITERATIONS,
   decodeSalt,
+  deriveKdfSalt,
   deriveKeys,
   deriveMasterKey,
   deriveWrapKey,
+  encodeSalt,
   formatKey,
   missingKeys,
   parseKey,
@@ -172,6 +174,10 @@ describe("Signup page", () => {
     });
     expect(signupInput.authHash).toMatch(/^[0-9a-f]{64}$/);
     expect(decodeSalt(signupInput.kdfSalt)).toHaveLength(16);
+    // The salt is derived from the normalized email so login can repeat it.
+    expect(signupInput.kdfSalt).toBe(
+      encodeSalt(await deriveKdfSalt("a@example.com")),
+    );
 
     expect(login).toHaveBeenCalledWith({
       email: "a@example.com",
@@ -202,6 +208,28 @@ describe("Signup page", () => {
     expect(formatKey(rawKey)).toBe(storedKey);
 
     expect(within(dialog).getByText(storedKey as string)).toBeInTheDocument();
+  });
+
+  it("normalizes the email before deriving the salt and calling the API", async () => {
+    const user = userEvent.setup();
+    const { signup, login } = useClient();
+    renderSignup();
+
+    await user.type(screen.getByLabelText("Email"), "  A@Example.COM  ");
+    await user.type(screen.getByLabelText("Password"), PASSWORD);
+    await user.type(screen.getByLabelText("Confirm password"), PASSWORD);
+    await submit(user);
+    await findRecoveryDialog();
+
+    const input = signup.mock.calls[0][0];
+    expect(input.email).toBe("a@example.com");
+    expect(input.kdfSalt).toBe(
+      encodeSalt(await deriveKdfSalt("a@example.com")),
+    );
+    expect(login).toHaveBeenCalledWith({
+      email: "a@example.com",
+      authHash: input.authHash,
+    });
   });
 
   it("wraps the key already stored on the device instead of generating one", async () => {

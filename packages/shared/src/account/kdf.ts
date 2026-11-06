@@ -16,22 +16,37 @@ import { fromBase64Url, toBase64Url } from "../base64url";
 /** OWASP-recommended PBKDF2-SHA256 work factor for password storage. */
 export const KDF_ITERATIONS = 600_000;
 
-/** A 128-bit random salt makes precomputed tables per-account useless. */
+/** An email-derived 128-bit salt makes rainbow tables per account useless. */
 export const KDF_SALT_BYTES = 16;
 
 const MASTER_KEY_BYTES = 32;
 const AUTH_PROOF_MESSAGE = "savetabs-auth-v1";
+const KDF_SALT_DOMAIN = "savetabs-kdf-v1";
 const HKDF_SALT = new TextEncoder().encode("savetabs-v1");
 const HKDF_INFO = new TextEncoder().encode("vault-wrap");
 const AES_GCM_KEY_ALGORITHM = { name: "AES-GCM", length: 256 } as const;
 
 const textEncoder = new TextEncoder();
 
-/** Random salt for a new account, or for a password change. */
-export function randomKdfSalt(): Uint8Array {
-  const salt = new Uint8Array(KDF_SALT_BYTES);
-  globalThis.crypto.getRandomValues(salt);
-  return salt;
+/**
+ * Derive the KDF salt for an account from its email.
+ *
+ * Signup and every later login must stretch the password with the same salt,
+ * but the server cannot return the salt before the client authenticates and a
+ * "prepare login" endpoint would reveal which emails have accounts. Deriving
+ * the salt from the normalized email (trimmed and lowercased, matching the
+ * worker) gives every device the same value without a server round trip. The
+ * domain prefix keeps the digest from doubling as an email hash elsewhere.
+ */
+export async function deriveKdfSalt(email: string): Promise<Uint8Array> {
+  const normalized = email.trim().toLowerCase();
+  const digest = new Uint8Array(
+    await globalThis.crypto.subtle.digest(
+      "SHA-256",
+      textEncoder.encode(`${KDF_SALT_DOMAIN}:${normalized}`),
+    ),
+  );
+  return digest.slice(0, KDF_SALT_BYTES);
 }
 
 /** Encode a salt for storage in the account profile. */

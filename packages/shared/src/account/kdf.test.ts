@@ -4,10 +4,10 @@ import {
   KDF_SALT_BYTES,
   decodeSalt,
   deriveAuthHash,
+  deriveKdfSalt,
   deriveMasterKey,
   deriveWrapKey,
   encodeSalt,
-  randomKdfSalt,
 } from "./kdf";
 
 const PASSWORD = "correct horse battery staple";
@@ -35,12 +35,24 @@ describe("account KDF", () => {
     );
   });
 
-  it("generates a fresh 16-byte salt", () => {
+  it("derives a stable 16-byte salt from the email", async () => {
     expect(KDF_SALT_BYTES).toBe(16);
-    const first = randomKdfSalt();
-    const second = randomKdfSalt();
-    expect(first).toHaveLength(KDF_SALT_BYTES);
-    expect(second).toHaveLength(KDF_SALT_BYTES);
+    const salt = await deriveKdfSalt("a@example.com");
+    expect(salt).toHaveLength(KDF_SALT_BYTES);
+    expect(Buffer.from(salt).toString("hex")).toBe(
+      "7f0cca4000f447765d3403d40aeff812",
+    );
+  });
+
+  it("normalizes case and surrounding whitespace before hashing", async () => {
+    const salt = await deriveKdfSalt("a@example.com");
+    expect(await deriveKdfSalt("  A@Example.COM  ")).toEqual(salt);
+    expect(await deriveKdfSalt("A@EXAMPLE.COM")).toEqual(salt);
+  });
+
+  it("derives different salts for different emails", async () => {
+    const first = await deriveKdfSalt("a@example.com");
+    const second = await deriveKdfSalt("b@example.com");
     expect(first).not.toEqual(second);
   });
 

@@ -23,6 +23,7 @@ import {
   AccountApiError,
   KDF_ITERATIONS,
   deriveAuthHash,
+  deriveKdfSalt,
   deriveKeys,
   deriveMasterKey,
   deriveWrapKey,
@@ -30,7 +31,6 @@ import {
   formatKey,
   generateKey,
   parseKey,
-  randomKdfSalt,
   unwrapSyncKey,
   wrapSyncKey,
   type Translator,
@@ -180,12 +180,14 @@ export default function Signup() {
     setSubmitting(true);
 
     try {
-      const salt = randomKdfSalt();
+      // The salt is derived from the normalized email, so a later login on
+      // another device derives the same salt without a server round trip.
+      const accountEmail = email.trim().toLowerCase();
+      const salt = await deriveKdfSalt(accountEmail);
       const masterKey = await deriveMasterKey(password, salt);
       const authHash = await deriveAuthHash(masterKey);
       const wrapKey = await deriveWrapKey(masterKey);
       const client = createAccountClient();
-      const accountEmail = email.trim();
 
       await client.signup({
         email: accountEmail,
