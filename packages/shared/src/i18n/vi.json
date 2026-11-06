@@ -638,7 +638,122 @@
       "loseKeyWarning": "Key đồng bộ là cách duy nhất để giải mã các phiên của bạn. Nếu mất key, dữ liệu đã lưu không thể khôi phục.",
       "rememberLabel": "Ghi nhớ trên thiết bị này",
       "rememberWarning": "Chỉ dùng trên thiết bị bạn tin cậy. Key sẽ được lưu trong trình duyệt này cho đến khi bạn xoá.",
-      "privacyLink": "Chính sách riêng tư"
+      "privacyLink": "Chính sách riêng tư",
+      "header": {
+        "account": "Tài khoản"
+      },
+      "hero": {
+        "title": "Lưu mọi tab. Mở lại khi cần.",
+        "description": "SaveTabs lưu toàn bộ cửa sổ trình duyệt thành một phiên, đóng các tab rồi mở lại khi bạn cần. Tiện ích chạy trong trình duyệt và giữ các phiên trên thiết bị của bạn.",
+        "chrome": "Thêm vào Chrome",
+        "firefox": "Firefox",
+        "comingSoon": "Sắp ra mắt",
+        "noAccount": "Không cần tài khoản. Bạn có thể dùng cục bộ mà không cần đăng ký.",
+        "mockup": {
+          "save": "Lưu 12 tab",
+          "sessions": "Phiên gần đây",
+          "sessionOne": "Tài liệu thiết kế",
+          "sessionTwo": "Danh sách đọc",
+          "restore": "Khôi phục",
+          "sync": "Đang đồng bộ"
+        }
+      },
+      "howItWorks": {
+        "title": "Cách hoạt động",
+        "steps": {
+          "save": {
+            "title": "Lưu một cửa sổ",
+            "body": "Mở tiện ích và lưu mọi tab trong cửa sổ hiện tại thành một phiên."
+          },
+          "close": {
+            "title": "Tab được đóng",
+            "body": "SaveTabs đóng các tab đã lưu để trình duyệt của bạn gọn gàng."
+          },
+          "restore": {
+            "title": "Mở lại sau",
+            "body": "Mở phiên để khôi phục mọi tab đã lưu trong một cửa sổ mới."
+          }
+        }
+      },
+      "privacy": {
+        "title": "Quyền riêng tư",
+        "items": {
+          "e2ee": {
+            "title": "Mã hóa đầu cuối",
+            "body": "Các phiên được mã hóa trong trình duyệt trước khi tải lên. Máy chủ chỉ lưu bản mã và không thể đọc nội dung."
+          },
+          "keyOnly": {
+            "title": "Khóa của bạn, dữ liệu của bạn",
+            "body": "Đồng bộ dùng khóa đồng bộ của bạn. Không cần tài khoản và khóa không bao giờ rời khỏi trình duyệt."
+          },
+          "localFirst": {
+            "title": "Ưu tiên cục bộ",
+            "body": "Khi không bật đồng bộ, mọi phiên nằm trong bộ nhớ của tiện ích trong trình duyệt."
+          },
+          "privateWindows": {
+            "title": "Cửa sổ riêng tư chỉ ở cục bộ",
+            "body": "Các phiên lưu từ cửa sổ riêng tư hoặc ẩn danh không bao giờ được tải lên."
+          }
+        },
+        "link": "Đọc chính sách riêng tư"
+      },
+      "features": {
+        "title": "Tính năng",
+        "items": {
+          "search": {
+            "title": "Tìm kiếm phiên",
+            "body": "Tìm phiên đã lưu theo tên hoặc theo các tab bên trong."
+          },
+          "rename": {
+            "title": "Đổi tên phiên",
+            "body": "Đặt tên rõ ràng cho phiên để dễ tìm lại sau."
+          },
+          "exportImport": {
+            "title": "Xuất và nhập",
+            "body": "Chuyển phiên giữa các trình duyệt bằng tệp JSON."
+          },
+          "autoDiscard": {
+            "title": "Tự động giải phóng",
+            "body": "Giải phóng tab không hoạt động sau thời gian chờ bạn chọn, vẫn giữ tab ghim và tab đang phát âm thanh."
+          },
+          "sync": {
+            "title": "Đồng bộ nhiều thiết bị",
+            "body": "Đồng bộ các phiên đã mã hóa giữa các thiết bị bằng khóa đồng bộ."
+          },
+          "privateWindows": {
+            "title": "Cửa sổ riêng tư",
+            "body": "Phiên từ cửa sổ riêng tư ở lại trên thiết bị và không bao giờ được tải lên."
+          }
+        }
+      },
+      "account": {
+        "title": "Dùng mọi thiết bị cho các phiên của bạn",
+        "description": "Tài khoản giúp thiết bị mới mở các phiên chỉ với email và mật khẩu. Khóa đồng bộ vẫn mã hóa mọi thứ và máy chủ không bao giờ thấy khóa.",
+        "create": "Tạo tài khoản",
+        "signIn": "Đăng nhập",
+        "useKey": "hoặc dùng khóa đồng bộ"
+      },
+      "install": {
+        "title": "Cài đặt và xử lý sự cố",
+        "items": {
+          "install": {
+            "title": "Cài đặt",
+            "body": "Mở trang Chrome Web Store, chọn Thêm vào Chrome rồi ghim SaveTabs lên thanh công cụ. Firefox chưa được phát hành."
+          },
+          "uninstall": {
+            "title": "Gỡ cài đặt",
+            "body": "Gỡ SaveTabs trong trang tiện ích của trình duyệt. Các phiên đã lưu vẫn ở trong bộ nhớ trình duyệt cho đến khi xóa dữ liệu tiện ích."
+          },
+          "troubleshooting": {
+            "title": "Xử lý sự cố",
+            "body": "Nếu lưu hoặc khôi phục thất bại, hãy kiểm tra SaveTabs đang bật và tải lại trang. Sau đó thử lại với một cửa sổ."
+          }
+        }
+      },
+      "footer": {
+        "privacy": "Quyền riêng tư",
+        "store": "Chrome Web Store"
+      }
     },
     "privacy": {
       "back": "Quay lại SaveTabs",

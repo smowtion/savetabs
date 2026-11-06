@@ -638,7 +638,122 @@
       "loseKeyWarning": "Your sync key is the only way to decrypt your sessions. If you lose it, your saved data cannot be recovered.",
       "rememberLabel": "Remember on this device",
       "rememberWarning": "Only use this on a device you trust. The key stays in this browser until you clear it.",
-      "privacyLink": "Privacy policy"
+      "privacyLink": "Privacy policy",
+      "header": {
+        "account": "Account"
+      },
+      "hero": {
+        "title": "Save every tab. Get them back later.",
+        "description": "SaveTabs stores a whole browser window as one session, closes the tabs, and reopens them when you need them. It runs in your browser and keeps your sessions on your device.",
+        "chrome": "Add to Chrome",
+        "firefox": "Firefox",
+        "comingSoon": "Coming soon",
+        "noAccount": "No account needed. Local use works without signing up.",
+        "mockup": {
+          "save": "Save 12 tabs",
+          "sessions": "Recent sessions",
+          "sessionOne": "Design references",
+          "sessionTwo": "Reading list",
+          "restore": "Restore",
+          "sync": "Sync on"
+        }
+      },
+      "howItWorks": {
+        "title": "How it works",
+        "steps": {
+          "save": {
+            "title": "Save a window",
+            "body": "Open the extension and save every tab in the current window as one session."
+          },
+          "close": {
+            "title": "Tabs close",
+            "body": "SaveTabs closes the saved tabs, so your browser stays clear."
+          },
+          "restore": {
+            "title": "Restore later",
+            "body": "Open the session to bring every saved tab back in a new window."
+          }
+        }
+      },
+      "privacy": {
+        "title": "Privacy",
+        "items": {
+          "e2ee": {
+            "title": "End-to-end encrypted",
+            "body": "Sessions are encrypted in your browser before they are uploaded. The server stores ciphertext it cannot read."
+          },
+          "keyOnly": {
+            "title": "Your key, your data",
+            "body": "Sync runs on your sync key. No account is required, and the key never leaves your browser."
+          },
+          "localFirst": {
+            "title": "Local first",
+            "body": "Without sync, every session stays in your browser's extension storage."
+          },
+          "privateWindows": {
+            "title": "Private windows stay local",
+            "body": "Sessions saved from private or incognito windows are never uploaded."
+          }
+        },
+        "link": "Read the privacy policy"
+      },
+      "features": {
+        "title": "Features",
+        "items": {
+          "search": {
+            "title": "Search sessions",
+            "body": "Find a saved session by name or by the tabs it contains."
+          },
+          "rename": {
+            "title": "Rename sessions",
+            "body": "Give a session a clear name so it is easy to find later."
+          },
+          "exportImport": {
+            "title": "Export and import",
+            "body": "Move sessions between browsers with a JSON file."
+          },
+          "autoDiscard": {
+            "title": "Auto-discard",
+            "body": "Discard idle tabs after a timeout you choose, while keeping pinned and audible tabs open."
+          },
+          "sync": {
+            "title": "Multi-device sync",
+            "body": "Sync encrypted sessions across your devices with your sync key."
+          },
+          "privateWindows": {
+            "title": "Private windows",
+            "body": "Sessions from private windows stay on the device and are never uploaded."
+          }
+        }
+      },
+      "account": {
+        "title": "Keep your sessions on every device",
+        "description": "An account lets a new device unlock your sessions with just your email and password. Your sync key still encrypts everything, and the server never sees it.",
+        "create": "Create account",
+        "signIn": "Sign in",
+        "useKey": "or use a sync key"
+      },
+      "install": {
+        "title": "Install and troubleshooting",
+        "items": {
+          "install": {
+            "title": "Install",
+            "body": "Open the Chrome Web Store listing, choose Add to Chrome, and pin SaveTabs to the toolbar. Firefox is not published yet."
+          },
+          "uninstall": {
+            "title": "Uninstall",
+            "body": "Remove SaveTabs from your browser's extensions page. Saved sessions stay in browser storage until the extension data is cleared."
+          },
+          "troubleshooting": {
+            "title": "Troubleshooting",
+            "body": "If saving or restoring fails, check that SaveTabs is enabled and reload the page. Then try again with a single window."
+          }
+        }
+      },
+      "footer": {
+        "privacy": "Privacy",
+        "store": "Chrome Web Store"
+      }
     },
     "privacy": {
       "back": "Back to SaveTabs",
