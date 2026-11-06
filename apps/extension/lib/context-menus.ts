@@ -9,6 +9,7 @@
 
 import {
   createTranslator,
+  isLanguagePreference,
   resolveLang,
   type Settings,
   type Translator,
@@ -58,8 +59,7 @@ function getBrowserLanguage(): string {
 /** Translator bound to `general.language`; "auto" follows the browser. */
 function createMenuTranslator(settings: Settings): Translator {
   const preference = settings["general.language"];
-  const language =
-    preference === "en" || preference === "vi" ? preference : "auto";
+  const language = isLanguagePreference(preference) ? preference : "auto";
   return createTranslator(resolveLang(language, getBrowserLanguage()));
 }
 

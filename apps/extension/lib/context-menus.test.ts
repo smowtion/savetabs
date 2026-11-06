@@ -101,17 +101,35 @@ describe("rebuildContextMenus", () => {
     );
   });
 
-  it("localizes menu titles to the configured language", async () => {
-    const createSpy = vi.spyOn(fakeBrowser.contextMenus, "create");
+  it.each([
+    [
+      "vi",
+      ["Lưu tab này", "Lưu tất cả tab trong cửa sổ", "Lưu các tab đã chọn"],
+    ],
+    [
+      "zh-CN",
+      ["保存此标签页", "保存此窗口中的所有标签页", "保存选中的标签页"],
+    ],
+    [
+      "es",
+      [
+        "Guardar esta pestaña",
+        "Guardar todas las pestañas de esta ventana",
+        "Guardar las pestañas seleccionadas",
+      ],
+    ],
+  ] as const)(
+    "localizes menu titles to %s",
+    async (language, expectedTitles) => {
+      const createSpy = vi.spyOn(fakeBrowser.contextMenus, "create");
 
-    await rebuildContextMenus(settingsWith({ "general.language": "vi" }));
+      await rebuildContextMenus(settingsWith({ "general.language": language }));
 
-    expect(createSpy.mock.calls.map(([props]) => props.title)).toEqual([
-      "Lưu tab này",
-      "Lưu tất cả tab trong cửa sổ",
-      "Lưu các tab đã chọn",
-    ]);
-  });
+      expect(createSpy.mock.calls.map(([props]) => props.title)).toEqual([
+        ...expectedTitles,
+      ]);
+    },
+  );
 
   it("removes every menu item when the context menu is disabled", async () => {
     const removeAllSpy = vi.spyOn(fakeBrowser.contextMenus, "removeAll");
