@@ -324,7 +324,11 @@
       "changePasswordSubmit": "Change password",
       "changePasswordSubmitting": "Changing password…",
       "changePasswordSuccess": "Password changed. Other sessions were signed out.",
-      "changePasswordFailed": "We could not change your password. Check your current password."
+      "changePasswordFailed": "We could not change your password. Check your current password.",
+      "uploadPromptTitle": "Upload local sessions?",
+      "uploadPrompt": "Upload these sessions to this account?",
+      "uploadPromptUpload": "Upload sessions",
+      "uploadPromptSkip": "Keep local only"
     },
     "advanced": {
       "label": "Advanced",

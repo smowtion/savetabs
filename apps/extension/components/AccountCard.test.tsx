@@ -380,7 +380,7 @@ describe("AccountCard", () => {
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
   });
 
-  it("asks before uploading local sessions when adopting a different vault", async () => {
+  it("asks with the localized prompt before uploading local sessions", async () => {
     await setKey(DEVICE_KEY, "skip");
     await addSession({
       id: "local-1",
@@ -390,22 +390,33 @@ describe("AccountCard", () => {
       tabs: [],
     });
     clientMock.login.mockResolvedValue(await loginResult(ACCOUNT_KEY));
-    const confirmPrompt = vi.fn(() => true);
-    vi.stubGlobal("confirm", confirmPrompt);
 
     const user = userEvent.setup();
     renderCard();
     await fillForm(user);
     await user.click(screen.getByRole("button", { name: "Sign in" }));
+
+    // The question is resolved from the translator, not a hardcoded string,
+    // so a Vietnamese card gets the Vietnamese copy.
+    const dialog = await screen.findByRole("dialog", {}, { timeout: 15_000 });
+    expect(
+      within(dialog).getByText(t("settings.account.uploadPrompt")),
+    ).toBeInTheDocument();
+    expect(t("settings.account.uploadPrompt")).toBe(
+      "Upload these sessions to this account?",
+    );
+
+    await user.click(
+      within(dialog).getByRole("button", {
+        name: t("settings.account.uploadPromptUpload"),
+      }),
+    );
     await screen.findByRole(
       "button",
       { name: "Sign out" },
       { timeout: 15_000 },
     );
 
-    expect(confirmPrompt).toHaveBeenCalledWith(
-      "Upload these sessions to this account?",
-    );
     expect(await getKey()).toBe(ACCOUNT_KEY);
     const rebind = await fakeBrowser.storage.local.get(
       SYNC_KEY_REBIND_STORAGE_KEY,

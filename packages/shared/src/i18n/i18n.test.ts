@@ -128,6 +128,10 @@ describe("i18n", () => {
       "settings.sync.rotateSuccessRevokeFailed",
       "settings.sync.loseKeyWarning",
       "settings.sync.onlyCredentialWarning",
+      "settings.sync.accountPasswordLabel",
+      "settings.sync.accountPasswordHint",
+      "settings.sync.accountPasswordRequired",
+      "settings.sync.keyRelinkFailed",
       "settings.sync.actionFailed",
     ];
 
@@ -294,6 +298,17 @@ describe("i18n", () => {
       "settings.account.recoveryKeyLabel",
       "settings.account.recoveryConfirm",
       "settings.account.recoveryContinue",
+      "settings.account.changePassword",
+      "settings.account.currentPasswordLabel",
+      "settings.account.newPasswordLabel",
+      "settings.account.changePasswordSubmit",
+      "settings.account.changePasswordSubmitting",
+      "settings.account.changePasswordSuccess",
+      "settings.account.changePasswordFailed",
+      "settings.account.uploadPromptTitle",
+      "settings.account.uploadPrompt",
+      "settings.account.uploadPromptUpload",
+      "settings.account.uploadPromptSkip",
     ];
 
     expect(missingKeys("en", accountKeys)).toEqual([]);

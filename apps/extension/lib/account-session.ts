@@ -117,6 +117,11 @@ export type LinkDeviceKeyResult = {
   recoveryKey: string | null;
 };
 
+/**
+ * Fallback copy for callers without a translator. The account card passes a
+ * localized `confirmUpload`, so this English text only serves non-UI contexts;
+ * a context with no `confirm` function declines rather than uploading silently.
+ */
 const UPLOAD_PROMPT = "Upload these sessions to this account?";
 
 function defaultConfirmUpload(): boolean {
@@ -273,11 +278,18 @@ export async function reLinkAfterKeyChange(
   // The email supplies the KDF salt; fetching the profile also revalidates
   // the token before any key material is sent.
   const profile = await client.me(token);
-  const salt = await deriveKdfSalt(normalizeEmail(profile.email));
+  const accountEmail = normalizeEmail(profile.email);
+  const salt = await deriveKdfSalt(accountEmail);
   const masterKey = await deriveMasterKey(password, salt);
   const authHash = await deriveAuthHash(masterKey);
-  const wrapKey = await deriveWrapKey(masterKey);
 
+  // Prove the password before replacing the vault. The server only checks the
+  // proof when the submitted key id differs from the linked one, so without
+  // this a mistyped password for the already-linked key would overwrite the
+  // vault under the wrong password. A failed login aborts with no changes.
+  await client.login({ email: accountEmail, authHash });
+
+  const wrapKey = await deriveWrapKey(masterKey);
   const rawKey = parseKey(newKey);
   const { authId, authKey } = await deriveKeys(rawKey);
   const wrappedKey = await wrapSyncKey(wrapKey, rawKey, authId);

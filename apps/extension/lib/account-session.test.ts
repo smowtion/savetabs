@@ -162,6 +162,12 @@ beforeEach(async () => {
   await deleteDatabase();
   for (const mock of Object.values(clientMock)) mock.mockReset();
   clientMock.linkKey.mockResolvedValue({ ok: true });
+  // Re-link and rotation prove the account password with a login first.
+  clientMock.login.mockResolvedValue({
+    token: "login-proof-token",
+    account: PROFILE,
+    vault: null,
+  });
 });
 
 afterEach(async () => {
@@ -325,6 +331,21 @@ describe("reLinkAfterKeyChange", () => {
     expect(clientMock.me).not.toHaveBeenCalled();
   });
 
+  it("rejects a wrong password before replacing the account link", async () => {
+    await rememberToken();
+    clientMock.me.mockResolvedValue(PROFILE);
+    clientMock.login.mockRejectedValue(new Error("bad password"));
+
+    const newKey = generateKey();
+    await expect(
+      reLinkAfterKeyChange(newKey, "wrong-password"),
+    ).rejects.toThrow();
+
+    // The server verifies the proof only when the key id changes, so the
+    // pre-flight login is what protects an already-linked key's vault.
+    expect(clientMock.linkKey).not.toHaveBeenCalled();
+  }, 30_000);
+
   it("wraps the new key for its own authId and replaces the account link", async () => {
     await rememberToken();
     clientMock.me.mockResolvedValue(PROFILE);
@@ -407,6 +428,22 @@ describe("rotateSyncKey", () => {
     await expect(rotateAndRelink(PASSWORD)).rejects.toThrow();
     expect(await getKey()).toBe(oldKey);
     // Old cloud data is only deleted after a successful re-link.
+    expect(fetchMock).not.toHaveBeenCalled();
+  }, 30_000);
+
+  it("aborts rotation when the account password is wrong", async () => {
+    const oldKey = generateKey();
+    await setKey(oldKey);
+    await rememberToken();
+    clientMock.me.mockResolvedValue(PROFILE);
+    clientMock.login.mockRejectedValue(new Error("bad password"));
+    const fetchMock = vi.fn<typeof fetch>();
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(rotateSyncKey("wrong-password")).rejects.toThrow();
+
+    expect(await getKey()).toBe(oldKey);
+    expect(clientMock.linkKey).not.toHaveBeenCalled();
     expect(fetchMock).not.toHaveBeenCalled();
   }, 30_000);
 

@@ -324,7 +324,11 @@
       "changePasswordSubmit": "Đổi mật khẩu",
       "changePasswordSubmitting": "Đang đổi mật khẩu…",
       "changePasswordSuccess": "Đã đổi mật khẩu. Các phiên khác đã được đăng xuất.",
-      "changePasswordFailed": "Không thể đổi mật khẩu. Hãy kiểm tra mật khẩu hiện tại."
+      "changePasswordFailed": "Không thể đổi mật khẩu. Hãy kiểm tra mật khẩu hiện tại.",
+      "uploadPromptTitle": "Tải các phiên cục bộ lên?",
+      "uploadPrompt": "Tải các phiên này lên tài khoản này?",
+      "uploadPromptUpload": "Tải phiên lên",
+      "uploadPromptSkip": "Chỉ giữ cục bộ"
     },
     "advanced": {
       "label": "Nâng cao",

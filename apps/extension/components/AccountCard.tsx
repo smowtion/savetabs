@@ -23,6 +23,7 @@ import {
   signUp,
   type AccountSessionResult,
 } from "../lib/account-session";
+import { ConfirmDialog } from "./ConfirmDialog";
 import { RecoveryKeyDialog } from "./RecoveryKeyDialog";
 
 /** Minimum password length required before creating an account. */
@@ -94,6 +95,12 @@ export function AccountCard({ t }: AccountCardProps) {
   const [changingPassword, setChangingPassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  // Resolver for the "upload local sessions?" question. The session module
+  // awaits this promise, so the dialog replaces the native `window.confirm`
+  // with localized copy while the sign-in stays pending.
+  const [uploadPrompt, setUploadPrompt] = useState<{
+    resolve: (upload: boolean) => void;
+  } | null>(null);
   const emailId = useId();
   const passwordId = useId();
   const currentPasswordId = useId();
@@ -142,12 +149,23 @@ export function AccountCard({ t }: AccountCardProps) {
     }
   }
 
+  /** Ask, through the localized dialog, before uploading local sessions. */
+  function confirmUpload(): Promise<boolean> {
+    return new Promise((resolve) => setUploadPrompt({ resolve }));
+  }
+
+  function answerUploadPrompt(upload: boolean): void {
+    const pendingPrompt = uploadPrompt;
+    setUploadPrompt(null);
+    pendingPrompt?.resolve(upload);
+  }
+
   function handleSignIn(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
     if (pending !== null) return;
     void completeSignIn(
       "sign-in",
-      () => signIn(email, password),
+      () => signIn(email, password, { confirmUpload }),
       t("settings.account.signInFailed"),
     );
   }
@@ -163,7 +181,7 @@ export function AccountCard({ t }: AccountCardProps) {
     }
     void completeSignIn(
       "sign-up",
-      () => signUp(email, password),
+      () => signUp(email, password, { confirmUpload }),
       t("settings.account.signUpFailed"),
     );
   }
@@ -255,6 +273,20 @@ export function AccountCard({ t }: AccountCardProps) {
         recoveryKey={recoveryKey}
         t={t}
         onContinue={() => setRecoveryKey(null)}
+      />
+    ) : null;
+
+  // Offered only when the account vault replaces a different device key and
+  // local sessions exist; resolving the promise lets the sign-in finish.
+  const uploadDialog =
+    uploadPrompt !== null ? (
+      <ConfirmDialog
+        title={t("settings.account.uploadPromptTitle")}
+        message={t("settings.account.uploadPrompt")}
+        confirmLabel={t("settings.account.uploadPromptUpload")}
+        cancelLabel={t("settings.account.uploadPromptSkip")}
+        onConfirm={() => answerUploadPrompt(true)}
+        onCancel={() => answerUploadPrompt(false)}
       />
     ) : null;
 
@@ -355,6 +387,7 @@ export function AccountCard({ t }: AccountCardProps) {
         )}
         {statusBanner}
         {recoveryDialog}
+        {uploadDialog}
       </div>
     );
   }
@@ -461,6 +494,7 @@ export function AccountCard({ t }: AccountCardProps) {
 
       {statusBanner}
       {recoveryDialog}
+      {uploadDialog}
     </div>
   );
 }
