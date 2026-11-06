@@ -31,7 +31,7 @@ const TAB_TITLES = ["Example A", "Docs B"] as const;
 const FULL_CSP =
   "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
   "img-src 'self' data:; font-src 'self'; " +
-  "connect-src 'self' https://api.savetabs.example; " +
+  "connect-src 'self' https://savetabs-api.azcom.dev; " +
   "frame-ancestors 'none'; base-uri 'self'; form-action 'self';";
 
 /** Headers required by Chromium for a cross-origin fetch with a bearer token. */
