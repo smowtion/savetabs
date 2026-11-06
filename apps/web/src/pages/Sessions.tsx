@@ -18,6 +18,10 @@
  *   required session fields, is counted and skipped; the other sessions still
  *   render. The header links to the landing page and privacy policy and offers
  *   a confirmed "Forget key" action that clears storage and returns home.
+ *
+ * A signed-in account can reach this page without a stored key. In that case
+ * the inline unlock gate asks for the password and, once it unwraps the vault,
+ * the sessions page renders in place without a reload.
  */
 
 import {
@@ -33,9 +37,16 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { SessionCard } from "../components/SessionCard";
+import { UnlockGate } from "../components/UnlockGate";
 import { useI18n } from "../hooks/useI18n";
+import { loadAccountToken } from "../lib/account-session";
 import { API_BASE } from "../lib/config";
-import { clearKey, deriveForWeb, loadKey } from "../lib/key-session";
+import {
+  clearKey,
+  deriveForWeb,
+  loadKey,
+  saveKeyForSession,
+} from "../lib/key-session";
 
 const PAGE_SIZE = 50;
 /** Hard stop for a server that keeps returning the same next page. */
@@ -109,7 +120,7 @@ function matchesQuery(session: Session, query: string): boolean {
 export default function Sessions() {
   const { lang, t } = useI18n();
   const navigate = useNavigate();
-  const [key] = useState(() => loadKey());
+  const [key, setKey] = useState<string | null>(() => loadKey());
   const [sessions, setSessions] = useState<Session[] | null>(null);
   const [decryptFailures, setDecryptFailures] = useState(0);
   const [authError, setAuthError] = useState(false);
@@ -247,7 +258,16 @@ export default function Sessions() {
 
   // Every hook above runs on every render; only the tree below the guard is
   // skipped when the key disappeared (for example in another tab).
-  if (key === null) return <Navigate to="/" replace />;
+  if (key === null) {
+    if (loadAccountToken() === null) return <Navigate to="/" replace />;
+    return (
+      <UnlockGate
+        onUnlocked={(unlockedKey, remember) => {
+          setKey(saveKeyForSession(unlockedKey, remember));
+        }}
+      />
+    );
+  }
 
   const showEmptyState =
     sessions !== null && sessions.length === 0 && decryptFailures === 0;
