@@ -235,6 +235,7 @@ describe("AccountClient", () => {
     const client = createClient(fetchMock);
     const input = {
       token: "reset-token",
+      email: "a@example.com",
       authHash: AUTH_HASH,
       kdfSalt: "CCCC",
       kdfIterations: 600000,

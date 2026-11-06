@@ -139,6 +139,7 @@ describe("Reset page", () => {
     const masterKey = await deriveMasterKey(PASSWORD, salt);
     expect(confirmUnlinkedReset.mock.calls[0][0]).toEqual({
       token: TOKEN,
+      email: EMAIL,
       authHash: await deriveAuthHash(masterKey),
       kdfSalt: encodeSalt(salt),
       kdfIterations: KDF_ITERATIONS,
@@ -158,6 +159,9 @@ describe("Reset page", () => {
     await user.click(screen.getByRole("button", { name: "Reset password" }));
 
     await screen.findByRole("heading", { name: "Password reset" });
+    // The server matches this against the address the token was issued for,
+    // so it must be the same normalized form used to derive the salt.
+    expect(confirmUnlinkedReset.mock.calls[0][0].email).toBe(EMAIL);
     expect(confirmUnlinkedReset.mock.calls[0][0].kdfSalt).toBe(
       encodeSalt(await deriveKdfSalt(EMAIL)),
     );

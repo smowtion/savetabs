@@ -868,7 +868,33 @@ describe("account email rate limit", () => {
     );
 
     expect(response.status).toBe(401);
-    expect(seen).toEqual(["email:nobody@example.com"]);
+    expect(seen).toEqual(["login:nobody@example.com"]);
+  });
+
+  it("keeps the signup bucket separate from the login bucket", async () => {
+    const email = `scope-${crypto.randomUUID()}@example.com`;
+    await seedAccount({ email });
+
+    // Spend the signup/reset budget for the address.
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      const response = await post("/v1/accounts/signup", signupBody({ email }));
+      expect(response.status).toBe(202);
+    }
+    const blockedSignup = await post(
+      "/v1/accounts/signup",
+      signupBody({ email }),
+    );
+    expect(blockedSignup.status).toBe(429);
+
+    // The login budget is untouched: a wrong proof is 401, never 429.
+    const login = await post("/v1/accounts/login", {
+      email,
+      authHash: OTHER_AUTH_HASH,
+    });
+    expect(login.status).toBe(401);
+    expect(((await login.json()) as ErrorBody).error.code).toBe(
+      "invalid_credentials",
+    );
   });
 
   it("rate limits the sixth login within the window", async () => {
@@ -913,7 +939,7 @@ describe("account email rate limit", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(seen).toEqual([`email:${email}`]);
+    expect(seen).toEqual([`login:${email}`]);
   });
 
   it("charges recovery with the email from the body", async () => {
@@ -930,7 +956,7 @@ describe("account email rate limit", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(seen).toEqual([`email:${email}`]);
+    expect(seen).toEqual([`login:${email}`]);
   });
 
   it("charges account deletion with the authenticated account email", async () => {
@@ -947,7 +973,7 @@ describe("account email rate limit", () => {
     );
 
     expect(response.status).toBe(204);
-    expect(seen).toEqual([`email:${email}`]);
+    expect(seen).toEqual([`login:${email}`]);
   });
 });
 
@@ -2028,6 +2054,7 @@ describe("POST /v1/accounts/reset-unlinked/confirm", () => {
 
     const response = await post("/v1/accounts/reset-unlinked/confirm", {
       token: resetToken,
+      email: "confirm@example.com",
       ...newProof,
     });
     expect(response.status).toBe(200);
@@ -2068,6 +2095,7 @@ describe("POST /v1/accounts/reset-unlinked/confirm", () => {
 
     const again = await post("/v1/accounts/reset-unlinked/confirm", {
       token: resetToken,
+      email: "confirm@example.com",
       ...newProof,
     });
     expect(again.status).toBe(410);
@@ -2106,6 +2134,7 @@ describe("POST /v1/accounts/reset-unlinked/confirm", () => {
     ]) {
       const response = await post("/v1/accounts/reset-unlinked/confirm", {
         token,
+        email: "bad-reset@example.com",
         ...newProof,
       });
       expect(response.status).toBe(410);
@@ -2125,14 +2154,61 @@ describe("POST /v1/accounts/reset-unlinked/confirm", () => {
     expect(vaultedRow?.used_at).toBeNull();
   });
 
+  it("rejects a confirm for a different email without consuming the token", async () => {
+    const resetToken = `reset-${crypto.randomUUID()}`;
+    const seeded = await seedAccount({ email: "bound-email@example.com" });
+    await seedVerification(seeded.id, resetToken, { purpose: "reset" });
+
+    const mismatched = await post("/v1/accounts/reset-unlinked/confirm", {
+      token: resetToken,
+      email: "typo@example.com",
+      ...newProof,
+    });
+    expect(mismatched.status).toBe(400);
+    expect(((await mismatched.json()) as ErrorBody).error.code).toBe(
+      "invalid_request",
+    );
+
+    // Nothing is rotated and the token stays usable, so the holder can retry
+    // with the address the reset email was sent to.
+    const unchanged = await readAccount("bound-email@example.com");
+    expect(unchanged?.auth_hash).toBe(await sha256Hex(CLIENT_AUTH_HASH));
+    expect(unchanged?.kdf_salt).toBe(KDF_SALT);
+    expect(unchanged?.kdf_iterations).toBe(KDF_ITERATIONS);
+    expect(unchanged?.email_verified_at).toBeNull();
+    const tokenHash = await hashToken(resetToken);
+    const row = (await readVerifications(seeded.id)).find(
+      (verification) => verification.token_hash === tokenHash,
+    );
+    expect(row?.used_at).toBeNull();
+
+    const confirmed = await post("/v1/accounts/reset-unlinked/confirm", {
+      token: resetToken,
+      // The typed address is normalized before it is compared.
+      email: " Bound-Email@Example.com ",
+      ...newProof,
+    });
+    expect(confirmed.status).toBe(200);
+    expect(await confirmed.json()).toEqual({ ok: true });
+
+    const account = await readAccount("bound-email@example.com");
+    expect(account?.auth_hash).toBe(await sha256Hex(OTHER_AUTH_HASH));
+    expect(account?.kdf_salt).toBe(OTHER_KDF_SALT);
+    expect(account?.kdf_iterations).toBe(OTHER_KDF_ITERATIONS);
+    expect(account?.email_verified_at).toBeGreaterThan(0);
+  });
+
   it("rejects malformed bodies", async () => {
     for (const invalid of [
       {},
-      { token: 42, ...newProof },
-      { token: "", ...newProof },
-      { token: "t", ...newProof, authHash: "AB".repeat(32) },
-      { token: "t", ...newProof, kdfSalt: "AAAA" },
-      { token: "t", ...newProof, kdfIterations: 2_000_001 },
+      { token: 42, email: "a@example.com", ...newProof },
+      { token: "", email: "a@example.com", ...newProof },
+      { token: "t", ...newProof },
+      { token: "t", email: 42, ...newProof },
+      { token: "t", email: "   ", ...newProof },
+      { token: "t", email: "a@example.com", ...newProof, authHash: "AB".repeat(32) },
+      { token: "t", email: "a@example.com", ...newProof, kdfSalt: "AAAA" },
+      { token: "t", email: "a@example.com", ...newProof, kdfIterations: 2_000_001 },
       [],
     ]) {
       const response = await post(

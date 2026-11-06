@@ -98,6 +98,11 @@ export type RequestUnlinkedResetInput = {
 
 export type ConfirmUnlinkedResetInput = {
   token: string;
+  /**
+   * The address typed on the reset page. The server rejects a token issued for
+   * a different account, so a typo cannot store a proof under the wrong salt.
+   */
+  email: string;
   authHash: string;
   kdfSalt: string;
   kdfIterations: number;

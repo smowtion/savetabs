@@ -73,6 +73,9 @@ export default function Reset() {
 
       await createAccountClient().confirmUnlinkedReset({
         token,
+        // The server binds the token to its account, so this must match the
+        // address the reset email was sent to.
+        email: accountEmail,
         authHash,
         kdfSalt: encodeSalt(salt),
         kdfIterations: KDF_ITERATIONS,

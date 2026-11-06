@@ -171,7 +171,11 @@ accountsRoutes.post("/accounts/login", async (c) => {
   const normalizedEmail = normalizeEmail(email);
 
   // Charge before the lookup so unknown and known addresses cost the same.
-  const limited = await enforceEmailRateLimit(c, normalizedEmail);
+  const limited = await enforceEmailRateLimit(
+    c,
+    normalizedEmail,
+    "login",
+  );
   if (limited !== null) return limited;
 
   const digest = await sha256Hex(authHash);
@@ -449,7 +453,11 @@ accountsRoutes.post("/accounts/password", async (c) => {
 
   // The account is known here, so the proof check is charged against its
   // mailbox: a wrong current password cannot be retried without limit.
-  const limited = await enforceEmailRateLimit(c, auth.account.email);
+  const limited = await enforceEmailRateLimit(
+    c,
+    auth.account.email,
+    "login",
+  );
   if (limited !== null) return limited;
 
   if (
@@ -519,7 +527,11 @@ accountsRoutes.post("/accounts/recover", async (c) => {
 
   // Charge before the key and account lookups so a guessed address and a real
   // one cost the same and neither can be probed without limit.
-  const limited = await enforceEmailRateLimit(c, normalizedEmail);
+  const limited = await enforceEmailRateLimit(
+    c,
+    normalizedEmail,
+    "login",
+  );
   if (limited !== null) return limited;
 
   const keyHash = await sha256Hex(authKey);
@@ -633,8 +645,11 @@ accountsRoutes.post("/accounts/reset-unlinked/confirm", async (c) => {
   const body = await readJsonBody(c);
   if (body === null) return invalidRequest(c);
 
-  const { token, authHash, kdfSalt, kdfIterations } = body;
+  const { token, email, authHash, kdfSalt, kdfIterations } = body;
   if (!isNonEmptyString(token)) return invalidRequest(c);
+  if (typeof email !== "string") return invalidRequest(c);
+  const normalizedEmail = normalizeEmail(email);
+  if (normalizedEmail.length === 0) return invalidRequest(c);
   if (typeof authHash !== "string" || !AUTH_HASH_PATTERN.test(authHash)) {
     return invalidRequest(c);
   }
@@ -645,6 +660,27 @@ accountsRoutes.post("/accounts/reset-unlinked/confirm", async (c) => {
 
   const now = Date.now();
   const tokenHash = await hashToken(token);
+
+  // Resolve the account the token was issued for without claiming it. The
+  // typed address must match that account, because the new salt is derived
+  // from it: a typo would store a proof under a salt login can never
+  // reproduce. This lookup writes nothing.
+  const resetAccount = await c.env.DB.prepare(
+    `SELECT v.account_id, a.email
+       FROM email_verifications v
+       JOIN accounts a ON a.id = v.account_id
+      WHERE v.token_hash = ? AND v.purpose = 'reset'
+        AND v.used_at IS NULL AND v.expires_at > ?
+        AND a.auth_id IS NULL`,
+  )
+    .bind(tokenHash, now)
+    .first<{ account_id: string; email: string }>();
+
+  if (resetAccount === null) return invalidToken(c);
+
+  // A mismatch is the holder's typo, not an attack, so the token is left
+  // unused and the holder can retry with the right address.
+  if (resetAccount.email !== normalizedEmail) return invalidRequest(c);
 
   // Claim the reset token only while the account still has no vault. The
   // predicate is repeated in the UPDATE so a concurrent link wins the race
@@ -707,7 +743,11 @@ accountsRoutes.delete("/accounts", async (c) => {
 
   // Deletion is a proof-checked action too; charge the account's mailbox so a
   // stolen token cannot be used to guess the password without limit.
-  const limited = await enforceEmailRateLimit(c, auth.account.email);
+  const limited = await enforceEmailRateLimit(
+    c,
+    auth.account.email,
+    "login",
+  );
   if (limited !== null) return limited;
 
   if (!timingSafeEqual(auth.account.auth_hash, await sha256Hex(authHash))) {
@@ -742,8 +782,12 @@ accountsRoutes.delete("/accounts", async (c) => {
 type AccountAuth = { account: AccountRow } | { response: Response };
 
 /**
- * Charge the per-email bucket for signup and reset requests, keyed by the
- * normalized address so no single mailbox can be flooded. A no-op when the
+ * Charge the per-email bucket for a mailbox-scoped request, keyed by the
+ * normalized address and a scope so no single mailbox can be flooded.
+ *
+ * Signup and reset-unlinked share the `email` bucket; proof-checked actions
+ * use the separate `login` bucket, so an unauthenticated signup or reset flood
+ * for an address can never spend that address's login budget. A no-op when the
  * binding is absent (local development and unit tests).
  *
  * Returns a 429 response when the bucket is exhausted, otherwise `null`.
@@ -751,11 +795,12 @@ type AccountAuth = { account: AccountRow } | { response: Response };
 async function enforceEmailRateLimit(
   c: AppContext,
   email: string,
+  scope: "email" | "login" = "email",
 ): Promise<Response | null> {
   const limiter = c.env.RATE_LIMITER_EMAIL;
   if (limiter === undefined) return null;
 
-  if (await allowRequest(limiter, [`email:${email}`])) return null;
+  if (await allowRequest(limiter, [`${scope}:${email}`])) return null;
 
   return apiError(
     c,
