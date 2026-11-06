@@ -67,7 +67,7 @@ export default defineConfig({
         ? {
             gecko: {
               id: "savetabs@azcom.dev",
-              strict_min_version: "121.0",
+              strict_min_version: "142.0",
               // AMO requires this declaration for every new extension. Sync and
               // accounts are opt-in, so nothing is required: visited URLs
               // upload only after the user creates a sync key, account email

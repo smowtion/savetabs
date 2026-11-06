@@ -199,7 +199,7 @@ Build from the attached sources zip:
 3. pnpm --filter @savetabs/extension exec wxt prepare
 4. WXT_SAVETABS_API_BASE=https://savetabs-api.azcom.dev \
      pnpm --filter @savetabs/extension zip:firefox
-   Output: apps/extension/.output/savetabs-0.2.0-firefox.zip
+   Output: apps/extension/.output/savetabs-0.2.1-firefox.zip
 
 The submitted build is minified; the sources zip contains the same tree and
 these commands reproduce the package.

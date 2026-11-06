@@ -1,8 +1,8 @@
 {
   "extension": {
-    "chrome": "0.2.0",
-    "firefox": "0.2.0"
+    "chrome": "0.2.1",
+    "firefox": "0.2.1"
   },
   "notesUrl": "https://savetabs.azcom.dev",
-  "updatedAt": 1793952621869
+  "updatedAt": 1793955841653
 }
