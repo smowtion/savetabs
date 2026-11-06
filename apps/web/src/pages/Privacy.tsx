@@ -1,6 +1,6 @@
 import { createTranslator } from "@savetabs/shared";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
-import { useEffect } from "react";
+import { Fragment, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 /**
@@ -8,9 +8,11 @@ import { Link } from "react-router-dom";
  *
  * The content is intentionally explicit about what the sync server can see:
  * derived identifiers, an auth-key hash, encrypted blobs, timestamps and
- * deletion tombstones. It also states the consequences of losing the sync key
- * and where the "delete all cloud data" action lives, because the store
- * listings link here.
+ * deletion tombstones. For the optional account it documents the email, the
+ * password-derived proof hash, the wrapped sync key, hashed tokens, the email
+ * processor and the recovery-key limitation. It also states the consequences
+ * of losing the sync key and where the "delete all cloud data" action lives,
+ * because the store listings link here.
  *
  * The policy is published in English only. Other locales link here and read
  * the English text, so the page pins the English translator regardless of the
@@ -43,8 +45,34 @@ const DATA_ITEMS = [
   "timestamps",
 ] as const;
 
+/** Data disclosed when the visitor creates the optional account. */
+const ACCOUNT_ITEMS = [
+  "accountEmail",
+  "accountProof",
+  "accountVault",
+  "accountTokens",
+  "processorResend",
+  "recoveryLimit",
+] as const;
+
 const BODY_TEXT_CLASS =
   "mt-2 text-pretty text-sm leading-6 text-neutral-600 dark:text-neutral-400";
+
+/** The optional-account disclosure, rendered after the sync-key data. */
+function AccountSection() {
+  return (
+    <section aria-labelledby="privacy-account">
+      <h2 id="privacy-account" className="text-lg font-semibold tracking-tight">
+        {t("web.privacy.account.title")}
+      </h2>
+      <ul className="mt-2 list-disc space-y-2 ps-5 text-sm leading-6 text-neutral-600 dark:text-neutral-400">
+        {ACCOUNT_ITEMS.map((item) => (
+          <li key={item}>{t(`web.privacy.account.${item}`)}</li>
+        ))}
+      </ul>
+    </section>
+  );
+}
 
 export default function Privacy() {
   // The page is English-only, so it also resets the document attributes when
@@ -98,36 +126,39 @@ export default function Privacy() {
 
         <div className="mt-10 space-y-9">
           {SECTIONS.map((section) => (
-            <section key={section} aria-labelledby={`privacy-${section}`}>
-              <h2
-                id={`privacy-${section}`}
-                className="text-lg font-semibold tracking-tight"
-              >
-                {t(`web.privacy.sections.${section}.title`)}
-              </h2>
+            <Fragment key={section}>
+              <section aria-labelledby={`privacy-${section}`}>
+                <h2
+                  id={`privacy-${section}`}
+                  className="text-lg font-semibold tracking-tight"
+                >
+                  {t(`web.privacy.sections.${section}.title`)}
+                </h2>
 
-              {section === "data" ? (
-                <>
+                {section === "data" ? (
+                  <>
+                    <p className={BODY_TEXT_CLASS}>
+                      {t("web.privacy.sections.data.lead")}
+                    </p>
+                    <ul className="mt-3 list-disc space-y-2 ps-5 text-sm leading-6 text-neutral-600 dark:text-neutral-400">
+                      {DATA_ITEMS.map((item) => (
+                        <li key={item}>
+                          {t(`web.privacy.sections.data.${item}`)}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className={BODY_TEXT_CLASS}>
+                      {t("web.privacy.sections.data.footer")}
+                    </p>
+                  </>
+                ) : (
                   <p className={BODY_TEXT_CLASS}>
-                    {t("web.privacy.sections.data.lead")}
+                    {t(`web.privacy.sections.${section}.body`)}
                   </p>
-                  <ul className="mt-3 list-disc space-y-2 ps-5 text-sm leading-6 text-neutral-600 dark:text-neutral-400">
-                    {DATA_ITEMS.map((item) => (
-                      <li key={item}>
-                        {t(`web.privacy.sections.data.${item}`)}
-                      </li>
-                    ))}
-                  </ul>
-                  <p className={BODY_TEXT_CLASS}>
-                    {t("web.privacy.sections.data.footer")}
-                  </p>
-                </>
-              ) : (
-                <p className={BODY_TEXT_CLASS}>
-                  {t(`web.privacy.sections.${section}.body`)}
-                </p>
-              )}
-            </section>
+                )}
+              </section>
+              {section === "data" ? <AccountSection /> : null}
+            </Fragment>
           ))}
         </div>
       </main>

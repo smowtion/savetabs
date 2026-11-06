@@ -68,13 +68,20 @@ export default defineConfig({
             gecko: {
               id: "savetabs@azcom.dev",
               strict_min_version: "121.0",
-              // AMO requires this declaration for every new extension. Sync is
-              // opt-in, so nothing is required: visited URLs upload only after
-              // the user creates a sync key, and request metadata (IP, version
-              // check) is technical data. Both are declared optional.
+              // AMO requires this declaration for every new extension. Sync and
+              // accounts are opt-in, so nothing is required: visited URLs
+              // upload only after the user creates a sync key, account email
+              // and credentials exist only after signup, and request metadata
+              // (IP, version check) is technical data. All are declared
+              // optional.
               data_collection_permissions: {
                 required: ["none"],
-                optional: ["browsingActivity", "technicalAndInteraction"],
+                optional: [
+                  "browsingActivity",
+                  "authenticationInfo",
+                  "personallyIdentifyingInfo",
+                  "technicalAndInteraction",
+                ],
               },
             },
           }

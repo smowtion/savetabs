@@ -113,6 +113,22 @@ describe("i18n", () => {
     }
   });
 
+  it("documents every account data field in the privacy copy", () => {
+    const accountKeys = [
+      "title",
+      "accountEmail",
+      "accountProof",
+      "accountVault",
+      "accountTokens",
+      "processorResend",
+      "recoveryLimit",
+    ].map((key) => `web.privacy.account.${key}`);
+
+    // English is authoritative; Vietnamese keeps a full translation.
+    expect(missingKeys("en", accountKeys)).toEqual([]);
+    expect(missingKeys("vi", accountKeys)).toEqual([]);
+  });
+
   it("resolves language and covers every schema string", () => {
     expect(resolveLang("auto", "vi-VN")).toBe("vi");
     expect(resolveLang("auto", "en-US")).toBe("en");

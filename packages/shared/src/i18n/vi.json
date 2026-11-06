@@ -790,11 +790,11 @@
         },
         "keyLoss": {
           "title": "Nếu bạn mất khóa đồng bộ",
-          "body": "Không có tài khoản, địa chỉ email hay mật khẩu để khôi phục. Khóa đồng bộ là thông tin xác thực duy nhất có thể giải mã các phiên đã đồng bộ. Nếu mất khóa, dữ liệu đã mã hóa trên máy chủ không thể khôi phục. Hãy giữ một bản sao an toàn; bạn có thể hiện và sao chép khóa trong tiện ích tại Cài đặt → Đồng bộ."
+          "body": "Khóa đồng bộ là thông tin xác thực duy nhất có thể giải mã các phiên đã đồng bộ. Nếu có tài khoản, mật khẩu dùng để mở khóa đồng bộ và khóa đồng bộ cũng chính là khóa khôi phục của bạn. Nếu mất khóa đồng bộ và không thể mở bằng mật khẩu hoặc khóa khôi phục, dữ liệu đã mã hóa trên máy chủ không thể khôi phục. Hãy giữ một bản sao an toàn; bạn có thể hiện và sao chép khóa trong tiện ích tại Cài đặt → Đồng bộ."
         },
         "delete": {
           "title": "Xóa dữ liệu của bạn",
-          "body": "Các phiên cục bộ nằm trong trình duyệt cho đến khi bạn xóa chúng trong tiện ích; xóa dữ liệu của tiện ích hoặc gỡ cài đặt cũng xóa chúng. Để xóa toàn bộ dữ liệu đám mây của một khóa đồng bộ, mở tiện ích, vào Cài đặt → Đồng bộ và chọn Xóa dữ liệu đám mây. Thao tác này xóa các phiên đã mã hóa, đánh dấu xóa và bản ghi khóa của khóa đó, đồng thời tắt đồng bộ để các phiên cục bộ không bị tải lên lại. Xoay khóa đồng bộ cũng xóa dữ liệu được lưu dưới khóa cũ; nếu việc xóa thất bại, hãy nhập lại khóa cũ và dùng Xóa dữ liệu đám mây."
+          "body": "Các phiên cục bộ nằm trong trình duyệt cho đến khi bạn xóa chúng trong tiện ích; xóa dữ liệu của tiện ích hoặc gỡ cài đặt cũng xóa chúng. Để xóa toàn bộ dữ liệu đám mây của một khóa đồng bộ, mở tiện ích, vào Cài đặt → Đồng bộ và chọn Xóa dữ liệu đám mây. Thao tác này xóa các phiên đã mã hóa, đánh dấu xóa và bản ghi khóa của khóa đó, đồng thời tắt đồng bộ để các phiên cục bộ không bị tải lên lại. Xoay khóa đồng bộ cũng xóa dữ liệu được lưu dưới khóa cũ; nếu việc xóa thất bại, hãy nhập lại khóa cũ và dùng Xóa dữ liệu đám mây. Xóa tài khoản trên trang tài khoản web sẽ gỡ email, bằng chứng mật khẩu, thông số KDF, khóa đã bọc, token và bộ đếm email; các phiên đã đồng bộ được xóa riêng bằng Xóa dữ liệu đám mây."
         },
         "analytics": {
           "title": "Không phân tích, không bên thứ ba",
@@ -804,6 +804,15 @@
           "title": "Liên hệ",
           "body": "Mọi câu hỏi về chính sách này có thể gửi tới support@azcom.dev."
         }
+      },
+      "account": {
+        "title": "Tài khoản SaveTabs của bạn",
+        "accountEmail": "Tài khoản là tuỳ chọn. Nếu bạn tạo tài khoản, máy chủ lưu địa chỉ email để đăng nhập và gửi thư xác minh hoặc đặt lại mật khẩu.",
+        "accountProof": "Mã băm SHA-256 của bằng chứng xác thực được tạo từ mật khẩu bằng PBKDF2-SHA256 (600.000 vòng lặp và muối riêng cho từng tài khoản). Máy chủ không bao giờ nhận mật khẩu của bạn và không thể đảo ngược mã băm đã lưu.",
+        "accountVault": "Khóa đồng bộ của bạn được mã hóa bằng một khóa dẫn xuất từ mật khẩu (AES-GCM-256, ràng buộc với mã tài khoản trong dữ liệu mã hóa). Máy chủ chỉ lưu khóa đã được bọc và không thể giải mã.",
+        "accountTokens": "Mã băm của token phiên đăng nhập có hiệu lực 30 ngày, token xác minh email và đặt lại mật khẩu có hiệu lực 24 giờ, cùng bộ đếm số email gửi mỗi ngày. Token gốc chỉ tồn tại trong trình duyệt của bạn hoặc trong email được gửi tới bạn.",
+        "processorResend": "Resend xử lý email tài khoản thay cho chúng tôi. Dịch vụ này nhận địa chỉ email và nội dung thư, không bao giờ nhận mật khẩu, khóa đồng bộ hay dữ liệu phiên của bạn.",
+        "recoveryLimit": "Khóa khôi phục của bạn chính là khóa đồng bộ. Nếu bạn mất cả mật khẩu lẫn khóa khôi phục, dữ liệu đám mây đã mã hóa không thể khôi phục; không ai tại SaveTabs có thể đặt lại."
       },
       "notice": "Chính sách này được công bố bằng tiếng Anh. Phiên bản tiếng Anh là bản có hiệu lực."
     },

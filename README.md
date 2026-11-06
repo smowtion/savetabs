@@ -10,20 +10,39 @@ optional end-to-end encrypted (E2EE) sync.
 > live deployment and store submission are completed. See
 > [Status and placeholders](#status-and-placeholders).
 
+## Features
+
+- Save the current window or every window as a named session from the toolbar,
+  keyboard shortcut, or context menu; restore tab order and pinned state.
+- Optional end-to-end encrypted (E2EE) sync: URLs, titles, and favicons are
+  encrypted in the browser with AES-GCM 256, and the server stores only
+  ciphertext.
+- Optional accounts: sign up with an email and password to make sync easier
+  across devices. The password unlocks the wrapped sync key locally; the server
+  stores the email, a password-derived proof hash, KDF salt and iterations, the
+  wrapped sync key, hashed session and email tokens, and daily email counters.
+  A recovery key (the sync key) is shown once when an account is linked.
+- Sessions saved from private or incognito windows stay local-only.
+- Interface in English, Vietnamese, and ten more locales; light, dark, and
+  system themes.
+- No analytics, third-party trackers, content scripts, or remote code.
+
 ## Architecture
 
 | Path | Role |
 | --- | --- |
-| `apps/extension` | WXT + React Manifest V3 extension: popup, options, sessions page, background service worker, local IndexedDB storage, E2EE sync client. |
-| `apps/worker` | Hono API on Cloudflare Workers: sync endpoints, D1 for key hashes/tombstones/counters, R2 for release artifacts, optional rate-limit bindings. |
-| `apps/web` | Vite + React web app: landing page, sessions viewer, privacy policy. Decrypts locally with the sync key. |
-| `packages/shared` | Shared TypeScript types, settings schema, key derivation and AES-GCM helpers, i18n strings, and the HTTP sync client. |
+| `apps/extension` | WXT + React Manifest V3 extension: popup, options, sessions page, background service worker, local IndexedDB storage, E2EE sync client, optional account session. |
+| `apps/worker` | Hono API on Cloudflare Workers: sync and account endpoints, D1 for key hashes/tombstones/counters plus account, email-token, and email-send records, R2 for release artifacts, optional rate-limit bindings. |
+| `apps/web` | Vite + React web app: landing page, account signup/login/verify/recovery, sessions viewer, privacy policy. Decrypts locally with the sync key. |
+| `packages/shared` | Shared TypeScript types, settings schema, key derivation and AES-GCM helpers, i18n strings, and the HTTP sync and account clients. |
 
 Sync flow: the extension derives keys locally and encrypts each session with
 AES-GCM 256 before upload. The Worker stores ciphertext, a public `authId`
 derived from the sync key, a SHA-256 hash of the derived auth key, timestamps,
-and deletion tombstones. The server never receives the sync key or plaintext
-URLs and titles.
+and deletion tombstones. Accounts are optional; when created, the password is
+stretched with PBKDF2-SHA256 and the sync key is wrapped client-side, so the
+server never receives the password, master key, sync key, or plaintext URLs and
+titles.
 
 More detail: `docs/superpowers/specs/2026-11-04-savetabs-design.md`.
 
@@ -187,18 +206,30 @@ savetabs-releases/
 
 ## Privacy
 
-- No account, email address, or password. The generated sync key is the only
-  credential.
+- No account is required. Local use and key-only sync work with just the
+  generated sync key. If the user creates the optional account, the server
+  stores the email address, a password-derived proof hash, KDF salt and
+  iteration count, the wrapped sync key, hashed account session and
+  verification/reset tokens, and daily email-send counters. The password,
+  master key, sync key, and readable URLs or titles never reach the server.
 - Session contents are encrypted in the browser with AES-GCM 256 before upload.
   The server stores ciphertext, a public `authId`, a hash of the derived auth
   key, timestamps, deletion tombstones, and short-lived rate-limit counters.
-  It never receives the sync key or readable URLs, titles, or favicons.
+- Resend processes account verification and password-reset email; it receives
+  the email address and message content only.
 - Private/incognito sessions are local-only and are never uploaded.
 - There are no analytics, ads, tracking pixels, content scripts, or remotely
   loaded third-party scripts.
-- Losing the sync key makes synced data unrecoverable; there is no server-side
-  reset. JSON session export/import is the local recovery path.
+- Losing both the account password and the recovery key (the sync key) makes
+  synced data unrecoverable; there is no server-side reset. JSON session
+  export/import is the local recovery path.
 - Users can delete all cloud data from Settings → Sync → Delete cloud data.
+- Store declarations: Chrome Web Store data usage lists personally
+  identifiable information (account email), authentication information (sync
+  and account credentials), web history, and location (rate-limit IP). AMO
+  declares required `none` with optional `browsingActivity`,
+  `authenticationInfo`, `personallyIdentifyingInfo`, and
+  `technicalAndInteraction`.
 
 Details: `apps/extension/store/privacy-notes.md` and the web app's `/privacy`
 page.
@@ -233,7 +264,8 @@ pnpm --filter @savetabs/extension screenshots
 - Firefox Add-ons listing URL in `apps/extension/lib/store-urls.ts` and the
   Firefox link in `apps/extension/store/description.md` once AMO submission
   exists. The add-on id is `savetabs@azcom.dev`; the AMO data-collection
-  declaration is `required: ["none"]`, optional `browsingActivity` and
+  declaration is `required: ["none"]`, optional `browsingActivity`,
+  `authenticationInfo`, `personallyIdentifyingInfo`, and
   `technicalAndInteraction`.
 - Build-time defaults (`https://api.savetabs.example` in
   `apps/extension/lib/config.ts` and `apps/web/src/lib/config.ts`) stay as

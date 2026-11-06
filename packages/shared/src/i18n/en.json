@@ -790,11 +790,11 @@
         },
         "keyLoss": {
           "title": "If you lose your sync key",
-          "body": "There is no account, email address or password to reset. The sync key is the only credential that can decrypt synced sessions. If you lose it, the encrypted data on the server cannot be recovered. Keep a safe copy; you can reveal and copy the key in the extension under Settings → Sync."
+          "body": "The sync key is the only credential that can decrypt synced sessions. With an account, your password unwraps the sync key and the sync key is also your recovery key. If you lose the sync key and cannot unlock it with your password or recovery key, the encrypted data on the server cannot be recovered. Keep a safe copy; you can reveal and copy the key in the extension under Settings → Sync."
         },
         "delete": {
           "title": "Deleting your data",
-          "body": "Local sessions stay in your browser until you delete them in the extension; clearing the extension's data or uninstalling it also removes them. To delete all cloud data for a sync key, open the extension, go to Settings → Sync and choose Delete cloud data. This removes the encrypted sessions, deletion tombstones and the key record for that sync key, and turns sync off so local sessions are not uploaded again. Rotating the sync key also deletes the data stored under the old key; if that deletion fails, import the old key and use Delete cloud data."
+          "body": "Local sessions stay in your browser until you delete them in the extension; clearing the extension's data or uninstalling it also removes them. To delete all cloud data for a sync key, open the extension, go to Settings → Sync and choose Delete cloud data. This removes the encrypted sessions, deletion tombstones and the key record for that sync key, and turns sync off so local sessions are not uploaded again. Rotating the sync key also deletes the data stored under the old key; if that deletion fails, import the old key and use Delete cloud data. Deleting your account from the web account page removes your email, password proof, KDF settings, wrapped key, tokens and email counters; synced sessions are removed separately with Delete cloud data."
         },
         "analytics": {
           "title": "No analytics or third parties",
@@ -804,6 +804,15 @@
           "title": "Contact",
           "body": "Questions about this policy can be sent to support@azcom.dev."
         }
+      },
+      "account": {
+        "title": "Your SaveTabs account",
+        "accountEmail": "Creating an account is optional. If you create one, the server stores your email address to sign you in and to send verification and password-reset messages.",
+        "accountProof": "A SHA-256 hash of an authentication proof derived from your password with PBKDF2-SHA256 (600,000 iterations and a per-account salt). The server never receives your password, and the stored hash cannot be reversed into it.",
+        "accountVault": "Your sync key encrypted under a key derived from your password (AES-GCM-256, with the account id bound into the encrypted data). The server stores only the wrapped key and cannot decrypt it.",
+        "accountTokens": "Hashed account session tokens valid for 30 days, hashed email-verification and password-reset tokens valid for 24 hours, and a daily email-send counter. Raw tokens exist only in your browser or in the email sent to you.",
+        "processorResend": "Resend processes account email on our behalf. It receives your email address and the message content, never your password, sync key or session data.",
+        "recoveryLimit": "Your recovery key is your sync key. If you lose both your password and your recovery key, the encrypted cloud data cannot be recovered; no one at SaveTabs can reset it."
       },
       "notice": "This policy is published in English. The English version prevails."
     },

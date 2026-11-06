@@ -48,6 +48,15 @@ keyboard shortcuts.
 encrypted sync requests. When sync is off, the extension makes no requests to
 that origin. There is no broad host access and no access to browsing content.
 
+## Accounts
+
+Optional accounts add **no new permissions**. Signup, sign-in, email
+verification, password reset, and the wrapped-key vault all call the same
+single API origin covered by the host permission above. The opaque account
+token is stored in `extension.storage.local`, which the existing `storage`
+permission already covers. No content scripts, `activeTab`, `scripting`,
+`cookies`, `history`, or additional hosts are involved.
+
 ## Not requested
 
 - No `activeTab` or `scripting`: SaveTabs never injects scripts into pages.

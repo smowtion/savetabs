@@ -34,6 +34,13 @@ const PRIVACY_TRANSLATION_KEYS = [
   "web.privacy.sections.analytics.body",
   "web.privacy.sections.contact.title",
   "web.privacy.sections.contact.body",
+  "web.privacy.account.title",
+  "web.privacy.account.accountEmail",
+  "web.privacy.account.accountProof",
+  "web.privacy.account.accountVault",
+  "web.privacy.account.accountTokens",
+  "web.privacy.account.processorResend",
+  "web.privacy.account.recoveryLimit",
 ];
 
 function renderApp(path: string) {
@@ -114,6 +121,10 @@ describe("App routing", () => {
     expect(
       screen.getByRole("heading", { name: "What the sync server stores" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Your SaveTabs account" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Resend processes/)).toBeInTheDocument();
     expect(screen.getByText(/support@azcom\.dev/)).toBeInTheDocument();
   });
 
