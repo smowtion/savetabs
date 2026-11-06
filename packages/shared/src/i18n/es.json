@@ -687,6 +687,31 @@
           "sync": "Sincronización activada"
         }
       },
+      "trust": {
+        "label": "Aspectos destacados",
+        "localFirst": "Local primero",
+        "encrypted": "Cifrado de extremo a extremo",
+        "languages": "12 idiomas",
+        "noAccount": "Sin cuenta"
+      },
+      "gallery": {
+        "title": "Una mirada de cerca",
+        "subtitle": "Consulta la página de sesiones, los ajustes y la ventana emergente.",
+        "tabs": {
+          "sessions": "Sesiones",
+          "settings": "Ajustes",
+          "popup": "Ventana emergente"
+        },
+        "captions": {
+          "sessions": "Cada ventana guardada se convierte en una sesión que puedes restaurar más tarde.",
+          "settings": "Elige qué se guarda, se cierra y se sincroniza.",
+          "popup": "Guarda todas las pestañas de la ventana actual con un clic."
+        }
+      },
+      "guide": {
+        "saveAlt": "La ventana emergente de SaveTabs con la acción de guardar",
+        "restoreAlt": "La página de sesiones con ventanas guardadas listas para restaurar"
+      },
       "howItWorks": {
         "title": "Cómo funciona",
         "steps": {

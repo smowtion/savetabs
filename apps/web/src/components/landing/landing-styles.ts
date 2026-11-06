@@ -10,7 +10,7 @@ export const SECTION_CLASS =
   "border-t border-neutral-200 dark:border-neutral-800";
 
 export const SECTION_INNER_CLASS =
-  "mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-20";
+  "motion-fade-up mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-20";
 
 export const SECTION_TITLE_CLASS =
   "text-balance text-2xl font-bold tracking-tight sm:text-3xl";
@@ -19,7 +19,7 @@ export const SECTION_LEAD_CLASS =
   "mt-3 max-w-2xl text-pretty text-base text-neutral-600 dark:text-neutral-400";
 
 export const CARD_CLASS =
-  "rounded-2xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900";
+  "motion-hover-lift rounded-2xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900";
 
 export const MUTED_TEXT_CLASS =
   "text-sm leading-6 text-neutral-600 dark:text-neutral-400";

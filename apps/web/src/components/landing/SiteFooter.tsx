@@ -1,5 +1,4 @@
 import type { Translator } from "@savetabs/shared";
-import { KeyRound } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { TEXT_LINK_CLASS } from "./landing-styles";
@@ -19,9 +18,13 @@ export function SiteFooter({ t }: Props) {
     <footer className="border-t border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <span className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight">
-          <span className="grid size-7 place-items-center rounded-lg bg-indigo-600 text-white">
-            <KeyRound aria-hidden="true" size={15} />
-          </span>
+          <img
+            src="/icon.svg"
+            alt=""
+            width={28}
+            height={28}
+            className="size-7 rounded-lg"
+          />
           SaveTabs
         </span>
 

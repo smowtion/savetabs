@@ -687,6 +687,31 @@
           "sync": "同期オン"
         }
       },
+      "trust": {
+        "label": "主な特長",
+        "localFirst": "ローカル優先",
+        "encrypted": "エンドツーエンド暗号化",
+        "languages": "12言語",
+        "noAccount": "アカウント不要"
+      },
+      "gallery": {
+        "title": "詳しく見る",
+        "subtitle": "セッションページ、設定、ポップアップをご覧ください。",
+        "tabs": {
+          "sessions": "セッション",
+          "settings": "設定",
+          "popup": "ポップアップ"
+        },
+        "captions": {
+          "sessions": "保存したウィンドウはそれぞれ 1 つのセッションになり、後で復元できます。",
+          "settings": "保存・閉じる・同期する内容を選べます。",
+          "popup": "現在のウィンドウのすべてのタブをワンクリックで保存します。"
+        }
+      },
+      "guide": {
+        "saveAlt": "保存アクションを表示した SaveTabs のポップアップ",
+        "restoreAlt": "復元できる保存済みウィンドウを表示したセッションページ"
+      },
       "howItWorks": {
         "title": "使い方",
         "steps": {

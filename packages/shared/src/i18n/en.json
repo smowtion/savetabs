@@ -687,6 +687,31 @@
           "sync": "Sync on"
         }
       },
+      "trust": {
+        "label": "Product highlights",
+        "localFirst": "Local-first",
+        "encrypted": "End-to-end encrypted",
+        "languages": "12 languages",
+        "noAccount": "No account needed"
+      },
+      "gallery": {
+        "title": "A closer look",
+        "subtitle": "See the sessions page, the settings, and the popup.",
+        "tabs": {
+          "sessions": "Sessions",
+          "settings": "Settings",
+          "popup": "Popup"
+        },
+        "captions": {
+          "sessions": "Each saved window becomes one session you can restore later.",
+          "settings": "Choose what gets saved, closed, and synced.",
+          "popup": "Save every tab in the current window in one click."
+        }
+      },
+      "guide": {
+        "saveAlt": "The SaveTabs popup with the save action",
+        "restoreAlt": "The sessions page with saved windows ready to restore"
+      },
       "howItWorks": {
         "title": "How it works",
         "steps": {

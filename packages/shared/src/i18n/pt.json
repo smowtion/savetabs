@@ -687,6 +687,31 @@
           "sync": "Sincronização ativada"
         }
       },
+      "trust": {
+        "label": "Destaques do produto",
+        "localFirst": "Local primeiro",
+        "encrypted": "Criptografia de ponta a ponta",
+        "languages": "12 idiomas",
+        "noAccount": "Sem conta"
+      },
+      "gallery": {
+        "title": "Um olhar mais de perto",
+        "subtitle": "Veja a página de sessões, as configurações e o pop-up.",
+        "tabs": {
+          "sessions": "Sessões",
+          "settings": "Configurações",
+          "popup": "Pop-up"
+        },
+        "captions": {
+          "sessions": "Cada janela guardada vira uma sessão que você pode restaurar depois.",
+          "settings": "Escolha o que é guardado, fechado e sincronizado.",
+          "popup": "Guarde todas as abas da janela atual com um clique."
+        }
+      },
+      "guide": {
+        "saveAlt": "O pop-up do SaveTabs com a ação de guardar",
+        "restoreAlt": "A página de sessões com janelas guardadas prontas para restaurar"
+      },
       "howItWorks": {
         "title": "Como funciona",
         "steps": {

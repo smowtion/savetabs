@@ -26,15 +26,21 @@ export function Hero({ t }: Props) {
         <div>
           <h1
             id="landing-hero"
-            className="text-balance text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl"
+            className="motion-fade-up text-balance text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl"
           >
             {t("web.landing.hero.title")}
           </h1>
-          <p className="mt-5 max-w-xl text-pretty text-lg leading-8 text-neutral-600 dark:text-neutral-400">
+          <p
+            className="motion-fade-up mt-5 max-w-xl text-pretty text-lg leading-8 text-neutral-600 dark:text-neutral-400"
+            style={{ animationDelay: "90ms" }}
+          >
             {t("web.landing.hero.description")}
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+          <div
+            className="motion-fade-up mt-8 flex flex-wrap items-center gap-3"
+            style={{ animationDelay: "180ms" }}
+          >
             <a
               href={CHROME_STORE_URL}
               target="_blank"
@@ -51,7 +57,10 @@ export function Hero({ t }: Props) {
             </button>
           </div>
 
-          <p className="mt-5 text-sm text-neutral-500 dark:text-neutral-400">
+          <p
+            className="motion-fade-up mt-5 text-sm text-neutral-500 dark:text-neutral-400"
+            style={{ animationDelay: "270ms" }}
+          >
             {t("web.landing.hero.noAccount")}
           </p>
         </div>
@@ -64,7 +73,10 @@ export function Hero({ t }: Props) {
 
 function PopupMockup({ t }: Props) {
   return (
-    <div aria-hidden="true" className="relative mx-auto w-full max-w-sm">
+    <div
+      aria-hidden="true"
+      className="motion-float-y relative mx-auto w-full max-w-sm"
+    >
       <div className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-indigo-500/10 blur-2xl dark:bg-indigo-500/20" />
       <div className="rounded-2xl border border-neutral-200 bg-white p-3 shadow-xl shadow-neutral-900/5 dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-black/30">
         <div className="flex items-center justify-between border-b border-neutral-200 pb-2 dark:border-neutral-800">

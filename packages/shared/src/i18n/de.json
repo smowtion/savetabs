@@ -687,6 +687,31 @@
           "sync": "Synchronisierung an"
         }
       },
+      "trust": {
+        "label": "Produktmerkmale",
+        "localFirst": "Lokal zuerst",
+        "encrypted": "Ende-zu-Ende-verschlüsselt",
+        "languages": "12 Sprachen",
+        "noAccount": "Kein Konto nötig"
+      },
+      "gallery": {
+        "title": "Näher betrachtet",
+        "subtitle": "Sieh dir die Sitzungsseite, die Einstellungen und das Popup an.",
+        "tabs": {
+          "sessions": "Sitzungen",
+          "settings": "Einstellungen",
+          "popup": "Popup"
+        },
+        "captions": {
+          "sessions": "Jedes gespeicherte Fenster wird zu einer Sitzung, die du später wiederherstellen kannst.",
+          "settings": "Lege fest, was gespeichert, geschlossen und synchronisiert wird.",
+          "popup": "Speichere alle Tabs des aktuellen Fensters mit einem Klick."
+        }
+      },
+      "guide": {
+        "saveAlt": "Das SaveTabs-Popup mit der Speichern-Aktion",
+        "restoreAlt": "Die Sitzungsseite mit gespeicherten Fenstern zum Wiederherstellen"
+      },
       "howItWorks": {
         "title": "So funktioniert es",
         "steps": {

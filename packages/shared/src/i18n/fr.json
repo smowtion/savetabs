@@ -687,6 +687,31 @@
           "sync": "Synchronisation activée"
         }
       },
+      "trust": {
+        "label": "Points forts",
+        "localFirst": "Local d'abord",
+        "encrypted": "Chiffrement de bout en bout",
+        "languages": "12 langues",
+        "noAccount": "Sans compte"
+      },
+      "gallery": {
+        "title": "De plus près",
+        "subtitle": "Découvrez la page des sessions, les réglages et la fenêtre contextuelle.",
+        "tabs": {
+          "sessions": "Sessions",
+          "settings": "Réglages",
+          "popup": "Fenêtre"
+        },
+        "captions": {
+          "sessions": "Chaque fenêtre enregistrée devient une session que vous pouvez restaurer plus tard.",
+          "settings": "Choisissez ce qui est enregistré, fermé et synchronisé.",
+          "popup": "Enregistrez tous les onglets de la fenêtre actuelle en un clic."
+        }
+      },
+      "guide": {
+        "saveAlt": "La fenêtre contextuelle de SaveTabs avec l'action d'enregistrement",
+        "restoreAlt": "La page des sessions avec des fenêtres enregistrées prêtes à restaurer"
+      },
       "howItWorks": {
         "title": "Comment ça marche",
         "steps": {

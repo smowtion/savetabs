@@ -687,6 +687,31 @@
           "sync": "동기화 켜짐"
         }
       },
+      "trust": {
+        "label": "주요 기능",
+        "localFirst": "로컬 우선",
+        "encrypted": "종단 간 암호화",
+        "languages": "12개 언어",
+        "noAccount": "계정 필요 없음"
+      },
+      "gallery": {
+        "title": "자세히 보기",
+        "subtitle": "세션 페이지, 설정, 팝업을 살펴보세요.",
+        "tabs": {
+          "sessions": "세션",
+          "settings": "설정",
+          "popup": "팝업"
+        },
+        "captions": {
+          "sessions": "저장한 각 창은 나중에 복원할 수 있는 하나의 세션이 됩니다.",
+          "settings": "무엇을 저장하고 닫고 동기화할지 선택하세요.",
+          "popup": "현재 창의 모든 탭을 한 번의 클릭으로 저장하세요."
+        }
+      },
+      "guide": {
+        "saveAlt": "저장 동작이 보이는 SaveTabs 팝업",
+        "restoreAlt": "복원할 수 있는 저장된 창이 있는 세션 페이지"
+      },
       "howItWorks": {
         "title": "사용 방법",
         "steps": {

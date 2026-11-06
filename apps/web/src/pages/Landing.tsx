@@ -1,5 +1,5 @@
 import { LOCALES, type Lang } from "@savetabs/shared";
-import { KeyRound, Monitor, Moon, Sun } from "lucide-react";
+import { Monitor, Moon, Sun } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { AccountCta } from "../components/landing/AccountCta";
@@ -9,8 +9,10 @@ import { HowItWorks } from "../components/landing/HowItWorks";
 import { InstallHelp } from "../components/landing/InstallHelp";
 import { HEADER_CONTROL_CLASS } from "../components/landing/landing-styles";
 import { PrivacySection } from "../components/landing/PrivacySection";
+import { ScreenshotGallery } from "../components/landing/ScreenshotGallery";
 import { SiteFooter } from "../components/landing/SiteFooter";
 import { SyncKeyPanel } from "../components/landing/SyncKeyPanel";
+import { TrustStrip } from "../components/landing/TrustStrip";
 import { useI18n } from "../hooks/useI18n";
 import { useTheme, type WebThemePreference } from "../hooks/useTheme";
 import { loadAccountToken } from "../lib/account-session";
@@ -58,9 +60,13 @@ export default function Landing() {
       <header className="sticky top-0 z-20 border-b border-neutral-200/80 bg-neutral-50/85 backdrop-blur dark:border-neutral-800/80 dark:bg-neutral-950/85">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <span className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight">
-            <span className="grid size-8 place-items-center rounded-lg bg-indigo-600 text-white">
-              <KeyRound aria-hidden="true" size={18} />
-            </span>
+            <img
+              src="/icon.svg"
+              alt=""
+              width={32}
+              height={32}
+              className="size-8 rounded-lg"
+            />
             SaveTabs
           </span>
 
@@ -94,6 +100,8 @@ export default function Landing() {
 
       <main className="flex-1">
         <Hero t={t} />
+        <TrustStrip t={t} />
+        <ScreenshotGallery t={t} />
         <HowItWorks t={t} />
         <PrivacySection t={t} />
         <FeatureGrid t={t} />

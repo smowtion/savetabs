@@ -687,6 +687,31 @@
           "sync": "同步已开启"
         }
       },
+      "trust": {
+        "label": "产品亮点",
+        "localFirst": "本地优先",
+        "encrypted": "端到端加密",
+        "languages": "12 种语言",
+        "noAccount": "无需账户"
+      },
+      "gallery": {
+        "title": "看得更近",
+        "subtitle": "查看会话页面、设置和弹出窗口。",
+        "tabs": {
+          "sessions": "会话",
+          "settings": "设置",
+          "popup": "弹出窗口"
+        },
+        "captions": {
+          "sessions": "每个保存的窗口都会成为一个可随时恢复的会话。",
+          "settings": "选择要保存、关闭和同步的内容。",
+          "popup": "一键保存当前窗口中的所有标签页。"
+        }
+      },
+      "guide": {
+        "saveAlt": "带有保存操作的 SaveTabs 弹出窗口",
+        "restoreAlt": "显示待恢复窗口的会话页面"
+      },
       "howItWorks": {
         "title": "工作原理",
         "steps": {

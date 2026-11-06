@@ -1,5 +1,5 @@
 import { missingKeys } from "@savetabs/shared";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -43,6 +43,21 @@ const WEB_TRANSLATION_KEYS = [
   "web.landing.hero.mockup.sessionTwo",
   "web.landing.hero.mockup.restore",
   "web.landing.hero.mockup.sync",
+  "web.landing.trust.label",
+  "web.landing.trust.localFirst",
+  "web.landing.trust.encrypted",
+  "web.landing.trust.languages",
+  "web.landing.trust.noAccount",
+  "web.landing.gallery.title",
+  "web.landing.gallery.subtitle",
+  "web.landing.gallery.tabs.sessions",
+  "web.landing.gallery.tabs.settings",
+  "web.landing.gallery.tabs.popup",
+  "web.landing.gallery.captions.sessions",
+  "web.landing.gallery.captions.settings",
+  "web.landing.gallery.captions.popup",
+  "web.landing.guide.saveAlt",
+  "web.landing.guide.restoreAlt",
   "web.landing.howItWorks.title",
   "web.landing.howItWorks.steps.save.title",
   "web.landing.howItWorks.steps.save.body",
@@ -156,17 +171,122 @@ describe("Landing", () => {
       screen.getByRole("heading", { name: "How it works" }),
     ).toBeInTheDocument();
     expect(
+      screen.getByRole("heading", { name: "A closer look" }),
+    ).toBeInTheDocument();
+    expect(
       screen.getByRole("heading", { name: "Privacy" }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/end-to-end encrypted/i)).toBeInTheDocument();
+    expect(
+      screen.getAllByText(/end-to-end encrypted/i).length,
+    ).toBeGreaterThan(0);
     expect(
       screen.getByRole("heading", { name: "Features" }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Install and troubleshooting" }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/no account needed/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/no account needed/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/support@azcom\.dev/)).toBeInTheDocument();
+  });
+
+  it("uses the extension icon in the header and footer", () => {
+    const { container } = renderLanding();
+
+    const headerLogo = container.querySelector("header img");
+    expect(headerLogo).toHaveAttribute("src", "/icon.svg");
+    expect(headerLogo).toHaveAttribute("alt", "");
+    expect(headerLogo).toHaveAttribute("width", "32");
+
+    const footerLogo = container.querySelector("footer img");
+    expect(footerLogo).toHaveAttribute("src", "/icon.svg");
+    expect(footerLogo).toHaveAttribute("alt", "");
+    expect(footerLogo).toHaveAttribute("width", "28");
+  });
+
+  it("shows the four trust chips under the hero", () => {
+    renderLanding();
+
+    const trust = screen.getByRole("list", { name: "Product highlights" });
+    for (const label of [
+      "Local-first",
+      "End-to-end encrypted",
+      "12 languages",
+      "No account needed",
+    ]) {
+      expect(within(trust).getByText(label)).toBeInTheDocument();
+    }
+  });
+
+  it("switches the screenshot gallery between its three tabs", async () => {
+    const user = userEvent.setup();
+    renderLanding();
+
+    expect(screen.getByRole("tab", { name: "Sessions" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    expect(
+      screen.getByRole("img", {
+        name: "Each saved window becomes one session you can restore later.",
+      }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("tab", { name: "Settings" }));
+
+    expect(screen.getByRole("tab", { name: "Settings" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    expect(
+      screen.getByRole("img", {
+        name: "Choose what gets saved, closed, and synced.",
+      }),
+    ).toBeVisible();
+    expect(
+      screen.queryByRole("img", {
+        name: "Each saved window becomes one session you can restore later.",
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("moves the gallery selection with the arrow keys", async () => {
+    const user = userEvent.setup();
+    renderLanding();
+
+    screen.getByRole("tab", { name: "Sessions" }).focus();
+
+    await user.keyboard("{ArrowRight}");
+    expect(screen.getByRole("tab", { name: "Settings" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+
+    await user.keyboard("{ArrowRight}");
+    expect(screen.getByRole("tab", { name: "Popup" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+
+    await user.keyboard("{ArrowRight}");
+    expect(screen.getByRole("tab", { name: "Sessions" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+  });
+
+  it("shows a labelled visual in the save and restore guide steps", () => {
+    renderLanding();
+
+    expect(
+      screen.getByRole("img", {
+        name: "The SaveTabs popup with the save action",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", {
+        name: "The sessions page with saved windows ready to restore",
+      }),
+    ).toBeInTheDocument();
   });
 
   it("offers the Chrome install and a disabled Firefox button", () => {

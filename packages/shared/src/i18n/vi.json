@@ -687,6 +687,31 @@
           "sync": "Đang đồng bộ"
         }
       },
+      "trust": {
+        "label": "Điểm nổi bật",
+        "localFirst": "Ưu tiên cục bộ",
+        "encrypted": "Mã hóa đầu cuối",
+        "languages": "12 ngôn ngữ",
+        "noAccount": "Không cần tài khoản"
+      },
+      "gallery": {
+        "title": "Xem gần hơn",
+        "subtitle": "Xem trang phiên, phần cài đặt và cửa sổ tiện ích.",
+        "tabs": {
+          "sessions": "Phiên",
+          "settings": "Cài đặt",
+          "popup": "Cửa sổ tiện ích"
+        },
+        "captions": {
+          "sessions": "Mỗi cửa sổ đã lưu trở thành một phiên để bạn khôi phục sau.",
+          "settings": "Chọn nội dung được lưu, đóng và đồng bộ.",
+          "popup": "Lưu mọi tab trong cửa sổ hiện tại chỉ với một cú nhấp."
+        }
+      },
+      "guide": {
+        "saveAlt": "Cửa sổ tiện ích SaveTabs với thao tác lưu",
+        "restoreAlt": "Trang phiên đã lưu với các cửa sổ sẵn sàng khôi phục"
+      },
       "howItWorks": {
         "title": "Cách hoạt động",
         "steps": {
