@@ -14,7 +14,7 @@
 
 - Node.js >= 22.12, pnpm 10.33; TypeScript strict, no `any` escapes in new code.
 - E2EE invariants: the worker never receives the password, `masterKey`, sync key or `encKey`.
-- KDF: PBKDF2-SHA256, **600000** iterations, **16-byte** random salt, 32-byte output.
+- KDF: PBKDF2-SHA256, **600000** iterations, **16-byte KDF salt derived from the normalized email** (first 16 bytes of `SHA-256("savetabs-kdf-v1:" + email)`), 32-byte output.
 - `authHash = lowercase hex HMAC-SHA256(masterKey, "savetabs-auth-v1")`; the worker stores `SHA-256(authHash)` as lowercase hex.
 - Vault: `wrapKey = HKDF-SHA256(masterKey, salt="savetabs-v1", info="vault-wrap")`; AES-GCM-256, 12-byte random IV, AAD `savetabs:vault:v1:<accountId>`, stored as `base64url(IV || ciphertext)`.
 - Account tokens: 32 random bytes, base64url bearer, 30-day expiry, stored as lowercase hex SHA-256.

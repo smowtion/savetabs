@@ -59,8 +59,11 @@ the Bitwarden-style split: the password is stretched on the client and only a
 derived proof is sent.
 
 1. Client stretches the password:
-   `masterKey = PBKDF2-SHA256(password, kdfSalt, 600000, 32 bytes)`.
-   `masterKey` never leaves the device.
+   `masterKey = PBKDF2-SHA256(password, kdfSalt, 600000, 32 bytes)`, where
+   `kdfSalt` is the first 16 bytes of `SHA-256("savetabs-kdf-v1:" + normalized
+   email)`. Deriving the salt from the email lets any device compute the same
+   proof without a lookup endpoint; the server still stores the value for
+   compatibility with the vault response. `masterKey` never leaves the device.
 2. Client derives the authentication proof:
    `authHash = HMAC-SHA256(masterKey, "savetabs-auth-v1")`.
    `authHash` is sent to the server; the server stores only
@@ -101,8 +104,9 @@ bearer, so an account cannot claim another user's `authId`.
 
 Signup (web or extension):
 
-1. Email + password (minimum 12 characters, confirm field). Client generates a
-   random 16-byte KDF salt, derives `masterKey`, `authHash`.
+1. Email + password (minimum 12 characters, confirm field). Client derives the
+   16-byte KDF salt from the normalized email, computes `masterKey` and
+   `authHash`.
 2. `POST /v1/accounts/signup` with email, `authHash`, salt, iterations. The
    account is created unverified; no key material yet.
 3. Server sends a verification email through Resend (24-hour, single-use
