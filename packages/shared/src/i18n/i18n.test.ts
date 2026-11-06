@@ -36,6 +36,8 @@ describe("i18n", () => {
       "ru",
       "ja",
       "fr",
+      "de",
+      "ko",
     ]);
     expect(LOCALES.map((locale) => locale.name)).toEqual([
       "English",
@@ -48,6 +50,8 @@ describe("i18n", () => {
       "Русский",
       "日本語",
       "Français",
+      "Deutsch",
+      "한국어",
     ]);
     for (const locale of LOCALES) expect(localeDir(locale.code)).toBe(locale.dir);
     expect(localeDir("ar")).toBe("rtl");
@@ -68,6 +72,8 @@ describe("i18n", () => {
     expect(resolveLang("auto", "ru-RU")).toBe("ru");
     expect(resolveLang("auto", "ja-JP")).toBe("ja");
     expect(resolveLang("auto", "fr-CA")).toBe("fr");
+    expect(resolveLang("auto", "de-DE")).toBe("de");
+    expect(resolveLang("auto", "ko-KR")).toBe("ko");
     expect(resolveLang("auto", "xx")).toBe("en");
   });
 
@@ -78,6 +84,8 @@ describe("i18n", () => {
     expect(resolveLang("ar", "en-US")).toBe("ar");
     expect(resolveLang("pt", "ru-RU")).toBe("pt");
     expect(resolveLang("ru", "en-US")).toBe("ru");
+    expect(resolveLang("de", "ko-KR")).toBe("de");
+    expect(resolveLang("ko", "de-DE")).toBe("ko");
   });
 
   it("keeps the policy page in English for locales that do not translate it", () => {
@@ -114,6 +122,8 @@ describe("i18n", () => {
     expect(resolveLang("en", "vi-VN")).toBe("en");
     expect(resolveLang("ja", "en-US")).toBe("ja");
     expect(resolveLang("fr", "en-US")).toBe("fr");
+    expect(resolveLang("de", "en-US")).toBe("de");
+    expect(resolveLang("ko", "en-US")).toBe("ko");
     expect(resolveLang("auto", "th-TH")).toBe("en");
   });
 

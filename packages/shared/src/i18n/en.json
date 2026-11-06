@@ -377,7 +377,9 @@
           "pt": "Portuguese",
           "ru": "Russian",
           "ja": "Japanese",
-          "fr": "French"
+          "fr": "French",
+          "de": "German",
+          "ko": "Korean"
         }
       },
       "duplicates": {

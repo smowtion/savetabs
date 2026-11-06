@@ -8,11 +8,13 @@
  */
 
 import ar from "./ar.json";
+import de from "./de.json";
 import en from "./en.json";
 import es from "./es.json";
 import fr from "./fr.json";
 import hi from "./hi.json";
 import ja from "./ja.json";
+import ko from "./ko.json";
 import pt from "./pt.json";
 import ru from "./ru.json";
 import vi from "./vi.json";
@@ -30,7 +32,9 @@ export type Lang =
   | "pt"
   | "ru"
   | "ja"
-  | "fr";
+  | "fr"
+  | "de"
+  | "ko";
 
 /** Stored `general.language` preference; "auto" follows the browser language. */
 export type LanguagePreference = "auto" | Lang;
@@ -86,6 +90,8 @@ const FLAT_DICTIONARIES: Readonly<Record<Lang, FlatDictionary>> = {
   ru: flattenDictionary(ru as Dictionary),
   ja: flattenDictionary(ja as Dictionary),
   fr: flattenDictionary(fr as Dictionary),
+  de: flattenDictionary(de as Dictionary),
+  ko: flattenDictionary(ko as Dictionary),
 };
 
 /**
@@ -104,6 +110,8 @@ const BROWSER_LANG_PREFIXES: readonly (readonly [string, Lang])[] = [
   ["ru", "ru"],
   ["ja", "ja"],
   ["fr", "fr"],
+  ["de", "de"],
+  ["ko", "ko"],
 ];
 
 /**

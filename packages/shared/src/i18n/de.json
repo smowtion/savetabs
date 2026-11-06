@@ -1,0 +1,855 @@
+{
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "copy": "Kopieren",
+    "confirm": "Bestätigen",
+    "restore": "Wiederherstellen",
+    "settings": "Einstellungen",
+    "openSessions": "Sitzungen öffnen",
+    "syncNow": "Jetzt synchronisieren",
+    "retry": "Erneut versuchen",
+    "loading": "Wird geladen…",
+    "error": "Etwas ist schiefgelaufen",
+    "empty": "Noch nichts vorhanden",
+    "tabsCount": "{count} Tabs"
+  },
+  "settings": {
+    "general": {
+      "label": "Allgemein",
+      "description": "Darstellung, Sprache und Tab-Anzahl.",
+      "theme": {
+        "label": "Design",
+        "description": "Hell, dunkel oder dem System folgen."
+      },
+      "language": {
+        "label": "Sprache",
+        "description": "Anzeigesprache wählen oder automatisch der Browsersprache folgen."
+      },
+      "showBadgeCount": {
+        "label": "Tab-Anzahl als Badge anzeigen",
+        "description": "Die Anzahl geöffneter Tabs auf dem Symbol in der Symbolleiste anzeigen."
+      },
+      "confirmThreshold": {
+        "label": "Vor dem Schließen vieler Tabs bestätigen",
+        "description": "Nachfragen, wenn beim Speichern mindestens so viele Tabs geschlossen würden. Auf 0 setzen, um dies zu deaktivieren."
+      }
+    },
+    "tabs": {
+      "label": "Tabs",
+      "description": "Festlegen, welche Tabs gespeichert werden und was nach dem Speichern geschieht.",
+      "saveAllWindows": {
+        "label": "Alle Fenster speichern",
+        "description": "Tabs aus allen Browserfenstern einbeziehen, nicht nur aus dem aktuellen."
+      },
+      "closeAfterSave": {
+        "label": "Tabs nach dem Speichern schließen",
+        "description": "Gespeicherte Tabs schließen, sobald die Sitzung abgelegt ist."
+      },
+      "skipAudible": {
+        "label": "Tabs mit Audiowiedergabe überspringen",
+        "description": "Tabs, die gerade Ton abspielen, geöffnet lassen."
+      },
+      "excludedDomains": {
+        "label": "Ausgeschlossene Domains",
+        "description": "Tabs von diesen Domains werden nie gespeichert oder geschlossen. Eine Domain pro Zeile."
+      },
+      "includeFileUrls": {
+        "label": "Lokale Datei-URLs einbeziehen",
+        "description": "Das Speichern von Tabs erlauben, die auf Dateien auf diesem Computer verweisen. Erfordert die Berechtigung für Dateizugriff."
+      }
+    },
+    "duplicates": {
+      "label": "Duplikate",
+      "description": "Festlegen, wie wiederholte Tabs und URLs behandelt werden.",
+      "removeOnSave": {
+        "label": "Doppelte Tabs entfernen",
+        "description": "Wiederholte Tabs schließen und nur eine Kopie jeder URL in der Sitzung behalten."
+      },
+      "matchMode": {
+        "label": "Duplikat-Abgleich",
+        "description": "Wie URLs verglichen werden: exakt, ohne Hash-Fragment oder ohne Abfrageparameter."
+      },
+      "skipAlreadySaved": {
+        "label": "Bereits gespeicherte Tabs überspringen",
+        "description": "URLs nicht speichern, die bereits in einer anderen Sitzung vorhanden sind."
+      }
+    },
+    "pinned": {
+      "label": "Angeheftete Tabs",
+      "description": "Festlegen, ob angeheftete Tabs gespeichert oder wiederhergestellt werden.",
+      "skipOnSave": {
+        "label": "Angeheftete Tabs beim Speichern überspringen",
+        "description": "Angeheftete Tabs geöffnet lassen und aus neuen Sitzungen ausschließen."
+      },
+      "restoreAsPinned": {
+        "label": "Angeheftete Tabs als angeheftet wiederherstellen",
+        "description": "Gespeicherte angeheftete Tabs beim Wiederherstellen einer Sitzung wieder als angeheftet öffnen."
+      }
+    },
+    "open": {
+      "label": "Sitzungen öffnen",
+      "description": "Festlegen, was beim Öffnen der Erweiterung und von Sitzungen geschieht.",
+      "toolbarAction": {
+        "label": "Aktion der Symbolleisten-Schaltfläche",
+        "description": "Was beim Klick auf das Symbol geschieht: Popup öffnen, Tabs sofort speichern oder die Sitzungsseite öffnen."
+      },
+      "openSessionsAfterSave": {
+        "label": "Sitzungsseite nach dem Speichern öffnen",
+        "description": "Die gespeicherte Sitzung direkt nach dem Speichern auf der Sitzungsseite anzeigen."
+      },
+      "reuseSessionsTab": {
+        "label": "Sitzungs-Tab wiederverwenden",
+        "description": "Sitzungen in einem vorhandenen Sitzungs-Tab öffnen, statt einen neuen zu erstellen."
+      }
+    },
+    "urlDisplay": {
+      "label": "URL-Anzeige",
+      "description": "Festlegen, wie gespeicherte Tabs und Sitzungen dargestellt werden.",
+      "mode": {
+        "label": "URL-Anzeigemodus",
+        "description": "Gespeicherte Tabs nach Titel, nach Domain oder als vollständige URL anzeigen."
+      },
+      "showFavicons": {
+        "label": "Favicons anzeigen",
+        "description": "Das Favicon jeder Website in Sitzungslisten anzeigen."
+      },
+      "showTabCount": {
+        "label": "Tab-Anzahl anzeigen",
+        "description": "Anzeigen, wie viele Tabs jede Sitzung enthält."
+      }
+    },
+    "restore": {
+      "label": "Wiederherstellen",
+      "description": "Festlegen, wie wiederhergestellte Sitzungen im Browser geöffnet werden.",
+      "targetWindow": {
+        "label": "Zielfenster beim Wiederherstellen",
+        "description": "Wiederhergestellte Tabs im aktuellen oder in einem neuen Fenster öffnen."
+      },
+      "openInBackground": {
+        "label": "Wiederhergestellte Tabs im Hintergrund öffnen",
+        "description": "Tabs wiederherstellen, ohne den Fokus vom aktuellen Tab zu nehmen."
+      },
+      "skipExisting": {
+        "label": "Bereits geöffnete Tabs überspringen",
+        "description": "URLs nicht erneut öffnen, die bereits im Browser geöffnet sind."
+      }
+    },
+    "clipboard": {
+      "label": "Zwischenablage",
+      "description": "Das Format beim Kopieren von Tabs wählen.",
+      "format": {
+        "label": "Kopierformat",
+        "description": "Format beim Kopieren von Sitzungs-Tabs: reine URLs, Markdown-Links oder Titel mit URLs."
+      }
+    },
+    "contextMenu": {
+      "label": "Kontextmenü",
+      "description": "Wählen, welche Aktionen im Rechtsklick-Menü erscheinen.",
+      "enabled": {
+        "label": "Kontextmenü-Einträge aktivieren",
+        "description": "SaveTabs-Aktionen im Kontextmenü des Browsers anzeigen."
+      },
+      "saveTab": {
+        "label": "Aktuellen Tab speichern",
+        "description": "Einen Kontextmenü-Eintrag hinzufügen, der den aktuellen Tab speichert."
+      },
+      "saveWindow": {
+        "label": "Aktuelles Fenster speichern",
+        "description": "Einen Kontextmenü-Eintrag hinzufügen, der alle Tabs im aktuellen Fenster speichert."
+      },
+      "saveSelection": {
+        "label": "Ausgewählte Tabs speichern",
+        "description": "Einen Kontextmenü-Eintrag hinzufügen, der die ausgewählten Tabs speichert."
+      }
+    },
+    "memory": {
+      "label": "Speicheroptimierung",
+      "description": "Arbeitsspeicher freigeben, indem inaktive Tabs automatisch verworfen werden.",
+      "autoDiscard": {
+        "label": "Inaktive Tabs automatisch verwerfen",
+        "description": "Arbeitsspeicher freigeben, indem Tabs verworfen werden, die länger als die unten angegebene Zeit inaktiv waren."
+      },
+      "timeoutMinutes": {
+        "label": "Inaktivitäts-Zeitlimit",
+        "description": "Wie viele Minuten ein Tab inaktiv sein muss, bevor er verworfen werden kann."
+      },
+      "keepAudible": {
+        "label": "Tabs mit Audiowiedergabe behalten",
+        "description": "Tabs, die Ton abspielen, niemals verwerfen."
+      },
+      "keepPinned": {
+        "label": "Angeheftete Tabs behalten",
+        "description": "Angeheftete Tabs niemals verwerfen."
+      },
+      "discardNow": "Jetzt verwerfen",
+      "discardNowSuccess": "{count} Tabs verworfen.",
+      "discardNowFailed": "Tabs konnten nicht verworfen werden: {message}"
+    },
+    "shortcuts": {
+      "label": "Tastenkürzel",
+      "description": "Die SaveTabs zugewiesenen Tastenkürzel anzeigen.",
+      "tableCaption": "Tastenkürzel für SaveTabs",
+      "commandHeader": "Befehl",
+      "bindingHeader": "Tastenkürzel",
+      "notSet": "Nicht festgelegt",
+      "instructions": "Um ein Tastenkürzel zu ändern, die Seite für Tastenkürzel unten öffnen und das Kürzel für SaveTabs bearbeiten.",
+      "pagePathLabel": "Pfad zur Tastenkürzel-Seite",
+      "copyPath": "Pfad kopieren",
+      "copySuccess": "Pfad in die Zwischenablage kopiert.",
+      "copyFailed": "Der Pfad konnte nicht kopiert werden.",
+      "commandLabel": {
+        "save-tabs": "Alle Tabs im aktuellen Fenster speichern",
+        "open-sessions": "Sitzungsseite öffnen",
+        "discard-now": "Inaktive Tabs jetzt verwerfen"
+      }
+    },
+    "incognito": {
+      "label": "Inkognito",
+      "description": "Festlegen, wie private Fenster behandelt werden.",
+      "includeInSaveAll": {
+        "label": "Inkognito-Fenster einbeziehen",
+        "description": "Private Fenster beim Speichern aller Fenster einbeziehen. Erfordert die Berechtigung für Inkognito-Zugriff."
+      },
+      "status": {
+        "label": "Inkognito-Zugriff",
+        "allowed": "Erlaubt",
+        "denied": "Nicht erlaubt"
+      },
+      "deniedNote": "Diese Einstellung ist deaktiviert, weil SaveTabs in Inkognito-Fenstern nicht erlaubt ist.",
+      "enableInstructions": "Um den Zugriff zu erlauben, die Erweiterungsseite unten öffnen, die SaveTabs-Details öffnen und die Erweiterung in privaten Fenstern zulassen.",
+      "pagePathLabel": "Pfad zur Erweiterungsseite",
+      "copyPath": "Pfad kopieren",
+      "copySuccess": "Pfad in die Zwischenablage kopiert.",
+      "copyFailed": "Der Pfad konnte nicht kopiert werden."
+    },
+    "sync": {
+      "label": "Synchronisierung",
+      "description": "Sitzungen mit Ende-zu-Ende-Verschlüsselung sichern und wiederherstellen.",
+      "enabled": {
+        "label": "Ende-zu-Ende-verschlüsselte Synchronisierung aktivieren",
+        "description": "Sitzungen mit Ende-zu-Ende-Verschlüsselung im Synchronisierungskonto sichern."
+      },
+      "autoUpload": {
+        "label": "Änderungen automatisch hochladen",
+        "description": "Neue und geänderte Sitzungen automatisch hochladen."
+      },
+      "autoDownload": {
+        "label": "Änderungen automatisch herunterladen",
+        "description": "Auf anderen Geräten gespeicherte Sitzungen automatisch herunterladen und zusammenführen."
+      },
+      "keyTitle": "Ihr Synchronisierungsschlüssel",
+      "keyLabel": "Wert des Synchronisierungsschlüssels",
+      "keyMaskedHint": "Der Schlüssel bleibt verborgen, da er die einzige Anmeldeinformation für Ihre verschlüsselten Daten ist.",
+      "revealKey": "Schlüssel anzeigen",
+      "hideKey": "Schlüssel verbergen",
+      "copyKey": "Schlüssel kopieren",
+      "copied": "Schlüssel in die Zwischenablage kopiert.",
+      "copyFailed": "Der Schlüssel konnte nicht kopiert werden.",
+      "importLabel": "Schlüssel importieren",
+      "importPlaceholder": "ST-…-Schlüssel einfügen",
+      "invalidKey": "Das ist kein gültiger SaveTabs-Schlüssel.",
+      "importPrompt": "Lokale Sitzungen mit diesem neuen Schlüssel hochladen?",
+      "importPromptHint": "Empfohlen. Lokale Sitzungen werden mit dem neuen Schlüssel verschlüsselt und hochgeladen.",
+      "importUpload": "Lokale Sitzungen hochladen",
+      "importSkip": "Hochladen überspringen",
+      "importSuccess": "Schlüssel importiert. Lokale Sitzungen werden damit hochgeladen.",
+      "importSkipped": "Schlüssel importiert. Lokale Sitzungen werden nicht hochgeladen.",
+      "rotateKey": "Schlüssel erneuern",
+      "rotateTitle": "Synchronisierungsschlüssel erneuern",
+      "rotateWarning": "Beim Erneuern wird ein neuer Schlüssel erstellt und versucht, die mit dem alten Schlüssel verschlüsselten Cloud-Daten zu löschen. Lokale Sitzungen werden mit dem neuen Schlüssel hochgeladen.",
+      "rotateConfirmLabel": "Zur Bestätigung ROTATE eingeben",
+      "rotateConfirmPlaceholder": "ROTATE",
+      "rotateConfirm": "Neuen Schlüssel erstellen",
+      "rotateSuccess": "Neuer Schlüssel erstellt. Lokale Sitzungen werden damit hochgeladen.",
+      "rotateSuccessRevoked": "Neuer Schlüssel erstellt. Alte Cloud-Daten wurden gelöscht. Lokale Sitzungen werden mit dem neuen Schlüssel hochgeladen.",
+      "rotateSuccessRevokeFailed": "Neuer Schlüssel erstellt, aber die alten Cloud-Daten konnten nicht gelöscht werden. Lokale Sitzungen werden mit dem neuen Schlüssel hochgeladen.",
+      "loseKeyWarning": "Wenn dieser Schlüssel verloren geht, können die synchronisierten Daten nicht wiederhergestellt werden.",
+      "onlyCredentialWarning": "Dieser Schlüssel ist die einzige Anmeldeinformation für Ihre synchronisierten Daten. Wer ihn besitzt, kann diese Daten lesen, ändern oder löschen.",
+      "actionFailed": "Die Aktion ist fehlgeschlagen: {message}",
+      "statusTitle": "Synchronisierungsstatus",
+      "statusOn": "Die Synchronisierung ist aktiviert.",
+      "statusOff": "Die Synchronisierung ist deaktiviert. Cloud-Daten bleiben erhalten, bis sie gelöscht werden.",
+      "lastSyncLabel": "Letzte Synchronisierung",
+      "neverSynced": "Nie",
+      "pendingLabel": "Ausstehende Uploads",
+      "syncing": "Synchronisierung…",
+      "syncResult": "{uploaded} hochgeladen, {downloaded} heruntergeladen, {deleted} gelöscht.",
+      "syncErrorsTitle": "Einige Elemente konnten nicht synchronisiert werden:",
+      "authError": "Der Synchronisierungsschlüssel wurde abgelehnt oder die Cloud-Daten können nicht entschlüsselt werden. Schlüssel erneut importieren oder erneuern.",
+      "deleteCloud": "Cloud-Daten löschen",
+      "deleteCloudTitle": "Cloud-Daten löschen?",
+      "deleteCloudMessage": "Dies löscht alle für diesen Schlüssel auf dem Server gespeicherten synchronisierten Sitzungen und deaktiviert anschließend die Synchronisierung, damit lokale Sitzungen nicht erneut hochgeladen werden. Lokale Sitzungen bleiben auf diesem Gerät. Dies kann nicht rückgängig gemacht werden.",
+      "deleteCloudConfirm": "Cloud-Daten löschen",
+      "deleteCloudSuccess": "Cloud-Daten gelöscht. Die Synchronisierung wurde deaktiviert, damit lokale Sitzungen nicht erneut hochgeladen werden. Sie kann später wieder aktiviert werden.",
+      "enableConfirmTitle": "Verschlüsselte Synchronisierung aktivieren?",
+      "enableConfirmMessage": "Sicherstellen, dass der Synchronisierungsschlüssel gespeichert wurde. Er ist der einzige Weg, synchronisierte Daten wiederherzustellen. Er kann im Bereich Synchronisierung angezeigt und kopiert werden.",
+      "enableConfirm": "Synchronisierung aktivieren",
+      "accountPasswordLabel": "Kontopasswort",
+      "accountPasswordHint": "Erforderlich, um den mit dem Konto verknüpften Schlüssel zu aktualisieren.",
+      "accountPasswordRequired": "Kontopasswort eingeben, um den Synchronisierungsschlüssel zu ändern.",
+      "keyRelinkFailed": "Der Kontoschlüssel konnte nicht aktualisiert werden. Der Synchronisierungsschlüssel wurde nicht geändert."
+    },
+    "account": {
+      "title": "Konto",
+      "description": "Anmelden, um den Synchronisierungsschlüssel auf jedem Gerät wiederherzustellen. Die Daten bleiben Ende-zu-Ende-verschlüsselt.",
+      "emailLabel": "E-Mail",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Passwort",
+      "signIn": "Anmelden",
+      "signingIn": "Anmeldung…",
+      "createAccount": "Konto erstellen",
+      "creatingAccount": "Konto wird erstellt…",
+      "useKeyInstead": "Stattdessen Schlüssel verwenden",
+      "useAccount": "Konto verwenden",
+      "keyOnlyHint": "Die Synchronisierung bleibt schlüsselbasiert. Der Schlüssel wird unten verwaltet.",
+      "signOut": "Abmelden",
+      "signedOut": "Abgemeldet. Synchronisierungsschlüssel und Synchronisierungseinstellungen bleiben unverändert.",
+      "signOutFailed": "Abmelden war nicht möglich. Erneut versuchen.",
+      "verified": "Bestätigt",
+      "unverified": "E-Mail nicht bestätigt",
+      "passwordTooShort": "Ein Passwort mit mindestens 12 Zeichen verwenden.",
+      "signInFailed": "Anmeldung war nicht möglich. E-Mail und Passwort prüfen.",
+      "signUpFailed": "Konto konnte nicht erstellt werden. Erneut versuchen.",
+      "loadFailed": "Konto konnte nicht geladen werden.",
+      "recoveryTitle": "Wiederherstellungsschlüssel speichern",
+      "recoveryMessage": "Dieser Schlüssel ist der einzige Weg, verschlüsselte Sitzungen wiederherzustellen. Er wird nicht erneut angezeigt.",
+      "recoveryKeyLabel": "Ihr Schlüssel",
+      "recoveryConfirm": "Habe ich gespeichert",
+      "recoveryContinue": "Weiter",
+      "changePassword": "Passwort ändern",
+      "currentPasswordLabel": "Aktuelles Passwort",
+      "newPasswordLabel": "Neues Passwort",
+      "changePasswordSubmit": "Passwort ändern",
+      "changePasswordSubmitting": "Passwort wird geändert…",
+      "changePasswordSuccess": "Passwort geändert. Andere Sitzungen wurden abgemeldet.",
+      "changePasswordFailed": "Passwort konnte nicht geändert werden. Aktuelles Passwort prüfen.",
+      "uploadPromptTitle": "Lokale Sitzungen hochladen?",
+      "uploadPrompt": "Diese Sitzungen in dieses Konto hochladen?",
+      "uploadPromptUpload": "Sitzungen hochladen",
+      "uploadPromptSkip": "Nur lokal behalten"
+    },
+    "advanced": {
+      "label": "Erweitert",
+      "description": "Import-, Export-, Zurücksetzungs- und Wartungsaktionen.",
+      "storageUsage": "Belegter Speicher: {sessions} Sitzungen, {tabs} Tabs",
+      "storageNearLimit": "Der lokale Speicher ist fast voll. Sitzungen exportieren oder löschen, um Platz freizugeben.",
+      "exportSettings": "Einstellungen exportieren",
+      "importSettings": "Einstellungen importieren",
+      "exportSessions": "Sitzungen exportieren",
+      "importSessions": "Sitzungen importieren",
+      "resetToDefaults": "Auf Standardwerte zurücksetzen",
+      "clearSessions": "Lokale Sitzungen löschen",
+      "sessionsPlaintextWarning": "Sitzungsexporte enthalten Titel und URLs im Klartext. Die Datei an einem privaten Ort speichern.",
+      "exportSuccess": "{filename} exportiert.",
+      "importSettingsSuccess": "Einstellungen importiert.",
+      "importSettingsSyncStaysOff": "Die Synchronisierung bleibt nach dem Importieren von Einstellungen deaktiviert. Über den Schalter aktivieren; dieser Vorgang bestätigt den Schlüssel.",
+      "importSettingsFailed": "Importieren der Einstellungen fehlgeschlagen:",
+      "importSessionsSuccess": "{added} Sitzungen importiert und {updated} aktualisiert.",
+      "importSessionsPartial": "{added} Sitzungen importiert und {updated} aktualisiert. Einige Sitzungen konnten nicht gespeichert werden:",
+      "importSessionsFailed": "Importieren der Sitzungen fehlgeschlagen:",
+      "actionFailed": "Die Aktion ist fehlgeschlagen: {message}",
+      "resetTitle": "Alle Einstellungen zurücksetzen?",
+      "resetMessage": "Alle Einstellungen kehren zu ihren Standardwerten zurück. Gespeicherte Sitzungen sind nicht betroffen.",
+      "resetConfirm": "Einstellungen zurücksetzen",
+      "resetSuccess": "Einstellungen auf Standardwerte zurückgesetzt.",
+      "clearTitle": "Alle lokalen Sitzungen löschen?",
+      "clearMessage": "Alle auf diesem Gerät gespeicherten Sitzungen werden dauerhaft gelöscht. Mit der Cloud synchronisierte Sitzungen werden nicht gelöscht und können bei der nächsten Synchronisierung erneut heruntergeladen werden. Bei Bedarf zuerst eine Sicherung exportieren.",
+      "clearConfirm": "Sitzungen löschen",
+      "clearSuccess": "Alle lokalen Sitzungen gelöscht."
+    },
+    "option": {
+      "general": {
+        "theme": {
+          "system": "System",
+          "light": "Hell",
+          "dark": "Dunkel"
+        },
+        "language": {
+          "auto": "Automatisch",
+          "en": "Englisch",
+          "vi": "Vietnamesisch",
+          "zh-CN": "Chinesisch (vereinfacht)",
+          "es": "Spanisch",
+          "hi": "Hindi",
+          "ar": "Arabisch",
+          "pt": "Portugiesisch",
+          "ru": "Russisch",
+          "ja": "Japanisch",
+          "fr": "Französisch",
+          "de": "Deutsch",
+          "ko": "Koreanisch"
+        }
+      },
+      "duplicates": {
+        "matchMode": {
+          "exact": "Exakte URL",
+          "ignore-hash": "Ohne #fragment",
+          "ignore-query": "Ohne ?query"
+        }
+      },
+      "open": {
+        "toolbarAction": {
+          "popup": "Popup öffnen",
+          "save": "Tabs jetzt speichern",
+          "sessions": "Sitzungsseite öffnen"
+        }
+      },
+      "urlDisplay": {
+        "mode": {
+          "title": "Titel",
+          "domain": "Domain",
+          "full-url": "Vollständige URL"
+        }
+      },
+      "restore": {
+        "targetWindow": {
+          "current": "Aktuelles Fenster",
+          "new": "Neues Fenster"
+        }
+      },
+      "clipboard": {
+        "format": {
+          "plain-urls": "Reine URLs",
+          "markdown": "Markdown-Links",
+          "titled": "Titel mit URLs"
+        }
+      },
+      "memory": {
+        "timeoutMinutes": {
+          "5": "5 Minuten",
+          "15": "15 Minuten",
+          "30": "30 Minuten",
+          "60": "60 Minuten",
+          "120": "120 Minuten"
+        }
+      }
+    }
+  },
+  "options": {
+    "search": "Einstellungen durchsuchen",
+    "searchPlaceholder": "Einstellungen durchsuchen…",
+    "expandAll": "Alle erweitern",
+    "collapseAll": "Alle reduzieren",
+    "categories": "Einstellungskategorien",
+    "settingCount": "{count} Einstellungen",
+    "saved": "Gespeichert",
+    "noResults": "Keine Einstellungen entsprechen der Suche.",
+    "tooltip": "Weitere Informationen zu {setting}",
+    "memoryUnsupported": "Das Verwerfen von Tabs ist in diesem Browser nicht verfügbar.",
+    "stringList": {
+      "placeholder": "Domain hinzufügen…",
+      "add": "Hinzufügen",
+      "remove": "{item} entfernen"
+    },
+    "validation": {
+      "numberRange": "Eine ganze Zahl zwischen {min} und {max} eingeben.",
+      "maxItems": "Es können höchstens {count} Einträge hinzugefügt werden.",
+      "duplicateEntry": "Dieser Eintrag ist bereits in der Liste.",
+      "emptyEntry": "Vor dem Hinzufügen einen Wert eingeben."
+    },
+    "theme": {
+      "system": "System",
+      "light": "Hell",
+      "dark": "Dunkel",
+      "toggle": "Design: {theme}"
+    }
+  },
+  "contextMenu": {
+    "saveTab": "Diesen Tab speichern",
+    "saveWindow": "Alle Tabs in diesem Fenster speichern",
+    "saveSelection": "Ausgewählte Tabs speichern"
+  },
+  "popup": {
+    "saveTabs": "{count} Tabs speichern",
+    "openSessions": "Sitzungsseite öffnen",
+    "syncOn": "Synchronisierung an",
+    "syncOff": "Synchronisierung aus",
+    "discardOff": "Auto-Verwerfen: Aus",
+    "discardStatus": "Auto-Verwerfen: {minutes} Min. · heute {count} verworfen",
+    "recentTitle": "Letzte Sitzungen",
+    "empty": "Noch keine gespeicherten Sitzungen.",
+    "restoreSession": "{time} wiederherstellen",
+    "loadFailed": "Popup-Daten konnten nicht geladen werden."
+  },
+  "update": {
+    "title": "Update verfügbar",
+    "message": "SaveTabs {version} ist zur Installation bereit.",
+    "action": "Im Store ansehen"
+  },
+  "sessions": {
+    "title": "Gespeicherte Sitzungen",
+    "searchLabel": "Sitzungen durchsuchen",
+    "searchPlaceholder": "Sitzungen durchsuchen…",
+    "saveWindow": "Fenster speichern",
+    "saveConfirmTitle": "Tabs speichern und schließen?",
+    "saveConfirmMessage": "Beim Speichern werden {count} Tabs geschlossen. Fortfahren?",
+    "saveConfirm": "Speichern und schließen",
+    "invalidResponse": "Die Erweiterung hat eine unerwartete Antwort zurückgegeben.",
+    "empty": "Noch keine Sitzungen. Offene Tabs mit der Schaltfläche Fenster speichern sichern.",
+    "noResults": "Keine Sitzungen entsprechen der Suche.",
+    "private": "Privat",
+    "moreActions": "Weitere Aktionen",
+    "rename": "Umbenennen",
+    "exportSession": "Sitzungs-JSON exportieren",
+    "renameLabel": "Sitzungsname",
+    "renameSuccess": "Sitzung umbenannt.",
+    "restoreSuccess": "{count} Tabs wiederhergestellt.",
+    "saveSuccess": "{count} Tabs gespeichert.",
+    "saveOverflow": "{saved} Tabs gespeichert; {overflow} bleiben offen (Sitzungslimit).",
+    "saveEmpty": "Keine Tabs zum Speichern.",
+    "copySuccess": "{count} Tabs in die Zwischenablage kopiert.",
+    "copyFailed": "Die Tabs konnten nicht kopiert werden.",
+    "exportSuccess": "{filename} exportiert.",
+    "deleteTitle": "Diese Sitzung löschen?",
+    "deleteMessage": "Diese Sitzung wird dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.",
+    "deleteConfirm": "Sitzung löschen",
+    "deleteSuccess": "Sitzung gelöscht.",
+    "sessionMissing": "Diese Sitzung existiert nicht mehr.",
+    "actionFailed": "Die Aktion ist fehlgeschlagen: {message}",
+    "loadFailed": "Die gespeicherten Sitzungen konnten nicht geladen werden.",
+    "noTabs": "Diese Sitzung enthält keine Tabs.",
+    "expand": "Tabs anzeigen",
+    "collapse": "Tabs ausblenden",
+    "time": {
+      "justNow": "Gerade eben",
+      "minutesAgo": "Vor {count} Minuten",
+      "hoursAgo": "Vor {count} Stunden",
+      "daysAgo": "Vor {count} Tagen"
+    }
+  },
+  "web": {
+    "signup": {
+      "title": "Konto erstellen",
+      "description": "Gespeicherte Sitzungen mit Ende-zu-Ende-Verschlüsselung sichern und auf jedem Gerät öffnen. Alles wird im Browser verschlüsselt.",
+      "emailLabel": "E-Mail",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Passwort",
+      "passwordHint": "Mindestens 12 Zeichen verwenden.",
+      "confirmLabel": "Passwort bestätigen",
+      "submit": "Konto erstellen",
+      "submitting": "Konto wird erstellt…",
+      "passwordTooShort": "Ein Passwort mit mindestens 12 Zeichen verwenden.",
+      "passwordMismatch": "Die Passwörter stimmen nicht überein.",
+      "error": "Konto konnte nicht erstellt werden. Erneut versuchen.",
+      "recoveryTitle": "Wiederherstellungsschlüssel speichern",
+      "recoveryMessage": "Dieser Schlüssel ist der einzige Weg, verschlüsselte Sitzungen wiederherzustellen. Er wird nicht erneut angezeigt.",
+      "recoveryKeyLabel": "Ihr Schlüssel",
+      "recoveryConfirm": "Habe ich gespeichert",
+      "continue": "Weiter",
+      "back": "Zurück zu SaveTabs"
+    },
+    "login": {
+      "title": "Anmelden",
+      "description": "E-Mail und Passwort eingeben, um verschlüsselte Sitzungen auf diesem Gerät zu entsperren.",
+      "emailLabel": "E-Mail",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Passwort",
+      "rememberLabel": "Auf diesem Gerät merken",
+      "rememberWarning": "Nur auf einem vertrauenswürdigen Gerät verwenden. Der Schlüssel bleibt in diesem Browser, bis er gelöscht wird.",
+      "submit": "Anmelden",
+      "submitting": "Anmeldung…",
+      "error": "Anmeldung war nicht möglich. E-Mail und Passwort prüfen und erneut versuchen.",
+      "recoveryLink": "Passwort vergessen? Wiederherstellungsschlüssel verwenden",
+      "createAccount": "Konto erstellen",
+      "back": "Zurück zu SaveTabs"
+    },
+    "recover": {
+      "title": "Passwort zurücksetzen",
+      "description": "Wiederherstellungsschlüssel eingeben und ein neues Passwort wählen. Alles wird im Browser verschlüsselt.",
+      "emailLabel": "E-Mail",
+      "emailPlaceholder": "you@example.com",
+      "keyLabel": "Wiederherstellungsschlüssel",
+      "keyPlaceholder": "ST-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-X",
+      "passwordLabel": "Neues Passwort",
+      "passwordHint": "Mindestens 12 Zeichen verwenden.",
+      "confirmLabel": "Neues Passwort bestätigen",
+      "submit": "Passwort zurücksetzen",
+      "submitting": "Passwort wird zurückgesetzt…",
+      "passwordTooShort": "Ein Passwort mit mindestens 12 Zeichen verwenden.",
+      "passwordMismatch": "Die Passwörter stimmen nicht überein.",
+      "error": "Passwort konnte nicht zurückgesetzt werden. E-Mail und Wiederherstellungsschlüssel prüfen und erneut versuchen.",
+      "cancel": "Zurück zur Anmeldung"
+    },
+    "verify": {
+      "title": "E-Mail-Bestätigung",
+      "checking": "E-Mail wird bestätigt…",
+      "successTitle": "E-Mail bestätigt",
+      "success": "Die E-Mail-Adresse ist bestätigt. Diese Seite kann geschlossen und zu SaveTabs zurückgekehrt werden.",
+      "expiredTitle": "Link abgelaufen",
+      "expired": "Dieser Bestätigungslink ist ungültig oder abgelaufen. Anmelden und eine neue E-Mail anfordern.",
+      "errorTitle": "Bestätigung fehlgeschlagen",
+      "error": "Die E-Mail konnte nicht bestätigt werden. Später erneut versuchen.",
+      "back": "Zurück zu SaveTabs"
+    },
+    "account": {
+      "title": "Ihr Konto",
+      "description": "Konto, Passwort und Wiederherstellungsschlüssel verwalten.",
+      "emailLabel": "E-Mail",
+      "verified": "Bestätigt",
+      "unverified": "Die E-Mail-Adresse ist noch nicht bestätigt.",
+      "resend": "Bestätigungs-E-Mail erneut senden",
+      "resending": "Wird gesendet…",
+      "resendSuccess": "Bestätigungs-E-Mail gesendet.",
+      "resendFailed": "Die Bestätigungs-E-Mail konnte nicht gesendet werden. Später erneut versuchen.",
+      "changePasswordTitle": "Passwort ändern",
+      "changePasswordDescription": "Aktuelles Passwort eingeben und ein neues wählen. Alles wird im Browser verschlüsselt.",
+      "currentPasswordLabel": "Aktuelles Passwort",
+      "newPasswordLabel": "Neues Passwort",
+      "confirmPasswordLabel": "Neues Passwort bestätigen",
+      "passwordHint": "Mindestens 12 Zeichen verwenden.",
+      "passwordTooShort": "Ein Passwort mit mindestens 12 Zeichen verwenden.",
+      "passwordMismatch": "Die Passwörter stimmen nicht überein.",
+      "passwordRequired": "Passwort eingeben.",
+      "changePasswordSubmit": "Passwort ändern",
+      "changePasswordSubmitting": "Passwort wird geändert…",
+      "passwordChanged": "Passwort geändert.",
+      "passwordChangeFailed": "Passwort konnte nicht geändert werden. Aktuelles Passwort prüfen und erneut versuchen.",
+      "noVault": "Dieses Konto hat noch keinen verknüpften Synchronisierungsschlüssel.",
+      "recoveryKeyTitle": "Wiederherstellungsschlüssel",
+      "recoveryKeyDescription": "Passwort erneut eingeben, um den Wiederherstellungsschlüssel dieses Kontos anzuzeigen.",
+      "passwordLabel": "Passwort",
+      "viewKeySubmit": "Wiederherstellungsschlüssel anzeigen",
+      "viewKeySubmitting": "Wird geprüft…",
+      "viewKeyLabel": "Ihr Wiederherstellungsschlüssel",
+      "viewKeyFailed": "Der Wiederherstellungsschlüssel konnte nicht angezeigt werden. Passwort prüfen und erneut versuchen.",
+      "hideKey": "Verbergen",
+      "logout": "Abmelden",
+      "deleteTitle": "Konto löschen",
+      "deleteDescription": "Beim Löschen des Kontos werden E-Mail und Anmeldung entfernt. Die verschlüsselten Sitzungen bleiben auf dem Synchronisierungsserver, sofern nicht auch die Cloud-Daten gelöscht werden.",
+      "deletePasswordLabel": "Ihr Passwort",
+      "deleteCloudLabel": "Auch die mit diesem Konto synchronisierten Cloud-Daten löschen",
+      "deleteCloudHint": "Dies löscht jede für den Synchronisierungsschlüssel dieses Kontos gespeicherte verschlüsselte Sitzung. Dies kann nicht rückgängig gemacht werden.",
+      "deleteSubmit": "Konto löschen",
+      "deleteConfirmTitle": "Konto löschen?",
+      "deleteConfirmMessage": "Konto und Anmeldedaten werden dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden. Der Synchronisierungsschlüssel funktioniert auf diesem Gerät weiter.",
+      "deleteCloudConfirmMessage": "Konto, Anmeldedaten und die Cloud-Daten für den zugehörigen Synchronisierungsschlüssel werden dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.",
+      "deleteConfirm": "Konto löschen",
+      "deleteDeleting": "Konto wird gelöscht…",
+      "deleteFailed": "Das Konto konnte nicht gelöscht werden. Passwort prüfen und erneut versuchen.",
+      "loadFailed": "Konto konnte nicht geladen werden.",
+      "home": "Startseite",
+      "sessionsLink": "Gespeicherte Sitzungen",
+      "unlockTitle": "Mit Passwort entsperren",
+      "unlockDescription": "Das Konto ist auf diesem Gerät angemeldet, aber der Synchronisierungsschlüssel ist gesperrt. Passwort eingeben, um gespeicherte Sitzungen zu öffnen.",
+      "unlockAccount": "Angemeldet als {email}",
+      "unlockSubmit": "Entsperren",
+      "unlockSubmitting": "Wird entsperrt…",
+      "unlockError": "Die Sitzungen konnten nicht entsperrt werden. Passwort prüfen und erneut versuchen."
+    },
+    "landing": {
+      "title": "Gespeicherte Tabs öffnen",
+      "description": "Synchronisierungsschlüssel eingeben, um gespeicherte Sitzungen anzuzeigen. Alles wird im Browser entschlüsselt.",
+      "keyLabel": "Synchronisierungsschlüssel",
+      "keyPlaceholder": "ST-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-X",
+      "continue": "Weiter",
+      "invalidKey": "Dieser Synchronisierungsschlüssel ist ungültig. Prüfen und erneut versuchen.",
+      "loseKeyWarning": "Der Synchronisierungsschlüssel ist der einzige Weg, Sitzungen zu entschlüsseln. Wenn er verloren geht, können die gespeicherten Daten nicht wiederhergestellt werden.",
+      "rememberLabel": "Auf diesem Gerät merken",
+      "rememberWarning": "Nur auf einem vertrauenswürdigen Gerät verwenden. Der Schlüssel bleibt in diesem Browser, bis er gelöscht wird.",
+      "privacyLink": "Datenschutzerklärung",
+      "header": {
+        "account": "Konto"
+      },
+      "hero": {
+        "title": "Jeden Tab speichern. Später zurückholen.",
+        "description": "SaveTabs speichert ein ganzes Browserfenster als eine Sitzung, schließt die Tabs und öffnet sie bei Bedarf wieder. Die Erweiterung läuft im Browser und behält die Sitzungen auf diesem Gerät.",
+        "chrome": "Zu Chrome hinzufügen",
+        "firefox": "Firefox",
+        "comingSoon": "Demnächst verfügbar",
+        "noAccount": "Kein Konto erforderlich. Die lokale Nutzung funktioniert ohne Registrierung.",
+        "mockup": {
+          "save": "12 Tabs speichern",
+          "sessions": "Letzte Sitzungen",
+          "sessionOne": "Design-Referenzen",
+          "sessionTwo": "Leseliste",
+          "restore": "Wiederherstellen",
+          "sync": "Synchronisierung an"
+        }
+      },
+      "howItWorks": {
+        "title": "So funktioniert es",
+        "steps": {
+          "save": {
+            "title": "Fenster speichern",
+            "body": "Die Erweiterung öffnen und alle Tabs im aktuellen Fenster als eine Sitzung speichern."
+          },
+          "close": {
+            "title": "Tabs werden geschlossen",
+            "body": "SaveTabs schließt die gespeicherten Tabs, damit der Browser übersichtlich bleibt."
+          },
+          "restore": {
+            "title": "Später wiederherstellen",
+            "body": "Die Sitzung öffnen, um alle gespeicherten Tabs in einem neuen Fenster zurückzubringen."
+          }
+        }
+      },
+      "privacy": {
+        "title": "Datenschutz",
+        "items": {
+          "e2ee": {
+            "title": "Ende-zu-Ende-verschlüsselt",
+            "body": "Sitzungen werden im Browser verschlüsselt, bevor sie hochgeladen werden. Der Server speichert Chiffretext, den er nicht lesen kann."
+          },
+          "keyOnly": {
+            "title": "Ihr Schlüssel, Ihre Daten",
+            "body": "Die Synchronisierung basiert auf dem Synchronisierungsschlüssel. Ein Konto ist nicht erforderlich, und der Schlüssel verlässt nie den Browser."
+          },
+          "localFirst": {
+            "title": "Lokal zuerst",
+            "body": "Ohne Synchronisierung bleibt jede Sitzung im Erweiterungsspeicher des Browsers."
+          },
+          "privateWindows": {
+            "title": "Private Fenster bleiben lokal",
+            "body": "Aus privaten oder Inkognito-Fenstern gespeicherte Sitzungen werden nie hochgeladen."
+          }
+        },
+        "link": "Datenschutzerklärung lesen"
+      },
+      "features": {
+        "title": "Funktionen",
+        "items": {
+          "search": {
+            "title": "Sitzungen durchsuchen",
+            "body": "Eine gespeicherte Sitzung nach Name oder nach ihren Tabs finden."
+          },
+          "rename": {
+            "title": "Sitzungen umbenennen",
+            "body": "Einer Sitzung einen klaren Namen geben, damit sie später leicht zu finden ist."
+          },
+          "exportImport": {
+            "title": "Exportieren und importieren",
+            "body": "Sitzungen mit einer JSON-Datei zwischen Browsern verschieben."
+          },
+          "autoDiscard": {
+            "title": "Automatisches Verwerfen",
+            "body": "Inaktive Tabs nach einem gewählten Zeitlimit verwerfen und dabei angeheftete und hörbare Tabs geöffnet lassen."
+          },
+          "sync": {
+            "title": "Synchronisierung über mehrere Geräte",
+            "body": "Verschlüsselte Sitzungen mit dem Synchronisierungsschlüssel zwischen Geräten synchronisieren."
+          },
+          "privateWindows": {
+            "title": "Private Fenster",
+            "body": "Sitzungen aus privaten Fenstern bleiben auf dem Gerät und werden nie hochgeladen."
+          }
+        }
+      },
+      "account": {
+        "title": "Sitzungen auf jedem Gerät behalten",
+        "description": "Mit einem Konto kann ein neues Gerät die Sitzungen allein mit E-Mail und Passwort entsperren. Der Synchronisierungsschlüssel verschlüsselt weiterhin alles, und der Server sieht ihn nie.",
+        "create": "Konto erstellen",
+        "signIn": "Anmelden",
+        "useKey": "oder einen Synchronisierungsschlüssel verwenden"
+      },
+      "install": {
+        "title": "Installation und Fehlerbehebung",
+        "items": {
+          "install": {
+            "title": "Installieren",
+            "body": "Den Chrome Web Store öffnen, Zu Chrome hinzufügen wählen und SaveTabs an die Symbolleiste anheften. Firefox ist noch nicht veröffentlicht."
+          },
+          "uninstall": {
+            "title": "Deinstallieren",
+            "body": "SaveTabs über die Erweiterungsseite des Browsers entfernen. Gespeicherte Sitzungen bleiben im Browserspeicher, bis die Erweiterungsdaten gelöscht werden."
+          },
+          "troubleshooting": {
+            "title": "Fehlerbehebung",
+            "body": "Wenn Speichern oder Wiederherstellen fehlschlägt, prüfen, ob SaveTabs aktiviert ist, und die Seite neu laden. Danach mit einem einzelnen Fenster erneut versuchen."
+          }
+        }
+      },
+      "footer": {
+        "privacy": "Datenschutz",
+        "store": "Chrome Web Store"
+      }
+    },
+    "privacy": {
+      "back": "Back to SaveTabs",
+      "title": "Privacy policy",
+      "intro": "SaveTabs keeps your saved tab sessions on your device. If you turn on end-to-end encrypted sync, an encrypted copy is stored on the sync server. This page lists exactly what that copy contains and what never leaves your browser.",
+      "sections": {
+        "data": {
+          "title": "What the sync server stores",
+          "lead": "The sync server stores the following data for your key:",
+          "authId": "A public account id derived from your sync key. It appears in API URLs and cannot be turned back into the key.",
+          "authKeyHash": "A SHA-256 hash of the bearer credential derived from your sync key. The hash verifies requests and cannot be reversed into the credential.",
+          "blobs": "Encrypted session blobs: AES-GCM 256 ciphertext encoded as base64url, with a session id, update timestamp and byte size.",
+          "tombstones": "Deletion tombstones: a deleted session id and its deletion time. Tombstones sync deletions to your other devices and are pruned during later deletions once they are 30 days old.",
+          "timestamps": "Timestamps for when a sync key was first seen and last uploaded.",
+          "footer": "URLs, page titles, favicons and all other session data travel only inside the encrypted blobs. The server cannot read them, and we never receive your sync key. The server also keeps short-lived abuse-prevention rate-limit records keyed by client IP address and authId, plus daily aggregate request and key-registration counters; none of these contain URLs or page titles."
+        },
+        "e2ee": {
+          "title": "End-to-end encryption",
+          "body": "Encryption and decryption happen in your browser with the Web Crypto API. Session blobs use AES-GCM 256, and the encryption key is derived from your sync key with HKDF-SHA256. The key stays in your browser; the web app keeps it in this tab's session storage, or in local storage when you choose Remember on this device. Only ciphertext is uploaded. Without your key, the server and anyone else who obtains a blob cannot read it."
+        },
+        "incognito": {
+          "title": "Private and incognito sessions",
+          "body": "Sessions saved from private or incognito windows are marked local-only by the extension. They are never uploaded to the sync server and never appear in the web app."
+        },
+        "keyLoss": {
+          "title": "If you lose your sync key",
+          "body": "There is no account, email address or password to reset. The sync key is the only credential that can decrypt synced sessions. If you lose it, the encrypted data on the server cannot be recovered. Keep a safe copy; you can reveal and copy the key in the extension under Settings → Sync."
+        },
+        "delete": {
+          "title": "Deleting your data",
+          "body": "Local sessions stay in your browser until you delete them in the extension; clearing the extension's data or uninstalling it also removes them. To delete all cloud data for a sync key, open the extension, go to Settings → Sync and choose Delete cloud data. This removes the encrypted sessions, deletion tombstones and the key record for that sync key, and turns sync off so local sessions are not uploaded again. Rotating the sync key also deletes the data stored under the old key; if that deletion fails, import the old key and use Delete cloud data."
+        },
+        "analytics": {
+          "title": "No analytics or third parties",
+          "body": "The web app and extension contain no analytics, tracking pixels, advertising or third-party scripts. The web app loads only its own code and styles and uses no external fonts."
+        },
+        "contact": {
+          "title": "Contact",
+          "body": "Questions about this policy can be sent to support@azcom.dev."
+        }
+      }
+    },
+    "sessions": {
+      "title": "Gespeicherte Sitzungen",
+      "searchLabel": "Sitzungen durchsuchen",
+      "searchPlaceholder": "Sitzungen durchsuchen…",
+      "noResults": "Keine Sitzungen entsprechen der Suche.",
+      "empty": "Noch keine Sitzungen. Tabs mit der SaveTabs-Erweiterung speichern und diese Seite dann erneut öffnen.",
+      "unknownKeyTitle": "Keine synchronisierten Daten für diesen Schlüssel",
+      "unknownKey": "Dieser Synchronisierungsschlüssel hat keine synchronisierten Sitzungen. Prüfen, ob er korrekt eingegeben wurde, oder zu einem anderen Schlüssel wechseln.",
+      "restore": "Wiederherstellen",
+      "restoreHint": "Beim Wiederherstellen wird jeder Tab in einem neuen Browser-Tab geöffnet. Pop-ups zulassen, falls der Browser danach fragt.",
+      "restoreSuccess": "{count} Tabs geöffnet.",
+      "popupBlocked": "Der Browser hat {count} Tabs blockiert. Pop-ups für diese Website zulassen oder Tabs einzeln öffnen.",
+      "copy": "Kopieren",
+      "copySuccess": "{count} Tabs in die Zwischenablage kopiert.",
+      "copyFailed": "Die Tabs konnten nicht kopiert werden.",
+      "export": "JSON exportieren",
+      "exportSuccess": "{filename} exportiert.",
+      "exportFailed": "Die Sitzung konnte nicht exportiert werden: {message}",
+      "delete": "Löschen",
+      "deleteTitle": "Diese Sitzung löschen?",
+      "deleteMessage": "Diese Sitzung wird dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.",
+      "deleteConfirm": "Sitzung löschen",
+      "deleteSuccess": "Sitzung gelöscht.",
+      "deleteFailed": "Die Sitzung konnte nicht gelöscht werden: {message}",
+      "authError": "Der Synchronisierungsschlüssel wurde abgelehnt. Schlüssel erneut eingeben, um fortzufahren.",
+      "changeKey": "Schlüssel wechseln",
+      "forgetKey": "Schlüssel vergessen",
+      "forgetKeyTitle": "Synchronisierungsschlüssel vergessen?",
+      "forgetKeyMessage": "Der Schlüssel wird aus diesem Browser entfernt. Die synchronisierten Daten bleiben auf dem Server und können später durch erneute Eingabe des Schlüssels wieder geöffnet werden.",
+      "forgetKeyConfirm": "Schlüssel vergessen",
+      "home": "Startseite",
+      "privacy": "Datenschutz",
+      "decryptError": "Einige Sitzungen konnten nicht entschlüsselt werden und wurden übersprungen ({count}).",
+      "loadFailed": "Die gespeicherten Sitzungen konnten nicht geladen werden.",
+      "noTabs": "Diese Sitzung enthält keine Tabs."
+    },
+    "language": {
+      "toggle": "Sprache wechseln"
+    },
+    "theme": {
+      "toggle": "Design ändern",
+      "system": "System",
+      "light": "Hell",
+      "dark": "Dunkel"
+    }
+  }
+}
