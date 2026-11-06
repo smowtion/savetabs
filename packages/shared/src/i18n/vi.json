@@ -371,7 +371,9 @@
           "en": "Tiếng Anh",
           "vi": "Tiếng Việt",
           "zh-CN": "Tiếng Trung (Giản thể)",
-          "es": "Tiếng Tây Ban Nha"
+          "es": "Tiếng Tây Ban Nha",
+          "hi": "Tiếng Hindi",
+          "ar": "Tiếng Ả Rập"
         }
       },
       "duplicates": {

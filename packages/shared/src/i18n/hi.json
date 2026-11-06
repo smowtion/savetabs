@@ -1,0 +1,849 @@
+{
+  "common": {
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "delete": "हटाएँ",
+    "copy": "कॉपी करें",
+    "confirm": "पुष्टि करें",
+    "restore": "पुनर्स्थापित करें",
+    "settings": "सेटिंग्स",
+    "openSessions": "सेशन खोलें",
+    "syncNow": "अभी सिंक करें",
+    "retry": "फिर से प्रयास करें",
+    "loading": "लोड हो रहा है…",
+    "error": "कुछ गड़बड़ हो गई",
+    "empty": "अभी यहाँ कुछ नहीं है",
+    "tabsCount": "{count} टैब"
+  },
+  "settings": {
+    "general": {
+      "label": "सामान्य",
+      "description": "दिखावट, भाषा और टैब-संख्या की प्राथमिकताएँ।",
+      "theme": {
+        "label": "थीम",
+        "description": "लाइट, डार्क चुनें या सिस्टम की दिखावट का पालन करें।"
+      },
+      "language": {
+        "label": "भाषा",
+        "description": "दिखाने की भाषा चुनें या ब्राउज़र भाषा का स्वतः पालन करें।"
+      },
+      "showBadgeCount": {
+        "label": "टैब संख्या बैज दिखाएँ",
+        "description": "टूलबार आइकन पर खुले टैब की संख्या दिखाएँ।"
+      },
+      "confirmThreshold": {
+        "label": "कई टैब बंद करने से पहले पुष्टि करें",
+        "description": "सहेजते समय कम से कम इतने टैब बंद होने पर पुष्टि माँगें। बंद करने के लिए 0 सेट करें।"
+      }
+    },
+    "tabs": {
+      "label": "टैब",
+      "description": "चुनें कि कौन से टैब सहेजे जाएँ और सहेजने के बाद क्या हो।",
+      "saveAllWindows": {
+        "label": "सभी विंडो सहेजें",
+        "description": "केवल मौजूदा विंडो ही नहीं, हर ब्राउज़र विंडो के टैब शामिल करें।"
+      },
+      "closeAfterSave": {
+        "label": "सहेजने के बाद टैब बंद करें",
+        "description": "सेशन सहेजे जाने के बाद सहेजे गए टैब बंद करें।"
+      },
+      "skipAudible": {
+        "label": "ऑडियो चला रहे टैब छोड़ें",
+        "description": "जो टैब अभी ध्वनि चला रहे हैं उन्हें खुला रहने दें।"
+      },
+      "excludedDomains": {
+        "label": "बहिष्कृत डोमेन",
+        "description": "इन डोमेन के टैब कभी सहेजे या बंद नहीं जाते। प्रति पंक्ति एक डोमेन।"
+      },
+      "includeFileUrls": {
+        "label": "स्थानीय फ़ाइल URL शामिल करें",
+        "description": "इस कंप्यूटर की फ़ाइलों वाले टैब सहेजने दें। इसके लिए फ़ाइल एक्सेस अनुमति चाहिए।"
+      }
+    },
+    "duplicates": {
+      "label": "डुप्लिकेट",
+      "description": "दोहराए गए टैब और URL कैसे संभाले जाएँ, यह नियंत्रित करें।",
+      "removeOnSave": {
+        "label": "डुप्लिकेट टैब हटाएँ",
+        "description": "दोहराए गए टैब बंद करें और सेशन में हर URL की केवल एक प्रति रखें।"
+      },
+      "matchMode": {
+        "label": "डुप्लिकेट मिलान",
+        "description": "URL की तुलना कैसे हो: सटीक, हैश फ़्रैगमेंट छोड़कर, या क्वेरी पैरामीटर छोड़कर।"
+      },
+      "skipAlreadySaved": {
+        "label": "पहले से सहेजे टैब छोड़ें",
+        "description": "ऐसे URL सहेजें नहीं जो पहले से किसी अन्य सेशन में मौजूद हैं।"
+      }
+    },
+    "pinned": {
+      "label": "पिन किए टैब",
+      "description": "तय करें कि पिन किए टैब सहेजे जाएँ या पुनर्स्थापित हों।",
+      "skipOnSave": {
+        "label": "सहेजते समय पिन किए टैब छोड़ें",
+        "description": "पिन किए टैब खुले रहने दें और नए सेशन में शामिल न करें।"
+      },
+      "restoreAsPinned": {
+        "label": "पिन किए टैब को पिन के रूप में पुनर्स्थापित करें",
+        "description": "सेशन पुनर्स्थापित करते समय सहेजे गए पिन किए टैब को पिन के रूप में फिर खोलें।"
+      }
+    },
+    "open": {
+      "label": "सेशन खोलना",
+      "description": "एक्सटेंशन और सेशन खोलने पर क्या हो, यह कॉन्फ़िगर करें।",
+      "toolbarAction": {
+        "label": "टूलबार बटन क्रिया",
+        "description": "टूलबार आइकन पर क्लिक करने पर क्या हो: पॉपअप खोलें, टैब तुरंत सहेजें, या सेशन पेज खोलें।"
+      },
+      "openSessionsAfterSave": {
+        "label": "सहेजने के बाद सेशन पेज खोलें",
+        "description": "सहेजने के तुरंत बाद सहेजा गया सेशन सेशन पेज पर दिखाएँ।"
+      },
+      "reuseSessionsTab": {
+        "label": "सेशन टैब का पुनः उपयोग करें",
+        "description": "नया टैब बनाने के बजाय मौजूदा सेशन टैब में सेशन खोलें।"
+      }
+    },
+    "urlDisplay": {
+      "label": "URL प्रदर्शन",
+      "description": "सहेजे गए टैब और सेशन कैसे दिखें, यह चुनें।",
+      "mode": {
+        "label": "URL प्रदर्शन मोड",
+        "description": "सहेजे गए टैब को शीर्षक, डोमेन या पूरे URL के रूप में दिखाएँ।"
+      },
+      "showFavicons": {
+        "label": "फ़ेविकॉन दिखाएँ",
+        "description": "सेशन सूचियों में हर साइट का फ़ेविकॉन दिखाएँ।"
+      },
+      "showTabCount": {
+        "label": "टैब संख्या दिखाएँ",
+        "description": "दिखाएँ कि हर सेशन में कितने टैब हैं।"
+      }
+    },
+    "restore": {
+      "label": "पुनर्स्थापना",
+      "description": "पुनर्स्थापित सेशन आपके ब्राउज़र में कैसे खुलें, यह सेट करें।",
+      "targetWindow": {
+        "label": "पुनर्स्थापना लक्ष्य विंडो",
+        "description": "पुनर्स्थापित टैब मौजूदा विंडो में खोलें या नई विंडो में।"
+      },
+      "openInBackground": {
+        "label": "पुनर्स्थापित टैब पृष्ठभूमि में खोलें",
+        "description": "मौजूदा टैब से फ़ोकस हटाए बिना टैब पुनर्स्थापित करें।"
+      },
+      "skipExisting": {
+        "label": "पहले से खुले टैब छोड़ें",
+        "description": "ऐसे URL फिर न खोलें जो पहले से ब्राउज़र में खुले हैं।"
+      }
+    },
+    "clipboard": {
+      "label": "क्लिपबोर्ड",
+      "description": "टैब कॉपी करते समय इस्तेमाल होने वाला फ़ॉर्मैट चुनें।",
+      "format": {
+        "label": "कॉपी फ़ॉर्मैट",
+        "description": "सेशन टैब कॉपी करते समय फ़ॉर्मैट: सादे URL, Markdown लिंक, या शीर्षक के साथ URL।"
+      }
+    },
+    "contextMenu": {
+      "label": "कॉन्टेक्स्ट मेन्यू",
+      "description": "राइट-क्लिक मेन्यू में कौन सी क्रियाएँ दिखें, यह चुनें।",
+      "enabled": {
+        "label": "कॉन्टेक्स्ट मेन्यू आइटम सक्षम करें",
+        "description": "ब्राउज़र कॉन्टेक्स्ट मेन्यू में SaveTabs क्रियाएँ दिखाएँ।"
+      },
+      "saveTab": {
+        "label": "मौजूदा टैब सहेजें",
+        "description": "मौजूदा टैब सहेजने वाला कॉन्टेक्स्ट मेन्यू आइटम जोड़ें।"
+      },
+      "saveWindow": {
+        "label": "मौजूदा विंडो सहेजें",
+        "description": "मौजूदा विंडो के हर टैब को सहेजने वाला कॉन्टेक्स्ट मेन्यू आइटम जोड़ें।"
+      },
+      "saveSelection": {
+        "label": "चुने गए टैब सहेजें",
+        "description": "चुने गए टैब सहेजने वाला कॉन्टेक्स्ट मेन्यू आइटम जोड़ें।"
+      }
+    },
+    "memory": {
+      "label": "मेमोरी सेवर",
+      "description": "निष्क्रिय टैब स्वतः हटाकर मेमोरी खाली करें।",
+      "autoDiscard": {
+        "label": "निष्क्रिय टैब स्वतः हटाएँ",
+        "description": "नीचे दिए टाइमआउट तक निष्क्रिय रहे टैब हटाकर मेमोरी खाली करें।"
+      },
+      "timeoutMinutes": {
+        "label": "निष्क्रियता टाइमआउट",
+        "description": "किसी टैब को हटाने से पहले वह कितने मिनट निष्क्रिय रहे।"
+      },
+      "keepAudible": {
+        "label": "ऑडियो चला रहे टैब रखें",
+        "description": "ध्वनि चला रहे टैब कभी न हटाएँ।"
+      },
+      "keepPinned": {
+        "label": "पिन किए टैब रखें",
+        "description": "पिन किए टैब कभी न हटाएँ।"
+      },
+      "discardNow": "अभी हटाएँ",
+      "discardNowSuccess": "{count} टैब हटाए गए।",
+      "discardNowFailed": "टैब हटाए नहीं जा सके: {message}"
+    },
+    "shortcuts": {
+      "label": "शॉर्टकट",
+      "description": "SaveTabs को सौंपे गए कीबोर्ड शॉर्टकट देखें।",
+      "tableCaption": "SaveTabs के लिए कीबोर्ड शॉर्टकट",
+      "commandHeader": "कमांड",
+      "bindingHeader": "शॉर्टकट",
+      "notSet": "सेट नहीं है",
+      "instructions": "शॉर्टकट बदलने के लिए नीचे शॉर्टकट पेज खोलें और SaveTabs का शॉर्टकट संपादित करें।",
+      "pagePathLabel": "शॉर्टकट पेज पथ",
+      "copyPath": "पथ कॉपी करें",
+      "copySuccess": "पथ क्लिपबोर्ड पर कॉपी हो गया।",
+      "copyFailed": "पथ कॉपी नहीं हो सका।",
+      "commandLabel": {
+        "save-tabs": "मौजूदा विंडो के सभी टैब सहेजें",
+        "open-sessions": "सेशन पेज खोलें",
+        "discard-now": "निष्क्रिय टैब अभी हटाएँ"
+      }
+    },
+    "incognito": {
+      "label": "इनकॉग्निटो",
+      "description": "निजी विंडो कैसे संभाली जाएँ, यह नियंत्रित करें।",
+      "includeInSaveAll": {
+        "label": "इनकॉग्निटो विंडो शामिल करें",
+        "description": "सभी विंडो सहेजते समय निजी विंडो शामिल करें। इसके लिए इनकॉग्निटो एक्सेस अनुमति चाहिए।"
+      },
+      "status": {
+        "label": "इनकॉग्निटो एक्सेस",
+        "allowed": "अनुमत",
+        "denied": "अनुमत नहीं"
+      },
+      "deniedNote": "यह सेटिंग बंद है क्योंकि इनकॉग्निटो विंडो में SaveTabs की अनुमति नहीं है।",
+      "enableInstructions": "एक्सेस देने के लिए नीचे एक्सटेंशन पेज खोलें, SaveTabs का विवरण खोलें और निजी विंडो में एक्सटेंशन की अनुमति दें।",
+      "pagePathLabel": "एक्सटेंशन पेज पथ",
+      "copyPath": "पथ कॉपी करें",
+      "copySuccess": "पथ क्लिपबोर्ड पर कॉपी हो गया।",
+      "copyFailed": "पथ कॉपी नहीं हो सका।"
+    },
+    "sync": {
+      "label": "सिंक",
+      "description": "एंड-टू-एंड एन्क्रिप्शन के साथ सेशन का बैकअप लें और पुनर्स्थापित करें।",
+      "enabled": {
+        "label": "एंड-टू-एंड एन्क्रिप्टेड सिंक सक्षम करें",
+        "description": "एंड-टू-एंड एन्क्रिप्शन के साथ अपने सिंक खाते में सेशन का बैकअप लें।"
+      },
+      "autoUpload": {
+        "label": "बदलाव स्वतः अपलोड करें",
+        "description": "नए और बदले सेशन स्वतः अपलोड करें।"
+      },
+      "autoDownload": {
+        "label": "बदलाव स्वतः डाउनलोड करें",
+        "description": "अन्य डिवाइस पर सहेजे सेशन स्वतः डाउनलोड और मर्ज करें।"
+      },
+      "keyTitle": "आपकी सिंक कुंजी",
+      "keyLabel": "सिंक कुंजी मान",
+      "keyMaskedHint": "कुंजी छिपी रहती है क्योंकि यह आपके एन्क्रिप्टेड डेटा की एकमात्र साख है।",
+      "revealKey": "कुंजी दिखाएँ",
+      "hideKey": "कुंजी छिपाएँ",
+      "copyKey": "कुंजी कॉपी करें",
+      "copied": "कुंजी क्लिपबोर्ड पर कॉपी हो गई।",
+      "copyFailed": "कुंजी कॉपी नहीं हो सकी।",
+      "importLabel": "कुंजी आयात करें",
+      "importPlaceholder": "अपनी ST-… कुंजी पेस्ट करें",
+      "invalidKey": "यह मान्य SaveTabs कुंजी नहीं है।",
+      "importPrompt": "क्या इस नई कुंजी के अंतर्गत स्थानीय सेशन अपलोड करें?",
+      "importPromptHint": "अनुशंसित। स्थानीय सेशन एन्क्रिप्ट होकर नई कुंजी से अपलोड होंगे।",
+      "importUpload": "स्थानीय सेशन अपलोड करें",
+      "importSkip": "अपलोड छोड़ें",
+      "importSuccess": "कुंजी आयात हो गई। स्थानीय सेशन इसके अंतर्गत अपलोड होंगे।",
+      "importSkipped": "कुंजी आयात हो गई। स्थानीय सेशन अपलोड नहीं होंगे।",
+      "rotateKey": "कुंजी रोटेट करें",
+      "rotateTitle": "सिंक कुंजी रोटेट करें",
+      "rotateWarning": "रोटेट करने पर नई कुंजी बनती है और पुरानी कुंजी से एन्क्रिप्ट क्लाउड डेटा हटाने का प्रयास होता है। स्थानीय सेशन नई कुंजी के अंतर्गत अपलोड होते हैं।",
+      "rotateConfirmLabel": "पुष्टि के लिए ROTATE लिखें",
+      "rotateConfirmPlaceholder": "ROTATE",
+      "rotateConfirm": "नई कुंजी बनाएँ",
+      "rotateSuccess": "नई कुंजी बन गई। स्थानीय सेशन इसके अंतर्गत अपलोड होंगे।",
+      "rotateSuccessRevoked": "नई कुंजी बन गई। पुराना क्लाउड डेटा हटा दिया गया। स्थानीय सेशन नई कुंजी के अंतर्गत अपलोड होंगे।",
+      "rotateSuccessRevokeFailed": "नई कुंजी बन गई, लेकिन पुराना क्लाउड डेटा हटाया नहीं जा सका। स्थानीय सेशन नई कुंजी के अंतर्गत अपलोड होंगे।",
+      "loseKeyWarning": "अगर यह कुंजी खो गई, तो आपका सिंक किया डेटा वापस नहीं पाया जा सकता।",
+      "onlyCredentialWarning": "यह कुंजी आपके सिंक किए डेटा की एकमात्र साख है। इसके पास मौजूद कोई भी व्यक्ति उस डेटा को पढ़, बदल या हटा सकता है।",
+      "actionFailed": "क्रिया विफल रही: {message}",
+      "statusTitle": "सिंक स्थिति",
+      "statusOn": "सिंक चालू है।",
+      "statusOff": "सिंक बंद है। क्लाउड डेटा तब तक रखा जाता है जब तक आप उसे नहीं हटाते।",
+      "lastSyncLabel": "अंतिम सिंक",
+      "neverSynced": "कभी नहीं",
+      "pendingLabel": "लंबित अपलोड",
+      "syncing": "सिंक हो रहा है…",
+      "syncResult": "{uploaded} अपलोड, {downloaded} डाउनलोड, {deleted} हटाए गए।",
+      "syncErrorsTitle": "कुछ आइटम सिंक नहीं हो सके:",
+      "authError": "सिंक कुंजी अस्वीकार हुई या क्लाउड डेटा डिक्रिप्ट नहीं हो सकता। अपनी कुंजी फिर से आयात करें या रोटेट करें।",
+      "deleteCloud": "क्लाउड डेटा हटाएँ",
+      "deleteCloudTitle": "क्लाउड डेटा हटाएँ?",
+      "deleteCloudMessage": "इससे इस कुंजी के लिए सर्वर पर मौजूद हर सिंक किया सेशन हट जाता है, फिर सिंक बंद हो जाता है ताकि आपके स्थानीय सेशन दोबारा अपलोड न हों। स्थानीय सेशन इस डिवाइस पर बने रहते हैं। इसे पूर्ववत नहीं किया जा सकता।",
+      "deleteCloudConfirm": "क्लाउड डेटा हटाएँ",
+      "deleteCloudSuccess": "क्लाउड डेटा हटा दिया गया। सिंक बंद कर दिया गया ताकि स्थानीय सेशन दोबारा अपलोड न हों। आप बाद में सिंक फिर से सक्षम कर सकते हैं।",
+      "enableConfirmTitle": "एन्क्रिप्टेड सिंक सक्षम करें?",
+      "enableConfirmMessage": "सुनिश्चित करें कि आपने अपनी सिंक कुंजी सहेज ली है। सिंक किए डेटा को वापस पाने का यही एकमात्र तरीका है। आप इसे सिंक अनुभाग में देख और कॉपी कर सकते हैं।",
+      "enableConfirm": "सिंक सक्षम करें",
+      "accountPasswordLabel": "खाता पासवर्ड",
+      "accountPasswordHint": "अपने खाते से जुड़ी कुंजी अपडेट करने के लिए आवश्यक।",
+      "accountPasswordRequired": "सिंक कुंजी बदलने के लिए अपना खाता पासवर्ड दर्ज करें।",
+      "keyRelinkFailed": "खाता कुंजी अपडेट नहीं हो सकी। आपकी सिंक कुंजी नहीं बदली गई।"
+    },
+    "account": {
+      "title": "खाता",
+      "description": "किसी भी डिवाइस पर अपनी सिंक कुंजी वापस पाने के लिए साइन इन करें। आपका डेटा एंड-टू-एंड एन्क्रिप्टेड रहता है।",
+      "emailLabel": "ईमेल",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "पासवर्ड",
+      "signIn": "साइन इन करें",
+      "signingIn": "साइन इन हो रहा है…",
+      "createAccount": "खाता बनाएँ",
+      "creatingAccount": "खाता बन रहा है…",
+      "useKeyInstead": "इसके बजाय कुंजी का उपयोग करें",
+      "useAccount": "खाते का उपयोग करें",
+      "keyOnlyHint": "सिंक केवल कुंजी से चलता रहता है। आपकी कुंजी नीचे प्रबंधित होती है।",
+      "signOut": "साइन आउट करें",
+      "signedOut": "साइन आउट हो गया। आपकी सिंक कुंजी और सिंक सेटिंग्स अपरिवर्तित हैं।",
+      "signOutFailed": "हम साइन आउट नहीं कर सके। फिर से प्रयास करें।",
+      "verified": "सत्यापित",
+      "unverified": "ईमेल सत्यापित नहीं है",
+      "passwordTooShort": "कम से कम 12 अक्षरों का पासवर्ड उपयोग करें।",
+      "signInFailed": "हम आपको साइन इन नहीं कर सके। अपना ईमेल और पासवर्ड जाँचें।",
+      "signUpFailed": "हम आपका खाता नहीं बना सके। फिर से प्रयास करें।",
+      "loadFailed": "हम आपका खाता लोड नहीं कर सके।",
+      "recoveryTitle": "अपनी रिकवरी कुंजी सहेजें",
+      "recoveryMessage": "यह कुंजी आपके एन्क्रिप्टेड सेशन वापस पाने का एकमात्र तरीका है। इसे दोबारा नहीं दिखाया जाएगा।",
+      "recoveryKeyLabel": "आपकी कुंजी",
+      "recoveryConfirm": "मैंने इसे सहेज लिया",
+      "recoveryContinue": "जारी रखें",
+      "changePassword": "पासवर्ड बदलें",
+      "currentPasswordLabel": "मौजूदा पासवर्ड",
+      "newPasswordLabel": "नया पासवर्ड",
+      "changePasswordSubmit": "पासवर्ड बदलें",
+      "changePasswordSubmitting": "पासवर्ड बदल रहा है…",
+      "changePasswordSuccess": "पासवर्ड बदल गया। अन्य सेशन साइन आउट कर दिए गए।",
+      "changePasswordFailed": "हम आपका पासवर्ड नहीं बदल सके। अपना मौजूदा पासवर्ड जाँचें।",
+      "uploadPromptTitle": "स्थानीय सेशन अपलोड करें?",
+      "uploadPrompt": "क्या ये सेशन इस खाते में अपलोड करें?",
+      "uploadPromptUpload": "सेशन अपलोड करें",
+      "uploadPromptSkip": "केवल स्थानीय रखें"
+    },
+    "advanced": {
+      "label": "उन्नत",
+      "description": "आयात, निर्यात, रीसेट और रखरखाव क्रियाएँ।",
+      "storageUsage": "उपयोग किया गया संग्रहण: {sessions} सेशन, {tabs} टैब",
+      "storageNearLimit": "स्थानीय संग्रहण लगभग भर गया है। जगह खाली करने के लिए सेशन निर्यात या हटाएँ।",
+      "exportSettings": "सेटिंग्स निर्यात करें",
+      "importSettings": "सेटिंग्स आयात करें",
+      "exportSessions": "सेशन निर्यात करें",
+      "importSessions": "सेशन आयात करें",
+      "resetToDefaults": "डिफ़ॉल्ट पर रीसेट करें",
+      "clearSessions": "स्थानीय सेशन साफ़ करें",
+      "sessionsPlaintextWarning": "सेशन निर्यात में सादे टेक्स्ट में शीर्षक और URL होते हैं। फ़ाइल को किसी निजी जगह पर रखें।",
+      "exportSuccess": "{filename} निर्यात किया गया।",
+      "importSettingsSuccess": "सेटिंग्स आयात हो गईं।",
+      "importSettingsSyncStaysOff": "सेटिंग्स आयात करने के बाद सिंक बंद रहता है। इसे टॉगल से सक्षम करें; वह प्रक्रिया आपकी कुंजी की पुष्टि करती है।",
+      "importSettingsFailed": "सेटिंग्स आयात विफल रहा:",
+      "importSessionsSuccess": "{added} सेशन आयात और {updated} अपडेट किए गए।",
+      "importSessionsPartial": "{added} सेशन आयात और {updated} अपडेट किए गए। कुछ सेशन सहेजे नहीं जा सके:",
+      "importSessionsFailed": "सेशन आयात विफल रहा:",
+      "actionFailed": "क्रिया विफल रही: {message}",
+      "resetTitle": "सभी सेटिंग्स रीसेट करें?",
+      "resetMessage": "सभी सेटिंग्स अपने डिफ़ॉल्ट पर लौट आएँगी। सहेजे गए सेशन प्रभावित नहीं होंगे।",
+      "resetConfirm": "सेटिंग्स रीसेट करें",
+      "resetSuccess": "सेटिंग्स डिफ़ॉल्ट पर रीसेट हो गईं।",
+      "clearTitle": "सभी स्थानीय सेशन हटाएँ?",
+      "clearMessage": "इस डिवाइस पर सहेजे गए सभी सेशन स्थायी रूप से हट जाएँगे। क्लाउड में सिंक किए सेशन नहीं हटते और अगले सिंक पर दोबारा डाउनलोड हो सकते हैं। ज़रूरत हो तो पहले बैकअप निर्यात करें।",
+      "clearConfirm": "सेशन हटाएँ",
+      "clearSuccess": "सभी स्थानीय सेशन हटा दिए गए।"
+    },
+    "option": {
+      "general": {
+        "theme": {
+          "system": "सिस्टम",
+          "light": "लाइट",
+          "dark": "डार्क"
+        },
+        "language": {
+          "auto": "स्वतः",
+          "en": "अंग्रेज़ी",
+          "vi": "वियतनामी",
+          "zh-CN": "चीनी (सरलीकृत)",
+          "es": "स्पेनिश",
+          "hi": "हिन्दी",
+          "ar": "अरबी"
+        }
+      },
+      "duplicates": {
+        "matchMode": {
+          "exact": "सटीक URL",
+          "ignore-hash": "#fragment छोड़ें",
+          "ignore-query": "?query छोड़ें"
+        }
+      },
+      "open": {
+        "toolbarAction": {
+          "popup": "पॉपअप खोलें",
+          "save": "टैब अभी सहेजें",
+          "sessions": "सेशन पेज खोलें"
+        }
+      },
+      "urlDisplay": {
+        "mode": {
+          "title": "शीर्षक",
+          "domain": "डोमेन",
+          "full-url": "पूरा URL"
+        }
+      },
+      "restore": {
+        "targetWindow": {
+          "current": "मौजूदा विंडो",
+          "new": "नई विंडो"
+        }
+      },
+      "clipboard": {
+        "format": {
+          "plain-urls": "सादे URL",
+          "markdown": "Markdown लिंक",
+          "titled": "शीर्षक के साथ URL"
+        }
+      },
+      "memory": {
+        "timeoutMinutes": {
+          "5": "5 मिनट",
+          "15": "15 मिनट",
+          "30": "30 मिनट",
+          "60": "60 मिनट",
+          "120": "120 मिनट"
+        }
+      }
+    }
+  },
+  "options": {
+    "search": "सेटिंग्स खोजें",
+    "searchPlaceholder": "सेटिंग्स खोजें…",
+    "expandAll": "सभी विस्तृत करें",
+    "collapseAll": "सभी संक्षिप्त करें",
+    "categories": "सेटिंग श्रेणियाँ",
+    "settingCount": "{count} सेटिंग्स",
+    "saved": "सहेजा गया",
+    "noResults": "आपकी खोज से कोई सेटिंग मेल नहीं खाती।",
+    "tooltip": "{setting} के बारे में अधिक जानकारी",
+    "memoryUnsupported": "इस ब्राउज़र में टैब हटाना उपलब्ध नहीं है।",
+    "stringList": {
+      "placeholder": "डोमेन जोड़ें…",
+      "add": "जोड़ें",
+      "remove": "{item} हटाएँ"
+    },
+    "validation": {
+      "numberRange": "{min} और {max} के बीच पूर्ण संख्या दर्ज करें।",
+      "maxItems": "आप अधिकतम {count} आइटम जोड़ सकते हैं।",
+      "duplicateEntry": "यह प्रविष्टि पहले से सूची में है।",
+      "emptyEntry": "जोड़ने से पहले कोई मान दर्ज करें।"
+    },
+    "theme": {
+      "system": "सिस्टम",
+      "light": "लाइट",
+      "dark": "डार्क",
+      "toggle": "थीम: {theme}"
+    }
+  },
+  "contextMenu": {
+    "saveTab": "यह टैब सहेजें",
+    "saveWindow": "इस विंडो के सभी टैब सहेजें",
+    "saveSelection": "चुने गए टैब सहेजें"
+  },
+  "popup": {
+    "saveTabs": "{count} टैब सहेजें",
+    "openSessions": "सेशन पेज खोलें",
+    "syncOn": "सिंक चालू",
+    "syncOff": "सिंक बंद",
+    "discardOff": "स्वतः हटाना: बंद",
+    "discardStatus": "स्वतः हटाना: {minutes} मिनट · आज {count} हटाए गए",
+    "recentTitle": "हाल के सेशन",
+    "empty": "अभी कोई सहेजा सेशन नहीं है।",
+    "restoreSession": "{time} पुनर्स्थापित करें",
+    "loadFailed": "पॉपअप डेटा लोड नहीं हो सका।"
+  },
+  "update": {
+    "title": "अपडेट उपलब्ध है",
+    "message": "SaveTabs {version} इंस्टॉल के लिए तैयार है।",
+    "action": "स्टोर में देखें"
+  },
+  "sessions": {
+    "title": "सहेजे गए सेशन",
+    "searchLabel": "सेशन खोजें",
+    "searchPlaceholder": "सेशन खोजें…",
+    "saveWindow": "विंडो सहेजें",
+    "saveConfirmTitle": "टैब सहेजें और बंद करें?",
+    "saveConfirmMessage": "सहेजने से {count} टैब बंद होंगे। जारी रखें?",
+    "saveConfirm": "सहेजें और बंद करें",
+    "invalidResponse": "एक्सटेंशन ने अप्रत्याशित प्रतिक्रिया दी।",
+    "empty": "अभी कोई सेशन नहीं है। 'विंडो सहेजें' बटन से अपने खुले टैब सहेजें।",
+    "noResults": "आपकी खोज से कोई सेशन मेल नहीं खाता।",
+    "private": "निजी",
+    "moreActions": "अधिक क्रियाएँ",
+    "rename": "नाम बदलें",
+    "exportSession": "सेशन JSON निर्यात करें",
+    "renameLabel": "सेशन नाम",
+    "renameSuccess": "सेशन का नाम बदल गया।",
+    "restoreSuccess": "{count} टैब पुनर्स्थापित किए गए।",
+    "saveSuccess": "{count} टैब सहेजे गए।",
+    "saveOverflow": "{saved} टैब सहेजे गए; {overflow} खुले रह गए (सेशन सीमा)।",
+    "saveEmpty": "सहेजने के लिए कोई टैब नहीं है।",
+    "copySuccess": "{count} टैब क्लिपबोर्ड पर कॉपी किए गए।",
+    "copyFailed": "टैब कॉपी नहीं हो सके।",
+    "exportSuccess": "{filename} निर्यात किया गया।",
+    "deleteTitle": "यह सेशन हटाएँ?",
+    "deleteMessage": "यह सेशन स्थायी रूप से हट जाएगा। इसे पूर्ववत नहीं किया जा सकता।",
+    "deleteConfirm": "सेशन हटाएँ",
+    "deleteSuccess": "सेशन हटा दिया गया।",
+    "sessionMissing": "वह सेशन अब मौजूद नहीं है।",
+    "actionFailed": "क्रिया विफल रही: {message}",
+    "loadFailed": "सहेजे गए सेशन लोड नहीं हो सके।",
+    "noTabs": "इस सेशन में कोई टैब नहीं है।",
+    "expand": "टैब दिखाएँ",
+    "collapse": "टैब छिपाएँ",
+    "time": {
+      "justNow": "अभी",
+      "minutesAgo": "{count} मिनट पहले",
+      "hoursAgo": "{count} घंटे पहले",
+      "daysAgo": "{count} दिन पहले"
+    }
+  },
+  "web": {
+    "signup": {
+      "title": "अपना खाता बनाएँ",
+      "description": "एंड-टू-एंड एन्क्रिप्शन के साथ अपने सहेजे सेशन का बैकअप लें और उन्हें किसी भी डिवाइस पर खोलें। सब कुछ आपके ब्राउज़र में एन्क्रिप्ट होता है।",
+      "emailLabel": "ईमेल",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "पासवर्ड",
+      "passwordHint": "कम से कम 12 अक्षर उपयोग करें।",
+      "confirmLabel": "पासवर्ड की पुष्टि करें",
+      "submit": "खाता बनाएँ",
+      "submitting": "खाता बन रहा है…",
+      "passwordTooShort": "कम से कम 12 अक्षरों का पासवर्ड उपयोग करें।",
+      "passwordMismatch": "पासवर्ड मेल नहीं खाते।",
+      "error": "हम आपका खाता नहीं बना सके। फिर से प्रयास करें।",
+      "recoveryTitle": "अपनी रिकवरी कुंजी सहेजें",
+      "recoveryMessage": "यह कुंजी आपके एन्क्रिप्टेड सेशन वापस पाने का एकमात्र तरीका है। इसे दोबारा नहीं दिखाया जाएगा।",
+      "recoveryKeyLabel": "आपकी कुंजी",
+      "recoveryConfirm": "मैंने इसे सहेज लिया",
+      "continue": "जारी रखें",
+      "back": "SaveTabs पर वापस जाएँ"
+    },
+    "login": {
+      "title": "साइन इन करें",
+      "description": "इस डिवाइस पर अपने एन्क्रिप्टेड सेशन अनलॉक करने के लिए ईमेल और पासवर्ड दर्ज करें।",
+      "emailLabel": "ईमेल",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "पासवर्ड",
+      "rememberLabel": "इस डिवाइस पर याद रखें",
+      "rememberWarning": "इसका उपयोग केवल किसी भरोसेमंद डिवाइस पर करें। जब तक आप इसे साफ़ नहीं करते, कुंजी इस ब्राउज़र में रहती है।",
+      "submit": "साइन इन करें",
+      "submitting": "साइन इन हो रहा है…",
+      "error": "हम आपको साइन इन नहीं कर सके। अपना ईमेल और पासवर्ड जाँचें और फिर से प्रयास करें।",
+      "recoveryLink": "पासवर्ड भूल गए? अपनी रिकवरी कुंजी का उपयोग करें",
+      "createAccount": "खाता बनाएँ",
+      "back": "SaveTabs पर वापस जाएँ"
+    },
+    "recover": {
+      "title": "अपना पासवर्ड रीसेट करें",
+      "description": "अपनी रिकवरी कुंजी दर्ज करें और नया पासवर्ड चुनें। सब कुछ आपके ब्राउज़र में एन्क्रिप्ट होता है।",
+      "emailLabel": "ईमेल",
+      "emailPlaceholder": "you@example.com",
+      "keyLabel": "रिकवरी कुंजी",
+      "keyPlaceholder": "ST-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-X",
+      "passwordLabel": "नया पासवर्ड",
+      "passwordHint": "कम से कम 12 अक्षर उपयोग करें।",
+      "confirmLabel": "नए पासवर्ड की पुष्टि करें",
+      "submit": "पासवर्ड रीसेट करें",
+      "submitting": "पासवर्ड रीसेट हो रहा है…",
+      "passwordTooShort": "कम से कम 12 अक्षरों का पासवर्ड उपयोग करें।",
+      "passwordMismatch": "पासवर्ड मेल नहीं खाते।",
+      "error": "हम आपका पासवर्ड रीसेट नहीं कर सके। अपना ईमेल और रिकवरी कुंजी जाँचें, फिर से प्रयास करें।",
+      "cancel": "साइन इन पर वापस जाएँ"
+    },
+    "verify": {
+      "title": "ईमेल सत्यापन",
+      "checking": "आपका ईमेल सत्यापित हो रहा है…",
+      "successTitle": "ईमेल सत्यापित",
+      "success": "आपका ईमेल पता सत्यापित है। आप यह पेज बंद करके SaveTabs पर लौट सकते हैं।",
+      "expiredTitle": "लिंक की अवधि समाप्त",
+      "expired": "यह सत्यापन लिंक अमान्य या समाप्त है। साइन इन करें और नया ईमेल अनुरोध करें।",
+      "errorTitle": "सत्यापन विफल",
+      "error": "हम आपका ईमेल सत्यापित नहीं कर सके। बाद में फिर से प्रयास करें।",
+      "back": "SaveTabs पर वापस जाएँ"
+    },
+    "account": {
+      "title": "आपका खाता",
+      "description": "अपना खाता, पासवर्ड और रिकवरी कुंजी प्रबंधित करें।",
+      "emailLabel": "ईमेल",
+      "verified": "सत्यापित",
+      "unverified": "आपका ईमेल पता अभी सत्यापित नहीं है।",
+      "resend": "सत्यापन ईमेल फिर भेजें",
+      "resending": "भेजा जा रहा है…",
+      "resendSuccess": "सत्यापन ईमेल भेजा गया।",
+      "resendFailed": "हम सत्यापन ईमेल नहीं भेज सके। बाद में फिर से प्रयास करें।",
+      "changePasswordTitle": "पासवर्ड बदलें",
+      "changePasswordDescription": "अपना मौजूदा पासवर्ड दर्ज करें और नया चुनें। सब कुछ आपके ब्राउज़र में एन्क्रिप्ट होता है।",
+      "currentPasswordLabel": "मौजूदा पासवर्ड",
+      "newPasswordLabel": "नया पासवर्ड",
+      "confirmPasswordLabel": "नए पासवर्ड की पुष्टि करें",
+      "passwordHint": "कम से कम 12 अक्षर उपयोग करें।",
+      "passwordTooShort": "कम से कम 12 अक्षरों का पासवर्ड उपयोग करें।",
+      "passwordMismatch": "पासवर्ड मेल नहीं खाते।",
+      "passwordRequired": "अपना पासवर्ड दर्ज करें।",
+      "changePasswordSubmit": "पासवर्ड बदलें",
+      "changePasswordSubmitting": "पासवर्ड बदल रहा है…",
+      "passwordChanged": "पासवर्ड बदल गया।",
+      "passwordChangeFailed": "हम आपका पासवर्ड नहीं बदल सके। अपना मौजूदा पासवर्ड जाँचें और फिर से प्रयास करें।",
+      "noVault": "इस खाते से अभी कोई सिंक कुंजी जुड़ी नहीं है।",
+      "recoveryKeyTitle": "रिकवरी कुंजी",
+      "recoveryKeyDescription": "इस खाते की रिकवरी कुंजी देखने के लिए अपना पासवर्ड फिर से दर्ज करें।",
+      "passwordLabel": "पासवर्ड",
+      "viewKeySubmit": "रिकवरी कुंजी देखें",
+      "viewKeySubmitting": "जाँच हो रही है…",
+      "viewKeyLabel": "आपकी रिकवरी कुंजी",
+      "viewKeyFailed": "हम रिकवरी कुंजी नहीं दिखा सके। अपना पासवर्ड जाँचें और फिर से प्रयास करें।",
+      "hideKey": "छिपाएँ",
+      "logout": "साइन आउट करें",
+      "deleteTitle": "खाता हटाएँ",
+      "deleteDescription": "खाता हटाने से आपका ईमेल और साइन-इन हट जाता है। जब तक आप क्लाउड डेटा भी नहीं हटाते, आपके एन्क्रिप्टेड सेशन सिंक सर्वर पर रहते हैं।",
+      "deletePasswordLabel": "आपका पासवर्ड",
+      "deleteCloudLabel": "इस खाते से सिंक किया क्लाउड डेटा भी हटाएँ",
+      "deleteCloudHint": "इससे इस खाते की सिंक कुंजी के लिए संग्रहीत हर एन्क्रिप्टेड सेशन हट जाता है। इसे पूर्ववत नहीं किया जा सकता।",
+      "deleteSubmit": "खाता हटाएँ",
+      "deleteConfirmTitle": "अपना खाता हटाएँ?",
+      "deleteConfirmMessage": "आपका खाता और साइन-इन विवरण स्थायी रूप से हट जाएँगे। इसे पूर्ववत नहीं किया जा सकता। आपकी सिंक कुंजी इस डिवाइस पर काम करती रहेगी।",
+      "deleteCloudConfirmMessage": "आपका खाता, साइन-इन विवरण और इसकी सिंक कुंजी का क्लाउड डेटा स्थायी रूप से हट जाएँगे। इसे पूर्ववत नहीं किया जा सकता।",
+      "deleteConfirm": "खाता हटाएँ",
+      "deleteDeleting": "खाता हटाया जा रहा है…",
+      "deleteFailed": "हम आपका खाता नहीं हटा सके। अपना पासवर्ड जाँचें और फिर से प्रयास करें।",
+      "loadFailed": "हम आपका खाता लोड नहीं कर सके।",
+      "home": "होम",
+      "sessionsLink": "सहेजे गए सेशन",
+      "unlockTitle": "अपने पासवर्ड से अनलॉक करें",
+      "unlockDescription": "आपका खाता इस डिवाइस पर साइन इन है, लेकिन सिंक कुंजी लॉक है। अपने सहेजे सेशन खोलने के लिए पासवर्ड दर्ज करें।",
+      "unlockAccount": "{email} के रूप में साइन इन",
+      "unlockSubmit": "अनलॉक करें",
+      "unlockSubmitting": "अनलॉक हो रहा है…",
+      "unlockError": "हम आपके सेशन अनलॉक नहीं कर सके। अपना पासवर्ड जाँचें और फिर से प्रयास करें।"
+    },
+    "landing": {
+      "title": "अपने सहेजे टैब खोलें",
+      "description": "अपने सहेजे सेशन देखने के लिए अपनी सिंक कुंजी दर्ज करें। सब कुछ आपके ब्राउज़र में डिक्रिप्ट होता है।",
+      "keyLabel": "सिंक कुंजी",
+      "keyPlaceholder": "ST-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-X",
+      "continue": "जारी रखें",
+      "invalidKey": "वह सिंक कुंजी मान्य नहीं है। उसे जाँचें और फिर से प्रयास करें।",
+      "loseKeyWarning": "आपकी सिंक कुंजी आपके सेशन डिक्रिप्ट करने का एकमात्र तरीका है। अगर यह खो गई, तो आपका सहेजा डेटा वापस नहीं पाया जा सकता।",
+      "rememberLabel": "इस डिवाइस पर याद रखें",
+      "rememberWarning": "इसका उपयोग केवल किसी भरोसेमंद डिवाइस पर करें। जब तक आप इसे साफ़ नहीं करते, कुंजी इस ब्राउज़र में रहती है।",
+      "privacyLink": "गोपनीयता नीति",
+      "header": {
+        "account": "खाता"
+      },
+      "hero": {
+        "title": "हर टैब सहेजें। बाद में वापस पाएँ।",
+        "description": "SaveTabs पूरी ब्राउज़र विंडो को एक सेशन के रूप में सहेजता है, टैब बंद करता है और ज़रूरत पड़ने पर उन्हें फिर खोलता है। यह आपके ब्राउज़र में चलता है और आपके सेशन आपके डिवाइस पर रखता है।",
+        "chrome": "Chrome में जोड़ें",
+        "firefox": "Firefox",
+        "comingSoon": "जल्द आ रहा है",
+        "noAccount": "खाते की ज़रूरत नहीं। साइन अप किए बिना स्थानीय उपयोग काम करता है।",
+        "mockup": {
+          "save": "12 टैब सहेजें",
+          "sessions": "हाल के सेशन",
+          "sessionOne": "डिज़ाइन संदर्भ",
+          "sessionTwo": "पढ़ने की सूची",
+          "restore": "पुनर्स्थापित करें",
+          "sync": "सिंक चालू"
+        }
+      },
+      "howItWorks": {
+        "title": "यह कैसे काम करता है",
+        "steps": {
+          "save": {
+            "title": "विंडो सहेजें",
+            "body": "एक्सटेंशन खोलें और मौजूदा विंडो के हर टैब को एक सेशन के रूप में सहेजें।"
+          },
+          "close": {
+            "title": "टैब बंद होते हैं",
+            "body": "SaveTabs सहेजे गए टैब बंद कर देता है, ताकि आपका ब्राउज़र साफ़ रहे।"
+          },
+          "restore": {
+            "title": "बाद में पुनर्स्थापित करें",
+            "body": "सेशन खोलकर हर सहेजा टैब नई विंडो में वापस लाएँ।"
+          }
+        }
+      },
+      "privacy": {
+        "title": "गोपनीयता",
+        "items": {
+          "e2ee": {
+            "title": "एंड-टू-एंड एन्क्रिप्टेड",
+            "body": "अपलोड होने से पहले सेशन आपके ब्राउज़र में एन्क्रिप्ट होते हैं। सर्वर ऐसा सिफ़रटेक्स्ट संग्रहीत करता है जिसे वह पढ़ नहीं सकता।"
+          },
+          "keyOnly": {
+            "title": "आपकी कुंजी, आपका डेटा",
+            "body": "सिंक आपकी सिंक कुंजी पर चलता है। किसी खाते की ज़रूरत नहीं, और कुंजी कभी आपका ब्राउज़र नहीं छोड़ती।"
+          },
+          "localFirst": {
+            "title": "स्थानीय पहले",
+            "body": "सिंक के बिना, हर सेशन आपके ब्राउज़र के एक्सटेंशन संग्रहण में रहता है।"
+          },
+          "privateWindows": {
+            "title": "निजी विंडो स्थानीय रहती हैं",
+            "body": "निजी या इनकॉग्निटो विंडो से सहेजे सेशन कभी अपलोड नहीं होते।"
+          }
+        },
+        "link": "गोपनीयता नीति पढ़ें"
+      },
+      "features": {
+        "title": "विशेषताएँ",
+        "items": {
+          "search": {
+            "title": "सेशन खोजें",
+            "body": "सहेजा सेशन उसके नाम या उसमें मौजूद टैब से खोजें।"
+          },
+          "rename": {
+            "title": "सेशन का नाम बदलें",
+            "body": "सेशन को स्पष्ट नाम दें ताकि बाद में आसानी से मिल सके।"
+          },
+          "exportImport": {
+            "title": "निर्यात और आयात",
+            "body": "JSON फ़ाइल से ब्राउज़रों के बीच सेशन ले जाएँ।"
+          },
+          "autoDiscard": {
+            "title": "स्वतः हटाना",
+            "body": "आपके चुने टाइमआउट के बाद निष्क्रिय टैब हटाएँ, जबकि पिन किए और ऑडियो चला रहे टैब खुले रखें।"
+          },
+          "sync": {
+            "title": "मल्टी-डिवाइस सिंक",
+            "body": "अपनी सिंक कुंजी से अपने डिवाइसों के बीच एन्क्रिप्टेड सेशन सिंक करें।"
+          },
+          "privateWindows": {
+            "title": "निजी विंडो",
+            "body": "निजी विंडो के सेशन डिवाइस पर रहते हैं और कभी अपलोड नहीं होते।"
+          }
+        }
+      },
+      "account": {
+        "title": "अपने सेशन हर डिवाइस पर रखें",
+        "description": "खाता होने पर नया डिवाइस सिर्फ़ ईमेल और पासवर्ड से आपके सेशन अनलॉक कर सकता है। आपकी सिंक कुंजी अब भी सब कुछ एन्क्रिप्ट करती है, और सर्वर उसे कभी नहीं देखता।",
+        "create": "खाता बनाएँ",
+        "signIn": "साइन इन करें",
+        "useKey": "या सिंक कुंजी का उपयोग करें"
+      },
+      "install": {
+        "title": "इंस्टॉल और समस्या निवारण",
+        "items": {
+          "install": {
+            "title": "इंस्टॉल",
+            "body": "Chrome Web Store लिस्टिंग खोलें, 'Chrome में जोड़ें' चुनें और SaveTabs को टूलबार पर पिन करें। Firefox अभी प्रकाशित नहीं है।"
+          },
+          "uninstall": {
+            "title": "अनइंस्टॉल",
+            "body": "अपने ब्राउज़र के एक्सटेंशन पेज से SaveTabs हटाएँ। सहेजे सेशन ब्राउज़र संग्रहण में तब तक रहते हैं जब तक एक्सटेंशन डेटा साफ़ नहीं होता।"
+          },
+          "troubleshooting": {
+            "title": "समस्या निवारण",
+            "body": "अगर सहेजना या पुनर्स्थापित करना विफल हो, तो जाँचें कि SaveTabs सक्षम है और पेज रीलोड करें। फिर एक ही विंडो के साथ प्रयास करें।"
+          }
+        }
+      },
+      "footer": {
+        "privacy": "गोपनीयता",
+        "store": "Chrome Web Store"
+      }
+    },
+    "privacy": {
+      "back": "Back to SaveTabs",
+      "title": "Privacy policy",
+      "intro": "SaveTabs keeps your saved tab sessions on your device. If you turn on end-to-end encrypted sync, an encrypted copy is stored on the sync server. This page lists exactly what that copy contains and what never leaves your browser.",
+      "sections": {
+        "data": {
+          "title": "What the sync server stores",
+          "lead": "The sync server stores the following data for your key:",
+          "authId": "A public account id derived from your sync key. It appears in API URLs and cannot be turned back into the key.",
+          "authKeyHash": "A SHA-256 hash of the bearer credential derived from your sync key. The hash verifies requests and cannot be reversed into the credential.",
+          "blobs": "Encrypted session blobs: AES-GCM 256 ciphertext encoded as base64url, with a session id, update timestamp and byte size.",
+          "tombstones": "Deletion tombstones: a deleted session id and its deletion time. Tombstones sync deletions to your other devices and are pruned during later deletions once they are 30 days old.",
+          "timestamps": "Timestamps for when a sync key was first seen and last uploaded.",
+          "footer": "URLs, page titles, favicons and all other session data travel only inside the encrypted blobs. The server cannot read them, and we never receive your sync key. The server also keeps short-lived abuse-prevention rate-limit records keyed by client IP address and authId, plus daily aggregate request and key-registration counters; none of these contain URLs or page titles."
+        },
+        "e2ee": {
+          "title": "End-to-end encryption",
+          "body": "Encryption and decryption happen in your browser with the Web Crypto API. Session blobs use AES-GCM 256, and the encryption key is derived from your sync key with HKDF-SHA256. The key stays in your browser; the web app keeps it in this tab's session storage, or in local storage when you choose Remember on this device. Only ciphertext is uploaded. Without your key, the server and anyone else who obtains a blob cannot read it."
+        },
+        "incognito": {
+          "title": "Private and incognito sessions",
+          "body": "Sessions saved from private or incognito windows are marked local-only by the extension. They are never uploaded to the sync server and never appear in the web app."
+        },
+        "keyLoss": {
+          "title": "If you lose your sync key",
+          "body": "There is no account, email address or password to reset. The sync key is the only credential that can decrypt synced sessions. If you lose it, the encrypted data on the server cannot be recovered. Keep a safe copy; you can reveal and copy the key in the extension under Settings → Sync."
+        },
+        "delete": {
+          "title": "Deleting your data",
+          "body": "Local sessions stay in your browser until you delete them in the extension; clearing the extension's data or uninstalling it also removes them. To delete all cloud data for a sync key, open the extension, go to Settings → Sync and choose Delete cloud data. This removes the encrypted sessions, deletion tombstones and the key record for that sync key, and turns sync off so local sessions are not uploaded again. Rotating the sync key also deletes the data stored under the old key; if that deletion fails, import the old key and use Delete cloud data."
+        },
+        "analytics": {
+          "title": "No analytics or third parties",
+          "body": "The web app and extension contain no analytics, tracking pixels, advertising or third-party scripts. The web app loads only its own code and styles and uses no external fonts."
+        },
+        "contact": {
+          "title": "Contact",
+          "body": "Questions about this policy can be sent to support@azcom.dev."
+        }
+      }
+    },
+    "sessions": {
+      "title": "सहेजे गए सेशन",
+      "searchLabel": "सेशन खोजें",
+      "searchPlaceholder": "सेशन खोजें…",
+      "noResults": "आपकी खोज से कोई सेशन मेल नहीं खाता।",
+      "empty": "अभी कोई सेशन नहीं है। SaveTabs एक्सटेंशन से टैब सहेजें, फिर यह पेज दोबारा खोलें।",
+      "unknownKeyTitle": "इस कुंजी के लिए कोई सिंक किया डेटा नहीं",
+      "unknownKey": "इस सिंक कुंजी के लिए कोई सिंक किया सेशन नहीं है। जाँचें कि आपने इसे सही दर्ज किया, या दूसरी कुंजी पर जाएँ।",
+      "restore": "पुनर्स्थापित करें",
+      "restoreHint": "पुनर्स्थापित करने पर हर टैब नए ब्राउज़र टैब में खुलता है। अगर ब्राउज़र पूछे तो पॉप-अप की अनुमति दें।",
+      "restoreSuccess": "{count} टैब खोले गए।",
+      "popupBlocked": "ब्राउज़र ने {count} टैब रोक दिए। इस साइट के लिए पॉप-अप की अनुमति दें या टैब अलग-अलग खोलें।",
+      "copy": "कॉपी करें",
+      "copySuccess": "{count} टैब क्लिपबोर्ड पर कॉपी किए गए।",
+      "copyFailed": "टैब कॉपी नहीं हो सके।",
+      "export": "JSON निर्यात करें",
+      "exportSuccess": "{filename} निर्यात किया गया।",
+      "exportFailed": "सेशन निर्यात नहीं हो सका: {message}",
+      "delete": "हटाएँ",
+      "deleteTitle": "यह सेशन हटाएँ?",
+      "deleteMessage": "यह सेशन स्थायी रूप से हट जाएगा। इसे पूर्ववत नहीं किया जा सकता।",
+      "deleteConfirm": "सेशन हटाएँ",
+      "deleteSuccess": "सेशन हटा दिया गया।",
+      "deleteFailed": "सेशन हटाया नहीं जा सका: {message}",
+      "authError": "आपकी सिंक कुंजी अस्वीकार हुई। जारी रखने के लिए अपनी कुंजी फिर से दर्ज करें।",
+      "changeKey": "कुंजी बदलें",
+      "forgetKey": "कुंजी भूलें",
+      "forgetKeyTitle": "सिंक कुंजी भूलें?",
+      "forgetKeyMessage": "कुंजी इस ब्राउज़र से हट जाती है। आपका सिंक किया डेटा सर्वर पर रहता है और बाद में कुंजी दर्ज करके दोबारा खोला जा सकता है।",
+      "forgetKeyConfirm": "कुंजी भूलें",
+      "home": "होम",
+      "privacy": "गोपनीयता",
+      "decryptError": "कुछ सेशन डिक्रिप्ट नहीं हो सके और छोड़ दिए गए ({count})।",
+      "loadFailed": "आपके सहेजे सेशन लोड नहीं हो सके।",
+      "noTabs": "इस सेशन में कोई टैब नहीं है।"
+    },
+    "language": {
+      "toggle": "भाषा बदलें"
+    },
+    "theme": {
+      "toggle": "थीम बदलें",
+      "system": "सिस्टम",
+      "light": "लाइट",
+      "dark": "डार्क"
+    }
+  }
+}

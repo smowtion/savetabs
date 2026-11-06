@@ -1,0 +1,849 @@
+{
+  "common": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "copy": "نسخ",
+    "confirm": "تأكيد",
+    "restore": "استعادة",
+    "settings": "الإعدادات",
+    "openSessions": "فتح الجلسات",
+    "syncNow": "المزامنة الآن",
+    "retry": "إعادة المحاولة",
+    "loading": "جارٍ التحميل…",
+    "error": "حدث خطأ ما",
+    "empty": "لا يوجد شيء هنا بعد",
+    "tabsCount": "{count} علامات تبويب"
+  },
+  "settings": {
+    "general": {
+      "label": "عام",
+      "description": "المظهر واللغة وتفضيلات عدد علامات التبويب.",
+      "theme": {
+        "label": "المظهر",
+        "description": "اختر المظهر الفاتح أو الداكن أو اتبع مظهر النظام."
+      },
+      "language": {
+        "label": "اللغة",
+        "description": "اختر لغة العرض أو اتبع لغة المتصفح تلقائيًا."
+      },
+      "showBadgeCount": {
+        "label": "إظهار شارة عدد علامات التبويب",
+        "description": "اعرض عدد علامات التبويب المفتوحة على رمز شريط الأدوات."
+      },
+      "confirmThreshold": {
+        "label": "تأكيد قبل إغلاق علامات تبويب كثيرة",
+        "description": "اطلب التأكيد عندما يؤدي الحفظ إلى إغلاق هذا العدد من علامات التبويب على الأقل. اضبطه على 0 للتعطيل."
+      }
+    },
+    "tabs": {
+      "label": "علامات التبويب",
+      "description": "اختر علامات التبويب التي تُحفظ وما يحدث بعد الحفظ.",
+      "saveAllWindows": {
+        "label": "حفظ جميع النوافذ",
+        "description": "ضمّن علامات التبويب من كل نوافذ المتصفح، وليس النافذة الحالية فقط."
+      },
+      "closeAfterSave": {
+        "label": "إغلاق علامات التبويب بعد الحفظ",
+        "description": "أغلق علامات التبويب المحفوظة بعد تخزين الجلسة."
+      },
+      "skipAudible": {
+        "label": "تخطي علامات التبويب التي تشغّل صوتًا",
+        "description": "اترك علامات التبويب التي تشغّل صوتًا مفتوحة."
+      },
+      "excludedDomains": {
+        "label": "النطاقات المستبعدة",
+        "description": "لا تُحفظ علامات التبويب من هذه النطاقات ولا تُغلق أبدًا. نطاق واحد في كل سطر."
+      },
+      "includeFileUrls": {
+        "label": "تضمين عناوين URL للملفات المحلية",
+        "description": "اسمح بحفظ علامات التبويب التي تشير إلى ملفات على هذا الكمبيوتر. يتطلب إذن الوصول إلى الملفات."
+      }
+    },
+    "duplicates": {
+      "label": "التكرارات",
+      "description": "تحكّم في كيفية التعامل مع علامات التبويب وعناوين URL المتكررة.",
+      "removeOnSave": {
+        "label": "إزالة علامات التبويب المكررة",
+        "description": "أغلق علامات التبويب المتكررة واحتفظ بنسخة واحدة فقط من كل عنوان URL في الجلسة."
+      },
+      "matchMode": {
+        "label": "مطابقة التكرارات",
+        "description": "كيف تُقارن عناوين URL: مطابقة تامة، أو بتجاهل جزء الهاش، أو بتجاهل معاملات الاستعلام."
+      },
+      "skipAlreadySaved": {
+        "label": "تخطي علامات التبويب المحفوظة مسبقًا",
+        "description": "لا تحفظ عناوين URL الموجودة بالفعل في جلسة أخرى."
+      }
+    },
+    "pinned": {
+      "label": "علامات التبويب المثبتة",
+      "description": "حدّد ما إذا كانت علامات التبويب المثبتة تُحفظ أو تُستعاد.",
+      "skipOnSave": {
+        "label": "تخطي علامات التبويب المثبتة عند الحفظ",
+        "description": "اترك علامات التبويب المثبتة مفتوحة وخارج الجلسات الجديدة."
+      },
+      "restoreAsPinned": {
+        "label": "استعادة علامات التبويب المثبتة كمثبتة",
+        "description": "أعد فتح علامات التبويب المثبتة المحفوظة كمثبتة عند استعادة الجلسة."
+      }
+    },
+    "open": {
+      "label": "فتح الجلسات",
+      "description": "اضبط ما يحدث عند فتح الإضافة والجلسات.",
+      "toolbarAction": {
+        "label": "إجراء زر شريط الأدوات",
+        "description": "ما يحدث عند النقر على رمز شريط الأدوات: فتح النافذة المنبثقة، أو حفظ علامات التبويب فورًا، أو فتح صفحة الجلسات."
+      },
+      "openSessionsAfterSave": {
+        "label": "فتح صفحة الجلسات بعد الحفظ",
+        "description": "اعرض الجلسة المحفوظة في صفحة الجلسات مباشرة بعد الحفظ."
+      },
+      "reuseSessionsTab": {
+        "label": "إعادة استخدام علامة تبويب الجلسات",
+        "description": "افتح الجلسات في علامة تبويب جلسات موجودة بدلًا من إنشاء واحدة جديدة."
+      }
+    },
+    "urlDisplay": {
+      "label": "عرض عنوان URL",
+      "description": "اختر كيفية عرض علامات التبويب والجلسات المحفوظة.",
+      "mode": {
+        "label": "وضع عرض عنوان URL",
+        "description": "اعرض علامات التبويب المحفوظة بالعنوان أو بالنطاق أو بعنوان URL الكامل."
+      },
+      "showFavicons": {
+        "label": "إظهار أيقونات المواقع",
+        "description": "اعرض أيقونة كل موقع في قوائم الجلسات."
+      },
+      "showTabCount": {
+        "label": "إظهار عدد علامات التبويب",
+        "description": "اعرض عدد علامات التبويب في كل جلسة."
+      }
+    },
+    "restore": {
+      "label": "الاستعادة",
+      "description": "حدّد كيفية فتح الجلسات المستعادة في متصفحك.",
+      "targetWindow": {
+        "label": "نافذة الاستعادة المستهدفة",
+        "description": "افتح علامات التبويب المستعادة في النافذة الحالية أو في نافذة جديدة."
+      },
+      "openInBackground": {
+        "label": "فتح علامات التبويب المستعادة في الخلفية",
+        "description": "استعد علامات التبويب دون إبعاد التركيز عن علامة التبويب الحالية."
+      },
+      "skipExisting": {
+        "label": "تخطي علامات التبويب المفتوحة بالفعل",
+        "description": "لا تُعد فتح عناوين URL المفتوحة بالفعل في المتصفح."
+      }
+    },
+    "clipboard": {
+      "label": "الحافظة",
+      "description": "اختر التنسيق المستخدم عند نسخ علامات التبويب.",
+      "format": {
+        "label": "تنسيق النسخ",
+        "description": "التنسيق المستخدم عند نسخ علامات تبويب الجلسة: عناوين URL عادية، أو روابط Markdown، أو العناوين مع عناوين URL."
+      }
+    },
+    "contextMenu": {
+      "label": "قائمة السياق",
+      "description": "اختر الإجراءات التي تظهر في قائمة النقر بزر الماوس الأيمن.",
+      "enabled": {
+        "label": "تفعيل عناصر قائمة السياق",
+        "description": "أظهر إجراءات SaveTabs في قائمة سياق المتصفح."
+      },
+      "saveTab": {
+        "label": "حفظ علامة التبويب الحالية",
+        "description": "أضف عنصر قائمة سياق يحفظ علامة التبويب الحالية."
+      },
+      "saveWindow": {
+        "label": "حفظ النافذة الحالية",
+        "description": "أضف عنصر قائمة سياق يحفظ كل علامات التبويب في النافذة الحالية."
+      },
+      "saveSelection": {
+        "label": "حفظ علامات التبويب المحددة",
+        "description": "أضف عنصر قائمة سياق يحفظ علامات التبويب المحددة."
+      }
+    },
+    "memory": {
+      "label": "موفّر الذاكرة",
+      "description": "حرّر الذاكرة بتجاهل علامات التبويب غير النشطة تلقائيًا.",
+      "autoDiscard": {
+        "label": "تجاهل علامات التبويب غير النشطة تلقائيًا",
+        "description": "حرّر الذاكرة بتجاهل علامات التبويب التي ظلت غير نشطة لمدة المهلة أدناه."
+      },
+      "timeoutMinutes": {
+        "label": "مهلة عدم النشاط",
+        "description": "عدد الدقائق التي يجب أن تظل فيها علامة التبويب غير نشطة قبل أن يمكن تجاهلها."
+      },
+      "keepAudible": {
+        "label": "الإبقاء على علامات التبويب التي تشغّل صوتًا",
+        "description": "لا تتجاهل أبدًا علامات التبويب التي تشغّل صوتًا."
+      },
+      "keepPinned": {
+        "label": "الإبقاء على علامات التبويب المثبتة",
+        "description": "لا تتجاهل أبدًا علامات التبويب المثبتة."
+      },
+      "discardNow": "تجاهل الآن",
+      "discardNowSuccess": "تم تجاهل {count} علامات تبويب.",
+      "discardNowFailed": "تعذّر تجاهل علامات التبويب: {message}"
+    },
+    "shortcuts": {
+      "label": "الاختصارات",
+      "description": "اعرض اختصارات لوحة المفاتيح المعينة لـ SaveTabs.",
+      "tableCaption": "اختصارات لوحة المفاتيح لـ SaveTabs",
+      "commandHeader": "الأمر",
+      "bindingHeader": "الاختصار",
+      "notSet": "غير معيّن",
+      "instructions": "لتغيير اختصار، افتح صفحة الاختصارات أدناه وعدّل اختصار SaveTabs.",
+      "pagePathLabel": "مسار صفحة الاختصارات",
+      "copyPath": "نسخ المسار",
+      "copySuccess": "تم نسخ المسار إلى الحافظة.",
+      "copyFailed": "تعذّر نسخ المسار.",
+      "commandLabel": {
+        "save-tabs": "حفظ كل علامات التبويب في النافذة الحالية",
+        "open-sessions": "فتح صفحة الجلسات",
+        "discard-now": "تجاهل علامات التبويب غير النشطة الآن"
+      }
+    },
+    "incognito": {
+      "label": "التصفح المتخفي",
+      "description": "تحكّم في كيفية التعامل مع النوافذ الخاصة.",
+      "includeInSaveAll": {
+        "label": "تضمين نوافذ التصفح المتخفي",
+        "description": "ضمّن النوافذ الخاصة عند حفظ كل النوافذ. يتطلب إذن الوصول إلى التصفح المتخفي."
+      },
+      "status": {
+        "label": "الوصول إلى التصفح المتخفي",
+        "allowed": "مسموح",
+        "denied": "غير مسموح"
+      },
+      "deniedNote": "هذا الإعداد معطّل لأن SaveTabs غير مسموح به في نوافذ التصفح المتخفي.",
+      "enableInstructions": "للسماح بالوصول، افتح صفحة الإضافات أدناه، وافتح تفاصيل SaveTabs، واسمح للإضافة في النوافذ الخاصة.",
+      "pagePathLabel": "مسار صفحة الإضافات",
+      "copyPath": "نسخ المسار",
+      "copySuccess": "تم نسخ المسار إلى الحافظة.",
+      "copyFailed": "تعذّر نسخ المسار."
+    },
+    "sync": {
+      "label": "المزامنة",
+      "description": "انسخ الجلسات احتياطيًا واستعدها بتشفير من طرف إلى طرف.",
+      "enabled": {
+        "label": "تفعيل المزامنة المشفرة من طرف إلى طرف",
+        "description": "انسخ الجلسات احتياطيًا إلى حساب المزامنة الخاص بك بتشفير من طرف إلى طرف."
+      },
+      "autoUpload": {
+        "label": "رفع التغييرات تلقائيًا",
+        "description": "ارفع الجلسات الجديدة والمعدّلة تلقائيًا."
+      },
+      "autoDownload": {
+        "label": "تنزيل التغييرات تلقائيًا",
+        "description": "نزّل الجلسات المحفوظة على أجهزة أخرى ودمجها تلقائيًا."
+      },
+      "keyTitle": "مفتاح المزامنة الخاص بك",
+      "keyLabel": "قيمة مفتاح المزامنة",
+      "keyMaskedHint": "يبقى المفتاح مخفيًا لأنه بيانات الاعتماد الوحيدة لبياناتك المشفرة.",
+      "revealKey": "إظهار المفتاح",
+      "hideKey": "إخفاء المفتاح",
+      "copyKey": "نسخ المفتاح",
+      "copied": "تم نسخ المفتاح إلى الحافظة.",
+      "copyFailed": "تعذّر نسخ المفتاح.",
+      "importLabel": "استيراد المفتاح",
+      "importPlaceholder": "ألصق مفتاح ST-… الخاص بك",
+      "invalidKey": "هذا ليس مفتاح SaveTabs صالحًا.",
+      "importPrompt": "هل تريد رفع الجلسات المحلية ضمن هذا المفتاح الجديد؟",
+      "importPromptHint": "موصى به. ستُشفّر الجلسات المحلية وتُرفع بالمفتاح الجديد.",
+      "importUpload": "رفع الجلسات المحلية",
+      "importSkip": "تخطي الرفع",
+      "importSuccess": "تم استيراد المفتاح. ستُرفع الجلسات المحلية ضمنه.",
+      "importSkipped": "تم استيراد المفتاح. لن تُرفع الجلسات المحلية.",
+      "rotateKey": "تدوير المفتاح",
+      "rotateTitle": "تدوير مفتاح المزامنة",
+      "rotateWarning": "يؤدي التدوير إلى إنشاء مفتاح جديد ومحاولة حذف البيانات السحابية المشفرة بالمفتاح القديم. تُرفع الجلسات المحلية ضمن المفتاح الجديد.",
+      "rotateConfirmLabel": "اكتب ROTATE للتأكيد",
+      "rotateConfirmPlaceholder": "ROTATE",
+      "rotateConfirm": "إنشاء مفتاح جديد",
+      "rotateSuccess": "تم إنشاء مفتاح جديد. ستُرفع الجلسات المحلية ضمنه.",
+      "rotateSuccessRevoked": "تم إنشاء مفتاح جديد. تم حذف البيانات السحابية القديمة. ستُرفع الجلسات المحلية ضمن المفتاح الجديد.",
+      "rotateSuccessRevokeFailed": "تم إنشاء مفتاح جديد، لكن تعذّر حذف البيانات السحابية القديمة. ستُرفع الجلسات المحلية ضمن المفتاح الجديد.",
+      "loseKeyWarning": "إذا فقدت هذا المفتاح، فلا يمكن استرداد بياناتك المزامنة.",
+      "onlyCredentialWarning": "هذا المفتاح هو بيانات الاعتماد الوحيدة لبياناتك المزامنة. أي شخص يحصل عليه يمكنه قراءة تلك البيانات أو تغييرها أو حذفها.",
+      "actionFailed": "فشل الإجراء: {message}",
+      "statusTitle": "حالة المزامنة",
+      "statusOn": "المزامنة مفعّلة.",
+      "statusOff": "المزامنة معطّلة. تُحفظ البيانات السحابية حتى تحذفها.",
+      "lastSyncLabel": "آخر مزامنة",
+      "neverSynced": "أبدًا",
+      "pendingLabel": "عمليات الرفع المعلّقة",
+      "syncing": "جارٍ المزامنة…",
+      "syncResult": "تم رفع {uploaded}، وتنزيل {downloaded}، وحذف {deleted}.",
+      "syncErrorsTitle": "تعذّرت مزامنة بعض العناصر:",
+      "authError": "تم رفض مفتاح المزامنة أو تعذّر فك تشفير البيانات السحابية. أعد استيراد مفتاحك أو دوّره.",
+      "deleteCloud": "حذف البيانات السحابية",
+      "deleteCloudTitle": "حذف البيانات السحابية؟",
+      "deleteCloudMessage": "يؤدي هذا إلى حذف كل جلسة مزامنة مخزنة على الخادم لهذا المفتاح، ثم إيقاف المزامنة كي لا تُرفع جلساتك المحلية مرة أخرى. تبقى الجلسات المحلية على هذا الجهاز. لا يمكن التراجع عن هذا الإجراء.",
+      "deleteCloudConfirm": "حذف البيانات السحابية",
+      "deleteCloudSuccess": "تم حذف البيانات السحابية. أُوقفت المزامنة كي لا تُرفع الجلسات المحلية مرة أخرى. يمكنك إعادة تفعيل المزامنة لاحقًا.",
+      "enableConfirmTitle": "تفعيل المزامنة المشفرة؟",
+      "enableConfirmMessage": "تأكد من أنك حفظت مفتاح المزامنة. إنه الطريقة الوحيدة لاسترداد البيانات المزامنة. يمكنك إظهاره ونسخه في قسم المزامنة.",
+      "enableConfirm": "تفعيل المزامنة",
+      "accountPasswordLabel": "كلمة مرور الحساب",
+      "accountPasswordHint": "مطلوبة لتحديث المفتاح المرتبط بحسابك.",
+      "accountPasswordRequired": "أدخل كلمة مرور حسابك لتغيير مفتاح المزامنة.",
+      "keyRelinkFailed": "تعذّر تحديث مفتاح الحساب. لم يتغيّر مفتاح المزامنة الخاص بك."
+    },
+    "account": {
+      "title": "الحساب",
+      "description": "سجّل الدخول لاسترداد مفتاح المزامنة على أي جهاز. تبقى بياناتك مشفرة من طرف إلى طرف.",
+      "emailLabel": "البريد الإلكتروني",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "كلمة المرور",
+      "signIn": "تسجيل الدخول",
+      "signingIn": "جارٍ تسجيل الدخول…",
+      "createAccount": "إنشاء حساب",
+      "creatingAccount": "جارٍ إنشاء الحساب…",
+      "useKeyInstead": "استخدام مفتاح بدلًا من ذلك",
+      "useAccount": "استخدام حساب",
+      "keyOnlyHint": "تبقى المزامنة بالمفتاح فقط. يُدار مفتاحك أدناه.",
+      "signOut": "تسجيل الخروج",
+      "signedOut": "تم تسجيل الخروج. مفتاح المزامنة وإعدادات المزامنة لم تتغيّر.",
+      "signOutFailed": "تعذّر تسجيل خروجك. حاول مرة أخرى.",
+      "verified": "موثّق",
+      "unverified": "البريد الإلكتروني غير موثّق",
+      "passwordTooShort": "استخدم كلمة مرور من 12 حرفًا على الأقل.",
+      "signInFailed": "تعذّر تسجيل دخولك. تحقق من بريدك الإلكتروني وكلمة المرور.",
+      "signUpFailed": "تعذّر إنشاء حسابك. حاول مرة أخرى.",
+      "loadFailed": "تعذّر تحميل حسابك.",
+      "recoveryTitle": "احفظ مفتاح الاسترداد",
+      "recoveryMessage": "هذا المفتاح هو الطريقة الوحيدة لاسترداد جلساتك المشفرة. لن يُعرض مرة أخرى.",
+      "recoveryKeyLabel": "مفتاحك",
+      "recoveryConfirm": "لقد حفظته",
+      "recoveryContinue": "متابعة",
+      "changePassword": "تغيير كلمة المرور",
+      "currentPasswordLabel": "كلمة المرور الحالية",
+      "newPasswordLabel": "كلمة المرور الجديدة",
+      "changePasswordSubmit": "تغيير كلمة المرور",
+      "changePasswordSubmitting": "جارٍ تغيير كلمة المرور…",
+      "changePasswordSuccess": "تم تغيير كلمة المرور. تم تسجيل خروج الجلسات الأخرى.",
+      "changePasswordFailed": "تعذّر تغيير كلمة مرورك. تحقق من كلمة المرور الحالية.",
+      "uploadPromptTitle": "رفع الجلسات المحلية؟",
+      "uploadPrompt": "هل تريد رفع هذه الجلسات إلى هذا الحساب؟",
+      "uploadPromptUpload": "رفع الجلسات",
+      "uploadPromptSkip": "الإبقاء محليًا فقط"
+    },
+    "advanced": {
+      "label": "متقدم",
+      "description": "إجراءات الاستيراد والتصدير وإعادة الضبط والصيانة.",
+      "storageUsage": "التخزين المستخدم: {sessions} جلسة، {tabs} علامة تبويب",
+      "storageNearLimit": "التخزين المحلي شبه ممتلئ. صدّر الجلسات أو احذفها لتحرير مساحة.",
+      "exportSettings": "تصدير الإعدادات",
+      "importSettings": "استيراد الإعدادات",
+      "exportSessions": "تصدير الجلسات",
+      "importSessions": "استيراد الجلسات",
+      "resetToDefaults": "إعادة الضبط إلى الإعدادات الافتراضية",
+      "clearSessions": "مسح الجلسات المحلية",
+      "sessionsPlaintextWarning": "تحتوي ملفات تصدير الجلسات على عناوين وعناوين URL بنص عادي. خزّن الملف في مكان خاص.",
+      "exportSuccess": "تم تصدير {filename}.",
+      "importSettingsSuccess": "تم استيراد الإعدادات.",
+      "importSettingsSyncStaysOff": "تبقى المزامنة معطّلة بعد استيراد الإعدادات. فعّلها من المفتاح؛ تلك العملية تؤكد مفتاحك.",
+      "importSettingsFailed": "فشل استيراد الإعدادات:",
+      "importSessionsSuccess": "تم استيراد {added} جلسة وتحديث {updated}.",
+      "importSessionsPartial": "تم استيراد {added} جلسة وتحديث {updated}. تعذّر حفظ بعض الجلسات:",
+      "importSessionsFailed": "فشل استيراد الجلسات:",
+      "actionFailed": "فشل الإجراء: {message}",
+      "resetTitle": "إعادة ضبط كل الإعدادات؟",
+      "resetMessage": "تعود كل الإعدادات إلى قيمها الافتراضية. لا تتأثر الجلسات المحفوظة.",
+      "resetConfirm": "إعادة ضبط الإعدادات",
+      "resetSuccess": "تمت إعادة ضبط الإعدادات إلى القيم الافتراضية.",
+      "clearTitle": "حذف كل الجلسات المحلية؟",
+      "clearMessage": "ستُحذف نهائيًا كل الجلسات المحفوظة على هذا الجهاز. لا تُحذف الجلسات المزامنة مع السحابة وقد تُنزّل مرة أخرى في المزامنة التالية. صدّر نسخة احتياطية أولًا إن كنت بحاجة إليها.",
+      "clearConfirm": "حذف الجلسات",
+      "clearSuccess": "تم حذف كل الجلسات المحلية."
+    },
+    "option": {
+      "general": {
+        "theme": {
+          "system": "النظام",
+          "light": "فاتح",
+          "dark": "داكن"
+        },
+        "language": {
+          "auto": "تلقائي",
+          "en": "الإنجليزية",
+          "vi": "الفيتنامية",
+          "zh-CN": "الصينية (المبسطة)",
+          "es": "الإسبانية",
+          "hi": "الهندية",
+          "ar": "العربية"
+        }
+      },
+      "duplicates": {
+        "matchMode": {
+          "exact": "عنوان URL مطابق",
+          "ignore-hash": "تجاهل #fragment",
+          "ignore-query": "تجاهل ?query"
+        }
+      },
+      "open": {
+        "toolbarAction": {
+          "popup": "فتح النافذة المنبثقة",
+          "save": "حفظ علامات التبويب الآن",
+          "sessions": "فتح صفحة الجلسات"
+        }
+      },
+      "urlDisplay": {
+        "mode": {
+          "title": "العنوان",
+          "domain": "النطاق",
+          "full-url": "عنوان URL الكامل"
+        }
+      },
+      "restore": {
+        "targetWindow": {
+          "current": "النافذة الحالية",
+          "new": "نافذة جديدة"
+        }
+      },
+      "clipboard": {
+        "format": {
+          "plain-urls": "عناوين URL عادية",
+          "markdown": "روابط Markdown",
+          "titled": "العناوين مع عناوين URL"
+        }
+      },
+      "memory": {
+        "timeoutMinutes": {
+          "5": "5 دقائق",
+          "15": "15 دقيقة",
+          "30": "30 دقيقة",
+          "60": "60 دقيقة",
+          "120": "120 دقيقة"
+        }
+      }
+    }
+  },
+  "options": {
+    "search": "البحث في الإعدادات",
+    "searchPlaceholder": "البحث في الإعدادات…",
+    "expandAll": "توسيع الكل",
+    "collapseAll": "طي الكل",
+    "categories": "فئات الإعدادات",
+    "settingCount": "{count} إعداد",
+    "saved": "محفوظ",
+    "noResults": "لا توجد إعدادات تطابق بحثك.",
+    "tooltip": "مزيد من المعلومات حول {setting}",
+    "memoryUnsupported": "تجاهل علامات التبويب غير متاح في هذا المتصفح.",
+    "stringList": {
+      "placeholder": "أضف نطاقًا…",
+      "add": "إضافة",
+      "remove": "إزالة {item}"
+    },
+    "validation": {
+      "numberRange": "أدخل عددًا صحيحًا بين {min} و{max}.",
+      "maxItems": "يمكنك إضافة {count} عنصر كحد أقصى.",
+      "duplicateEntry": "هذا الإدخال موجود في القائمة بالفعل.",
+      "emptyEntry": "أدخل قيمة قبل إضافتها."
+    },
+    "theme": {
+      "system": "النظام",
+      "light": "فاتح",
+      "dark": "داكن",
+      "toggle": "المظهر: {theme}"
+    }
+  },
+  "contextMenu": {
+    "saveTab": "حفظ علامة التبويب هذه",
+    "saveWindow": "حفظ كل علامات التبويب في هذه النافذة",
+    "saveSelection": "حفظ علامات التبويب المحددة"
+  },
+  "popup": {
+    "saveTabs": "حفظ {count} علامات تبويب",
+    "openSessions": "فتح صفحة الجلسات",
+    "syncOn": "المزامنة مفعّلة",
+    "syncOff": "المزامنة معطّلة",
+    "discardOff": "التجاهل التلقائي: معطّل",
+    "discardStatus": "التجاهل التلقائي: {minutes} دقيقة · تم تجاهل {count} اليوم",
+    "recentTitle": "الجلسات الأخيرة",
+    "empty": "لا توجد جلسات محفوظة بعد.",
+    "restoreSession": "استعادة {time}",
+    "loadFailed": "تعذّر تحميل بيانات النافذة المنبثقة."
+  },
+  "update": {
+    "title": "يتوفر تحديث",
+    "message": "SaveTabs {version} جاهز للتثبيت.",
+    "action": "عرض في المتجر"
+  },
+  "sessions": {
+    "title": "الجلسات المحفوظة",
+    "searchLabel": "البحث في الجلسات",
+    "searchPlaceholder": "البحث في الجلسات…",
+    "saveWindow": "حفظ النافذة",
+    "saveConfirmTitle": "حفظ علامات التبويب وإغلاقها؟",
+    "saveConfirmMessage": "سيؤدي الحفظ إلى إغلاق {count} علامات تبويب. هل تريد المتابعة؟",
+    "saveConfirm": "حفظ وإغلاق",
+    "invalidResponse": "أعادت الإضافة استجابة غير متوقعة.",
+    "empty": "لا توجد جلسات بعد. احفظ علامات التبويب المفتوحة بزر «حفظ النافذة».",
+    "noResults": "لا توجد جلسات تطابق بحثك.",
+    "private": "خاص",
+    "moreActions": "مزيد من الإجراءات",
+    "rename": "إعادة تسمية",
+    "exportSession": "تصدير الجلسة بصيغة JSON",
+    "renameLabel": "اسم الجلسة",
+    "renameSuccess": "تمت إعادة تسمية الجلسة.",
+    "restoreSuccess": "تمت استعادة {count} علامات تبويب.",
+    "saveSuccess": "تم حفظ {count} علامات تبويب.",
+    "saveOverflow": "تم حفظ {saved} علامات تبويب؛ وبقيت {overflow} مفتوحة (حد الجلسة).",
+    "saveEmpty": "لا توجد علامات تبويب لحفظها.",
+    "copySuccess": "تم نسخ {count} علامات تبويب إلى الحافظة.",
+    "copyFailed": "تعذّر نسخ علامات التبويب.",
+    "exportSuccess": "تم تصدير {filename}.",
+    "deleteTitle": "حذف هذه الجلسة؟",
+    "deleteMessage": "ستُحذف هذه الجلسة نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+    "deleteConfirm": "حذف الجلسة",
+    "deleteSuccess": "تم حذف الجلسة.",
+    "sessionMissing": "هذه الجلسة لم تعد موجودة.",
+    "actionFailed": "فشل الإجراء: {message}",
+    "loadFailed": "تعذّر تحميل الجلسات المحفوظة.",
+    "noTabs": "لا تحتوي هذه الجلسة على أي علامات تبويب.",
+    "expand": "إظهار علامات التبويب",
+    "collapse": "إخفاء علامات التبويب",
+    "time": {
+      "justNow": "الآن",
+      "minutesAgo": "قبل {count} دقيقة",
+      "hoursAgo": "قبل {count} ساعة",
+      "daysAgo": "قبل {count} يوم"
+    }
+  },
+  "web": {
+    "signup": {
+      "title": "أنشئ حسابك",
+      "description": "انسخ جلساتك المحفوظة احتياطيًا بتشفير من طرف إلى طرف وافتحها على أي جهاز. كل شيء مشفّر في متصفحك.",
+      "emailLabel": "البريد الإلكتروني",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "كلمة المرور",
+      "passwordHint": "استخدم 12 حرفًا على الأقل.",
+      "confirmLabel": "تأكيد كلمة المرور",
+      "submit": "إنشاء حساب",
+      "submitting": "جارٍ إنشاء الحساب…",
+      "passwordTooShort": "استخدم كلمة مرور من 12 حرفًا على الأقل.",
+      "passwordMismatch": "كلمتا المرور غير متطابقتين.",
+      "error": "تعذّر إنشاء حسابك. حاول مرة أخرى.",
+      "recoveryTitle": "احفظ مفتاح الاسترداد",
+      "recoveryMessage": "هذا المفتاح هو الطريقة الوحيدة لاسترداد جلساتك المشفرة. لن يُعرض مرة أخرى.",
+      "recoveryKeyLabel": "مفتاحك",
+      "recoveryConfirm": "لقد حفظته",
+      "continue": "متابعة",
+      "back": "العودة إلى SaveTabs"
+    },
+    "login": {
+      "title": "تسجيل الدخول",
+      "description": "أدخل بريدك الإلكتروني وكلمة المرور لفتح جلساتك المشفرة على هذا الجهاز.",
+      "emailLabel": "البريد الإلكتروني",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "كلمة المرور",
+      "rememberLabel": "تذكّر على هذا الجهاز",
+      "rememberWarning": "استخدم هذا على جهاز تثق به فقط. يبقى المفتاح في هذا المتصفح حتى تمسحه.",
+      "submit": "تسجيل الدخول",
+      "submitting": "جارٍ تسجيل الدخول…",
+      "error": "تعذّر تسجيل دخولك. تحقق من بريدك الإلكتروني وكلمة المرور وحاول مرة أخرى.",
+      "recoveryLink": "نسيت كلمة المرور؟ استخدم مفتاح الاسترداد",
+      "createAccount": "إنشاء حساب",
+      "back": "العودة إلى SaveTabs"
+    },
+    "recover": {
+      "title": "إعادة ضبط كلمة المرور",
+      "description": "أدخل مفتاح الاسترداد واختر كلمة مرور جديدة. كل شيء مشفّر في متصفحك.",
+      "emailLabel": "البريد الإلكتروني",
+      "emailPlaceholder": "you@example.com",
+      "keyLabel": "مفتاح الاسترداد",
+      "keyPlaceholder": "ST-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-X",
+      "passwordLabel": "كلمة المرور الجديدة",
+      "passwordHint": "استخدم 12 حرفًا على الأقل.",
+      "confirmLabel": "تأكيد كلمة المرور الجديدة",
+      "submit": "إعادة ضبط كلمة المرور",
+      "submitting": "جارٍ إعادة ضبط كلمة المرور…",
+      "passwordTooShort": "استخدم كلمة مرور من 12 حرفًا على الأقل.",
+      "passwordMismatch": "كلمتا المرور غير متطابقتين.",
+      "error": "تعذّر إعادة ضبط كلمة مرورك. تحقق من بريدك الإلكتروني ومفتاح الاسترداد، ثم حاول مرة أخرى.",
+      "cancel": "العودة إلى تسجيل الدخول"
+    },
+    "verify": {
+      "title": "التحقق من البريد الإلكتروني",
+      "checking": "جارٍ التحقق من بريدك الإلكتروني…",
+      "successTitle": "تم التحقق من البريد الإلكتروني",
+      "success": "تم التحقق من عنوان بريدك الإلكتروني. يمكنك إغلاق هذه الصفحة والعودة إلى SaveTabs.",
+      "expiredTitle": "انتهت صلاحية الرابط",
+      "expired": "رابط التحقق هذا غير صالح أو انتهت صلاحيته. سجّل الدخول واطلب بريدًا جديدًا.",
+      "errorTitle": "فشل التحقق",
+      "error": "تعذّر التحقق من بريدك الإلكتروني. حاول مرة أخرى لاحقًا.",
+      "back": "العودة إلى SaveTabs"
+    },
+    "account": {
+      "title": "حسابك",
+      "description": "أدر حسابك وكلمة المرور ومفتاح الاسترداد.",
+      "emailLabel": "البريد الإلكتروني",
+      "verified": "موثّق",
+      "unverified": "عنوان بريدك الإلكتروني غير موثّق بعد.",
+      "resend": "إعادة إرسال رسالة التحقق",
+      "resending": "جارٍ الإرسال…",
+      "resendSuccess": "تم إرسال رسالة التحقق.",
+      "resendFailed": "تعذّر إرسال رسالة التحقق. حاول مرة أخرى لاحقًا.",
+      "changePasswordTitle": "تغيير كلمة المرور",
+      "changePasswordDescription": "أدخل كلمة المرور الحالية واختر كلمة جديدة. كل شيء مشفّر في متصفحك.",
+      "currentPasswordLabel": "كلمة المرور الحالية",
+      "newPasswordLabel": "كلمة المرور الجديدة",
+      "confirmPasswordLabel": "تأكيد كلمة المرور الجديدة",
+      "passwordHint": "استخدم 12 حرفًا على الأقل.",
+      "passwordTooShort": "استخدم كلمة مرور من 12 حرفًا على الأقل.",
+      "passwordMismatch": "كلمتا المرور غير متطابقتين.",
+      "passwordRequired": "أدخل كلمة المرور.",
+      "changePasswordSubmit": "تغيير كلمة المرور",
+      "changePasswordSubmitting": "جارٍ تغيير كلمة المرور…",
+      "passwordChanged": "تم تغيير كلمة المرور.",
+      "passwordChangeFailed": "تعذّر تغيير كلمة مرورك. تحقق من كلمة المرور الحالية وحاول مرة أخرى.",
+      "noVault": "لا يوجد مفتاح مزامنة مرتبط بهذا الحساب بعد.",
+      "recoveryKeyTitle": "مفتاح الاسترداد",
+      "recoveryKeyDescription": "أعد إدخال كلمة المرور لعرض مفتاح الاسترداد لهذا الحساب.",
+      "passwordLabel": "كلمة المرور",
+      "viewKeySubmit": "عرض مفتاح الاسترداد",
+      "viewKeySubmitting": "جارٍ التحقق…",
+      "viewKeyLabel": "مفتاح الاسترداد الخاص بك",
+      "viewKeyFailed": "تعذّر عرض مفتاح الاسترداد. تحقق من كلمة المرور وحاول مرة أخرى.",
+      "hideKey": "إخفاء",
+      "logout": "تسجيل الخروج",
+      "deleteTitle": "حذف الحساب",
+      "deleteDescription": "حذف حسابك يزيل بريدك الإلكتروني وتسجيل الدخول. تبقى جلساتك المشفرة على خادم المزامنة ما لم تحذف البيانات السحابية أيضًا.",
+      "deletePasswordLabel": "كلمة المرور",
+      "deleteCloudLabel": "حذف البيانات السحابية المزامنة مع هذا الحساب أيضًا",
+      "deleteCloudHint": "يؤدي هذا إلى حذف كل جلسة مشفرة مخزنة لمفتاح مزامنة هذا الحساب. لا يمكن التراجع عن هذا الإجراء.",
+      "deleteSubmit": "حذف الحساب",
+      "deleteConfirmTitle": "حذف حسابك؟",
+      "deleteConfirmMessage": "سيُحذف حسابك وتفاصيل تسجيل الدخول نهائيًا. لا يمكن التراجع عن هذا الإجراء. يظل مفتاح المزامنة يعمل على هذا الجهاز.",
+      "deleteCloudConfirmMessage": "سيُحذف حسابك وتفاصيل تسجيل الدخول والبيانات السحابية لمفتاح مزامنته نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+      "deleteConfirm": "حذف الحساب",
+      "deleteDeleting": "جارٍ حذف الحساب…",
+      "deleteFailed": "تعذّر حذف حسابك. تحقق من كلمة المرور وحاول مرة أخرى.",
+      "loadFailed": "تعذّر تحميل حسابك.",
+      "home": "الرئيسية",
+      "sessionsLink": "الجلسات المحفوظة",
+      "unlockTitle": "فتح القفل بكلمة المرور",
+      "unlockDescription": "حسابك مسجّل الدخول على هذا الجهاز، لكن مفتاح المزامنة مقفل. أدخل كلمة المرور لفتح جلساتك المحفوظة.",
+      "unlockAccount": "مسجّل الدخول باسم {email}",
+      "unlockSubmit": "فتح القفل",
+      "unlockSubmitting": "جارٍ فتح القفل…",
+      "unlockError": "تعذّر فتح جلساتك. تحقق من كلمة المرور وحاول مرة أخرى."
+    },
+    "landing": {
+      "title": "افتح علامات التبويب المحفوظة",
+      "description": "أدخل مفتاح المزامنة لعرض جلساتك المحفوظة. كل شيء يُفكّ تشفيره في متصفحك.",
+      "keyLabel": "مفتاح المزامنة",
+      "keyPlaceholder": "ST-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-X",
+      "continue": "متابعة",
+      "invalidKey": "مفتاح المزامنة هذا غير صالح. تحقق منه وحاول مرة أخرى.",
+      "loseKeyWarning": "مفتاح المزامنة هو الطريقة الوحيدة لفك تشفير جلساتك. إذا فقدته، فلا يمكن استرداد بياناتك المحفوظة.",
+      "rememberLabel": "تذكّر على هذا الجهاز",
+      "rememberWarning": "استخدم هذا على جهاز تثق به فقط. يبقى المفتاح في هذا المتصفح حتى تمسحه.",
+      "privacyLink": "سياسة الخصوصية",
+      "header": {
+        "account": "الحساب"
+      },
+      "hero": {
+        "title": "احفظ كل علامة تبويب. واستعدها لاحقًا.",
+        "description": "يخزّن SaveTabs نافذة متصفح كاملة كجلسة واحدة، ويغلق علامات التبويب، ثم يعيد فتحها عند الحاجة. يعمل داخل متصفحك ويحتفظ بجلساتك على جهازك.",
+        "chrome": "إضافة إلى Chrome",
+        "firefox": "Firefox",
+        "comingSoon": "قريبًا",
+        "noAccount": "لا حاجة إلى حساب. يعمل الاستخدام المحلي دون تسجيل.",
+        "mockup": {
+          "save": "حفظ 12 علامة تبويب",
+          "sessions": "الجلسات الأخيرة",
+          "sessionOne": "مراجع التصميم",
+          "sessionTwo": "قائمة القراءة",
+          "restore": "استعادة",
+          "sync": "المزامنة مفعّلة"
+        }
+      },
+      "howItWorks": {
+        "title": "كيف يعمل",
+        "steps": {
+          "save": {
+            "title": "احفظ نافذة",
+            "body": "افتح الإضافة واحفظ كل علامات التبويب في النافذة الحالية كجلسة واحدة."
+          },
+          "close": {
+            "title": "تُغلق علامات التبويب",
+            "body": "يغلق SaveTabs علامات التبويب المحفوظة ليبقى متصفحك مرتبًا."
+          },
+          "restore": {
+            "title": "استعدها لاحقًا",
+            "body": "افتح الجلسة لإعادة كل علامة تبويب محفوظة في نافذة جديدة."
+          }
+        }
+      },
+      "privacy": {
+        "title": "الخصوصية",
+        "items": {
+          "e2ee": {
+            "title": "تشفير من طرف إلى طرف",
+            "body": "تُشفّر الجلسات في متصفحك قبل رفعها. يخزّن الخادم نصًا مشفّرًا لا يستطيع قراءته."
+          },
+          "keyOnly": {
+            "title": "مفتاحك وبياناتك",
+            "body": "تعمل المزامنة بمفتاح المزامنة الخاص بك. لا حاجة إلى حساب، ولا يغادر المفتاح متصفحك أبدًا."
+          },
+          "localFirst": {
+            "title": "محلي أولًا",
+            "body": "بدون المزامنة، تبقى كل جلسة في مساحة تخزين الإضافة بمتصفحك."
+          },
+          "privateWindows": {
+            "title": "تبقى النوافذ الخاصة محلية",
+            "body": "لا تُرفع الجلسات المحفوظة من النوافذ الخاصة أو المتخفية أبدًا."
+          }
+        },
+        "link": "اقرأ سياسة الخصوصية"
+      },
+      "features": {
+        "title": "المزايا",
+        "items": {
+          "search": {
+            "title": "البحث في الجلسات",
+            "body": "اعثر على جلسة محفوظة بالاسم أو بعلامات التبويب التي تحتويها."
+          },
+          "rename": {
+            "title": "إعادة تسمية الجلسات",
+            "body": "امنح الجلسة اسمًا واضحًا ليسهل العثور عليها لاحقًا."
+          },
+          "exportImport": {
+            "title": "التصدير والاستيراد",
+            "body": "انقل الجلسات بين المتصفحات بملف JSON."
+          },
+          "autoDiscard": {
+            "title": "التجاهل التلقائي",
+            "body": "تجاهل علامات التبويب الخاملة بعد مهلة تختارها، مع إبقاء المثبتة والتي تشغّل صوتًا مفتوحة."
+          },
+          "sync": {
+            "title": "مزامنة متعددة الأجهزة",
+            "body": "زامن الجلسات المشفرة عبر أجهزتك بمفتاح المزامنة."
+          },
+          "privateWindows": {
+            "title": "النوافذ الخاصة",
+            "body": "تبقى جلسات النوافذ الخاصة على الجهاز ولا تُرفع أبدًا."
+          }
+        }
+      },
+      "account": {
+        "title": "احتفظ بجلساتك على كل جهاز",
+        "description": "يتيح الحساب لجهاز جديد فتح جلساتك بالبريد الإلكتروني وكلمة المرور فقط. لا يزال مفتاح المزامنة يشفر كل شيء، ولا يراه الخادم أبدًا.",
+        "create": "إنشاء حساب",
+        "signIn": "تسجيل الدخول",
+        "useKey": "أو استخدم مفتاح مزامنة"
+      },
+      "install": {
+        "title": "التثبيت واستكشاف الأخطاء",
+        "items": {
+          "install": {
+            "title": "التثبيت",
+            "body": "افتح صفحة SaveTabs في Chrome Web Store، واختر إضافة إلى Chrome، وثبّت SaveTabs على شريط الأدوات. لم يُنشر Firefox بعد."
+          },
+          "uninstall": {
+            "title": "إلغاء التثبيت",
+            "body": "أزل SaveTabs من صفحة إضافات متصفحك. تبقى الجلسات المحفوظة في تخزين المتصفح حتى تُمسح بيانات الإضافة."
+          },
+          "troubleshooting": {
+            "title": "استكشاف الأخطاء",
+            "body": "إذا فشل الحفظ أو الاستعادة، فتحقق من تفعيل SaveTabs وأعد تحميل الصفحة. ثم حاول مرة أخرى بنافذة واحدة."
+          }
+        }
+      },
+      "footer": {
+        "privacy": "الخصوصية",
+        "store": "Chrome Web Store"
+      }
+    },
+    "privacy": {
+      "back": "Back to SaveTabs",
+      "title": "Privacy policy",
+      "intro": "SaveTabs keeps your saved tab sessions on your device. If you turn on end-to-end encrypted sync, an encrypted copy is stored on the sync server. This page lists exactly what that copy contains and what never leaves your browser.",
+      "sections": {
+        "data": {
+          "title": "What the sync server stores",
+          "lead": "The sync server stores the following data for your key:",
+          "authId": "A public account id derived from your sync key. It appears in API URLs and cannot be turned back into the key.",
+          "authKeyHash": "A SHA-256 hash of the bearer credential derived from your sync key. The hash verifies requests and cannot be reversed into the credential.",
+          "blobs": "Encrypted session blobs: AES-GCM 256 ciphertext encoded as base64url, with a session id, update timestamp and byte size.",
+          "tombstones": "Deletion tombstones: a deleted session id and its deletion time. Tombstones sync deletions to your other devices and are pruned during later deletions once they are 30 days old.",
+          "timestamps": "Timestamps for when a sync key was first seen and last uploaded.",
+          "footer": "URLs, page titles, favicons and all other session data travel only inside the encrypted blobs. The server cannot read them, and we never receive your sync key. The server also keeps short-lived abuse-prevention rate-limit records keyed by client IP address and authId, plus daily aggregate request and key-registration counters; none of these contain URLs or page titles."
+        },
+        "e2ee": {
+          "title": "End-to-end encryption",
+          "body": "Encryption and decryption happen in your browser with the Web Crypto API. Session blobs use AES-GCM 256, and the encryption key is derived from your sync key with HKDF-SHA256. The key stays in your browser; the web app keeps it in this tab's session storage, or in local storage when you choose Remember on this device. Only ciphertext is uploaded. Without your key, the server and anyone else who obtains a blob cannot read it."
+        },
+        "incognito": {
+          "title": "Private and incognito sessions",
+          "body": "Sessions saved from private or incognito windows are marked local-only by the extension. They are never uploaded to the sync server and never appear in the web app."
+        },
+        "keyLoss": {
+          "title": "If you lose your sync key",
+          "body": "There is no account, email address or password to reset. The sync key is the only credential that can decrypt synced sessions. If you lose it, the encrypted data on the server cannot be recovered. Keep a safe copy; you can reveal and copy the key in the extension under Settings → Sync."
+        },
+        "delete": {
+          "title": "Deleting your data",
+          "body": "Local sessions stay in your browser until you delete them in the extension; clearing the extension's data or uninstalling it also removes them. To delete all cloud data for a sync key, open the extension, go to Settings → Sync and choose Delete cloud data. This removes the encrypted sessions, deletion tombstones and the key record for that sync key, and turns sync off so local sessions are not uploaded again. Rotating the sync key also deletes the data stored under the old key; if that deletion fails, import the old key and use Delete cloud data."
+        },
+        "analytics": {
+          "title": "No analytics or third parties",
+          "body": "The web app and extension contain no analytics, tracking pixels, advertising or third-party scripts. The web app loads only its own code and styles and uses no external fonts."
+        },
+        "contact": {
+          "title": "Contact",
+          "body": "Questions about this policy can be sent to support@azcom.dev."
+        }
+      }
+    },
+    "sessions": {
+      "title": "الجلسات المحفوظة",
+      "searchLabel": "البحث في الجلسات",
+      "searchPlaceholder": "البحث في الجلسات…",
+      "noResults": "لا توجد جلسات تطابق بحثك.",
+      "empty": "لا توجد جلسات بعد. احفظ علامات التبويب بإضافة SaveTabs، ثم افتح هذه الصفحة مرة أخرى.",
+      "unknownKeyTitle": "لا توجد بيانات مزامنة لهذا المفتاح",
+      "unknownKey": "لا توجد جلسات مزامنة لهذا المفتاح. تحقق من إدخاله بشكل صحيح، أو انتقل إلى مفتاح آخر.",
+      "restore": "استعادة",
+      "restoreHint": "تفتح الاستعادة كل علامة تبويب في علامة تبويب متصفح جديدة. اسمح بالنوافذ المنبثقة إذا طلب متصفحك.",
+      "restoreSuccess": "تم فتح {count} علامات تبويب.",
+      "popupBlocked": "حجب المتصفح {count} علامات تبويب. اسمح بالنوافذ المنبثقة لهذا الموقع أو افتح علامات التبويب واحدة تلو الأخرى.",
+      "copy": "نسخ",
+      "copySuccess": "تم نسخ {count} علامات تبويب إلى الحافظة.",
+      "copyFailed": "تعذّر نسخ علامات التبويب.",
+      "export": "تصدير JSON",
+      "exportSuccess": "تم تصدير {filename}.",
+      "exportFailed": "تعذّر تصدير الجلسة: {message}",
+      "delete": "حذف",
+      "deleteTitle": "حذف هذه الجلسة؟",
+      "deleteMessage": "ستُحذف هذه الجلسة نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+      "deleteConfirm": "حذف الجلسة",
+      "deleteSuccess": "تم حذف الجلسة.",
+      "deleteFailed": "تعذّر حذف الجلسة: {message}",
+      "authError": "تم رفض مفتاح المزامنة. أدخل مفتاحك مرة أخرى للمتابعة.",
+      "changeKey": "تغيير المفتاح",
+      "forgetKey": "نسيان المفتاح",
+      "forgetKeyTitle": "نسيان مفتاح المزامنة؟",
+      "forgetKeyMessage": "يُزال المفتاح من هذا المتصفح. تبقى بياناتك المزامنة على الخادم ويمكن فتحها مرة أخرى بإدخال المفتاح لاحقًا.",
+      "forgetKeyConfirm": "نسيان المفتاح",
+      "home": "الرئيسية",
+      "privacy": "الخصوصية",
+      "decryptError": "تعذّر فك تشفير بعض الجلسات وتم تخطيها ({count}).",
+      "loadFailed": "تعذّر تحميل جلساتك المحفوظة.",
+      "noTabs": "لا تحتوي هذه الجلسة على أي علامات تبويب."
+    },
+    "language": {
+      "toggle": "تغيير اللغة"
+    },
+    "theme": {
+      "toggle": "تغيير المظهر",
+      "system": "النظام",
+      "light": "فاتح",
+      "dark": "داكن"
+    }
+  }
+}

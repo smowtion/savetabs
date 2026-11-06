@@ -1,5 +1,6 @@
 import {
   DEFAULT_SETTINGS,
+  LANGS,
   SETTINGS_SCHEMA,
   SETTING_KEYS,
   createTranslator,
@@ -179,17 +180,14 @@ describe("CategorySection", () => {
     ).toEqual(["System", "Light", "Dark"]);
 
     const language = screen.getByRole("combobox", { name: "Language" });
+    const expectedLanguageLabels = ["auto", ...LANGS].map((value) =>
+      t(`settings.option.general.language.${value}`),
+    );
     expect(
       within(language)
         .getAllByRole("option")
         .map((option) => option.textContent),
-    ).toEqual([
-      "Automatic",
-      "English",
-      "Vietnamese",
-      "Chinese (Simplified)",
-      "Spanish",
-    ]);
+    ).toEqual(expectedLanguageLabels);
   });
 
   it("saves numeric enum values as numbers", async () => {

@@ -25,14 +25,17 @@ function requiredKeys(locale: string): string[] {
 
 describe("i18n", () => {
   it("registers the supported locales with their direction", () => {
-    expect(LANGS).toEqual(["en", "vi", "zh-CN", "es"]);
+    expect(LANGS).toEqual(["en", "vi", "zh-CN", "es", "hi", "ar"]);
     expect(LOCALES.map((locale) => locale.name)).toEqual([
       "English",
       "Tiếng Việt",
       "简体中文",
       "Español",
+      "हिन्दी",
+      "العربية",
     ]);
     for (const locale of LOCALES) expect(localeDir(locale.code)).toBe(locale.dir);
+    expect(localeDir("ar")).toBe("rtl");
   });
 
   it("has every English key in every locale", () => {
@@ -44,12 +47,30 @@ describe("i18n", () => {
   it("resolves browser language prefixes", () => {
     expect(resolveLang("auto", "zh-TW")).toBe("zh-CN");
     expect(resolveLang("auto", "es-419")).toBe("es");
+    expect(resolveLang("auto", "hi-IN")).toBe("hi");
+    expect(resolveLang("auto", "ar-EG")).toBe("ar");
     expect(resolveLang("auto", "xx")).toBe("en");
   });
 
   it("honors explicit language preferences over the browser", () => {
     expect(resolveLang("zh-CN", "en-US")).toBe("zh-CN");
     expect(resolveLang("es", "vi-VN")).toBe("es");
+    expect(resolveLang("hi", "en-US")).toBe("hi");
+    expect(resolveLang("ar", "en-US")).toBe("ar");
+  });
+
+  it("keeps the policy page in English for Hindi and Arabic", () => {
+    const privacyKeys = ALL_EN_KEYS.filter((key) =>
+      key.startsWith("web.privacy."),
+    );
+    const english = createTranslator("en");
+
+    for (const locale of ["hi", "ar"] as const) {
+      const translator = createTranslator(locale);
+      for (const key of privacyKeys) {
+        expect(translator(key), `${locale}:${key}`).toBe(english(key));
+      }
+    }
   });
 
   it("resolves language and covers every schema string", () => {

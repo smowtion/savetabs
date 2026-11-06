@@ -371,7 +371,9 @@
           "en": "Inglés",
           "vi": "Vietnamita",
           "zh-CN": "Chino simplificado",
-          "es": "Español"
+          "es": "Español",
+          "hi": "Hindi",
+          "ar": "Árabe"
         }
       },
       "duplicates": {

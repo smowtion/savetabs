@@ -78,7 +78,7 @@ export const SETTINGS_SCHEMA: readonly SettingsCategory[] = [
         default: "auto",
         labelKey: "settings.general.language.label",
         descriptionKey: "settings.general.language.description",
-        keywords: ["language", "locale", "english", "vietnamese", "chinese", "spanish", "i18n"],
+        keywords: ["language", "locale", "english", "vietnamese", "chinese", "spanish", "hindi", "arabic", "i18n"],
       },
       {
         key: "general.showBadgeCount",
