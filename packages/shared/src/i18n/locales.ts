@@ -22,6 +22,8 @@ export const LOCALES: readonly Locale[] = [
   { code: "es", name: "Español", dir: "ltr" },
   { code: "hi", name: "हिन्दी", dir: "ltr" },
   { code: "ar", name: "العربية", dir: "rtl" },
+  { code: "pt", name: "Português", dir: "ltr" },
+  { code: "ru", name: "Русский", dir: "ltr" },
 ];
 
 /** Locale codes in display order, for settings enums and validation. */

@@ -11,12 +11,14 @@ import ar from "./ar.json";
 import en from "./en.json";
 import es from "./es.json";
 import hi from "./hi.json";
+import pt from "./pt.json";
+import ru from "./ru.json";
 import vi from "./vi.json";
 import zhCN from "./zh-CN.json";
 import { LANGS } from "./locales";
 
 /** Supported UI languages. */
-export type Lang = "en" | "vi" | "zh-CN" | "es" | "hi" | "ar";
+export type Lang = "en" | "vi" | "zh-CN" | "es" | "hi" | "ar" | "pt" | "ru";
 
 /** Stored `general.language` preference; "auto" follows the browser language. */
 export type LanguagePreference = "auto" | Lang;
@@ -68,6 +70,8 @@ const FLAT_DICTIONARIES: Readonly<Record<Lang, FlatDictionary>> = {
   es: flattenDictionary(es as Dictionary),
   hi: flattenDictionary(hi as Dictionary),
   ar: flattenDictionary(ar as Dictionary),
+  pt: flattenDictionary(pt as Dictionary),
+  ru: flattenDictionary(ru as Dictionary),
 };
 
 /**
@@ -82,6 +86,8 @@ const BROWSER_LANG_PREFIXES: readonly (readonly [string, Lang])[] = [
   ["vi", "vi"],
   ["hi", "hi"],
   ["ar", "ar"],
+  ["pt", "pt"],
+  ["ru", "ru"],
 ];
 
 /**

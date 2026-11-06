@@ -373,7 +373,9 @@
           "zh-CN": "Chino simplificado",
           "es": "Español",
           "hi": "Hindi",
-          "ar": "Árabe"
+          "ar": "Árabe",
+          "pt": "Portugués",
+          "ru": "Ruso"
         }
       },
       "duplicates": {

@@ -25,7 +25,7 @@ function requiredKeys(locale: string): string[] {
 
 describe("i18n", () => {
   it("registers the supported locales with their direction", () => {
-    expect(LANGS).toEqual(["en", "vi", "zh-CN", "es", "hi", "ar"]);
+    expect(LANGS).toEqual(["en", "vi", "zh-CN", "es", "hi", "ar", "pt", "ru"]);
     expect(LOCALES.map((locale) => locale.name)).toEqual([
       "English",
       "Tiếng Việt",
@@ -33,6 +33,8 @@ describe("i18n", () => {
       "Español",
       "हिन्दी",
       "العربية",
+      "Português",
+      "Русский",
     ]);
     for (const locale of LOCALES) expect(localeDir(locale.code)).toBe(locale.dir);
     expect(localeDir("ar")).toBe("rtl");
@@ -49,6 +51,8 @@ describe("i18n", () => {
     expect(resolveLang("auto", "es-419")).toBe("es");
     expect(resolveLang("auto", "hi-IN")).toBe("hi");
     expect(resolveLang("auto", "ar-EG")).toBe("ar");
+    expect(resolveLang("auto", "pt-BR")).toBe("pt");
+    expect(resolveLang("auto", "ru-RU")).toBe("ru");
     expect(resolveLang("auto", "xx")).toBe("en");
   });
 
@@ -57,15 +61,17 @@ describe("i18n", () => {
     expect(resolveLang("es", "vi-VN")).toBe("es");
     expect(resolveLang("hi", "en-US")).toBe("hi");
     expect(resolveLang("ar", "en-US")).toBe("ar");
+    expect(resolveLang("pt", "ru-RU")).toBe("pt");
+    expect(resolveLang("ru", "en-US")).toBe("ru");
   });
 
-  it("keeps the policy page in English for Hindi and Arabic", () => {
+  it("keeps the policy page in English for Hindi, Arabic, Portuguese and Russian", () => {
     const privacyKeys = ALL_EN_KEYS.filter((key) =>
       key.startsWith("web.privacy."),
     );
     const english = createTranslator("en");
 
-    for (const locale of ["hi", "ar"] as const) {
+    for (const locale of ["hi", "ar", "pt", "ru"] as const) {
       const translator = createTranslator(locale);
       for (const key of privacyKeys) {
         expect(translator(key), `${locale}:${key}`).toBe(english(key));
