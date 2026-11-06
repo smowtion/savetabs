@@ -31,6 +31,7 @@ import {
   KEY_STORAGE_KEY,
   isKeyRemembered,
   loadKey,
+  saveKeyForSession,
 } from "../lib/key-session";
 import Login from "./Login";
 
@@ -50,6 +51,7 @@ const NEW_PASSWORD = "a-new-password-456";
 const TOKEN = "account-token-123";
 const AUTH_ID = "sync-key-auth-id";
 const STORED_KEY = formatKey(new Uint8Array(16).fill(7));
+const EXISTING_KEY = formatKey(new Uint8Array(16).fill(9));
 const RECOVERY_KEY = formatKey(new Uint8Array(16).fill(3));
 const SERVER_MESSAGE = "Email or password is incorrect.";
 const ACCOUNT: AccountProfile = {
@@ -354,6 +356,41 @@ describe("Login page", () => {
     expect(
       await screen.findByRole("heading", { name: "Saved sessions" }),
     ).toBeInTheDocument();
+  });
+
+  it("links the key already stored on the device instead of generating one", async () => {
+    saveKeyForSession(EXISTING_KEY);
+    const user = userEvent.setup();
+    const material = await keyMaterial(PASSWORD);
+    const login = vi
+      .fn<(input: LoginInput) => Promise<LoginResult>>()
+      .mockResolvedValue({ token: TOKEN, account: ACCOUNT, vault: null });
+    const { linkKey } = useClient({ login });
+    renderLogin();
+
+    await signIn(user);
+
+    const dialog = await screen.findByRole(
+      "dialog",
+      { name: "Save your recovery key" },
+      { timeout: 10_000 },
+    );
+    expect(loadKey()).toBe(EXISTING_KEY);
+
+    const [, linkInput] = linkKey.mock.calls[0];
+    const derived = await deriveKeys(parseKey(EXISTING_KEY));
+    expect(linkInput.authId).toBe(derived.authId);
+    expect(linkInput.authKey).toBe(derived.authKey);
+    expect(linkInput.authHash).toBe(material.authHash);
+
+    // The vault wraps the pre-existing device key, not a fresh one.
+    const rawKey = await unwrapSyncKey(
+      material.wrapKey,
+      linkInput.wrappedKey,
+      derived.authId,
+    );
+    expect(formatKey(rawKey)).toBe(EXISTING_KEY);
+    expect(within(dialog).getByText(EXISTING_KEY)).toBeInTheDocument();
   });
 
   it("shows one generic error for rejected credentials", async () => {

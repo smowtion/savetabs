@@ -9,9 +9,11 @@
  *   returns and recovery can derive from the recovery key;
  * - the sync key is stored with the caller's remember choice.
  *
- * An account with no vault yet gets a freshly generated key, wrapped and
- * linked with the key-derived bearer, and the recovery key is returned so the
- * page can show its required acknowledgement dialog.
+ * An account with no vault yet links this device's existing key when there is
+ * one (a key-only user with local sessions), otherwise a freshly generated
+ * key. The key is wrapped and linked with the key-derived bearer, and the
+ * recovery key is returned so the page can show its required acknowledgement
+ * dialog.
  */
 
 import {
@@ -30,7 +32,7 @@ import {
 } from "@savetabs/shared";
 
 import { createAccountClient, saveAccountToken } from "./account-session";
-import { saveKeyForSession } from "./key-session";
+import { loadKey, saveKeyForSession } from "./key-session";
 
 export type SignInOutcome =
   | { kind: "signed-in" }
@@ -70,8 +72,10 @@ export async function signInWithPassword(
     return { kind: "signed-in" };
   }
 
-  // The account exists but never linked a key: create this device's key.
-  const rawKey = parseKey(generateKey());
+  // The account exists but never linked a key. Reuse this device's key when it
+  // has one, so a key-only user with local sessions keeps them; only a device
+  // with no key starts with a fresh one.
+  const rawKey = parseKey(loadKey() ?? generateKey());
   const { authId, authKey } = await deriveKeys(rawKey);
   const wrapKey = await deriveWrapKey(masterKey);
   const wrappedKey = await wrapSyncKey(wrapKey, rawKey, authId);
