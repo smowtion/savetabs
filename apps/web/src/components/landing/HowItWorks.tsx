@@ -67,9 +67,11 @@ function StepVisual({
   if (step === "save") {
     return (
       <StepScreenshot
-        src="/screenshots/popup.png"
+        src="/screenshots/popup-card.png"
         alt={t("web.landing.guide.saveAlt")}
-        imgClassName="object-cover object-right"
+        imgClassName="object-contain"
+        width={360}
+        height={420}
       />
     );
   }
@@ -91,18 +93,22 @@ function StepScreenshot({
   src,
   alt,
   imgClassName,
+  width = 1280,
+  height = 800,
 }: {
   src: string;
   alt: string;
   imgClassName: string;
+  width?: number;
+  height?: number;
 }) {
   return (
     <div className="mt-4 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-950">
       <img
         src={src}
         alt={alt}
-        width={1280}
-        height={800}
+        width={width}
+        height={height}
         loading="lazy"
         decoding="async"
         className={`h-40 w-full ${imgClassName}`}
