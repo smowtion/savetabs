@@ -194,7 +194,8 @@ describe("Signup page", () => {
     expect(linkInput.authId).toBe(derived.authId);
     expect(linkInput.authKey).toBe(derived.authKey);
 
-    // The vault wraps that same key under the password-derived wrap key.
+    // The vault wraps that same key under the password-derived wrap key and
+    // binds it to the sync key's authId, not the account record id.
     const masterKey = await deriveMasterKey(
       PASSWORD,
       decodeSalt(signupInput.kdfSalt),
@@ -203,7 +204,7 @@ describe("Signup page", () => {
     const rawKey = await unwrapSyncKey(
       wrapKey,
       linkInput.wrappedKey,
-      ACCOUNT.id,
+      derived.authId,
     );
     expect(formatKey(rawKey)).toBe(storedKey);
 
@@ -276,6 +277,7 @@ describe("Signup page", () => {
   it("adopts a vault returned by login instead of linking a new key", async () => {
     const user = userEvent.setup();
     const vaultKey = formatKey(new Uint8Array(16).fill(9));
+    const vaultAuthId = "existing-auth-id";
     let signupInput: SignupInput | undefined;
 
     const signup = vi.fn(async (input: SignupInput): Promise<AccountAck> => {
@@ -295,11 +297,11 @@ describe("Signup page", () => {
           wrappedKey: await wrapSyncKey(
             wrapKey,
             parseKey(vaultKey),
-            ACCOUNT.id,
+            vaultAuthId,
           ),
           kdfSalt: (signupInput as SignupInput).kdfSalt,
           kdfIterations: KDF_ITERATIONS,
-          authId: "existing-auth-id",
+          authId: vaultAuthId,
         },
       };
     });
