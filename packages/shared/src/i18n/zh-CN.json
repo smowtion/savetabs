@@ -1,0 +1,847 @@
+{
+  "common": {
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "copy": "复制",
+    "confirm": "确认",
+    "restore": "恢复",
+    "settings": "设置",
+    "openSessions": "打开会话",
+    "syncNow": "立即同步",
+    "retry": "重试",
+    "loading": "加载中…",
+    "error": "出错了",
+    "empty": "暂无内容",
+    "tabsCount": "{count} 个标签页"
+  },
+  "settings": {
+    "general": {
+      "label": "常规",
+      "description": "外观、语言和标签页数量偏好。",
+      "theme": {
+        "label": "主题",
+        "description": "选择浅色、深色，或跟随系统外观。"
+      },
+      "language": {
+        "label": "语言",
+        "description": "选择显示语言，或自动跟随浏览器语言。"
+      },
+      "showBadgeCount": {
+        "label": "显示标签页数量徽标",
+        "description": "在工具栏图标上显示打开的标签页数量。"
+      },
+      "confirmThreshold": {
+        "label": "关闭大量标签页前确认",
+        "description": "当保存操作将关闭至少这么多标签页时，请求确认。设为 0 可禁用。"
+      }
+    },
+    "tabs": {
+      "label": "标签页",
+      "description": "选择要保存哪些标签页，以及保存后的操作。",
+      "saveAllWindows": {
+        "label": "保存所有窗口",
+        "description": "包含每个浏览器窗口中的标签页，而不仅是当前窗口。"
+      },
+      "closeAfterSave": {
+        "label": "保存后关闭标签页",
+        "description": "会话保存完成后，关闭已保存的标签页。"
+      },
+      "skipAudible": {
+        "label": "跳过正在播放音频的标签页",
+        "description": "保持正在播放声音的标签页不关闭。"
+      },
+      "excludedDomains": {
+        "label": "排除的域名",
+        "description": "这些域名下的标签页永远不会被保存或关闭。每行一个域名。"
+      },
+      "includeFileUrls": {
+        "label": "包含本地文件 URL",
+        "description": "允许保存指向此计算机上文件的标签页。需要文件访问权限。"
+      }
+    },
+    "duplicates": {
+      "label": "重复项",
+      "description": "控制如何处理重复的标签页和 URL。",
+      "removeOnSave": {
+        "label": "移除重复标签页",
+        "description": "关闭重复的标签页，会话中每个 URL 只保留一个副本。"
+      },
+      "matchMode": {
+        "label": "重复匹配方式",
+        "description": "URL 的比较方式：精确匹配、忽略哈希片段，或忽略查询参数。"
+      },
+      "skipAlreadySaved": {
+        "label": "跳过已保存的标签页",
+        "description": "不保存已存在于其他会话中的 URL。"
+      }
+    },
+    "pinned": {
+      "label": "固定标签页",
+      "description": "决定是否保存或恢复固定标签页。",
+      "skipOnSave": {
+        "label": "保存时跳过固定标签页",
+        "description": "让固定标签页保持打开，且不加入新会话。"
+      },
+      "restoreAsPinned": {
+        "label": "以固定状态恢复固定标签页",
+        "description": "恢复会话时，将已保存的固定标签页重新以固定状态打开。"
+      }
+    },
+    "open": {
+      "label": "打开会话",
+      "description": "配置打开扩展和会话时的行为。",
+      "toolbarAction": {
+        "label": "工具栏按钮操作",
+        "description": "点击工具栏图标时的操作：打开弹出窗口、立即保存标签页，或打开会话页面。"
+      },
+      "openSessionsAfterSave": {
+        "label": "保存后打开会话页面",
+        "description": "保存后立即在会话页面中显示已保存的会话。"
+      },
+      "reuseSessionsTab": {
+        "label": "复用会话标签页",
+        "description": "在已有的会话标签页中打开会话，而不是新建标签页。"
+      }
+    },
+    "urlDisplay": {
+      "label": "URL 显示",
+      "description": "选择已保存标签页和会话的显示方式。",
+      "mode": {
+        "label": "URL 显示模式",
+        "description": "按标题、按域名或按完整 URL 显示已保存的标签页。"
+      },
+      "showFavicons": {
+        "label": "显示网站图标",
+        "description": "在会话列表中显示每个网站的图标。"
+      },
+      "showTabCount": {
+        "label": "显示标签页数量",
+        "description": "显示每个会话包含的标签页数量。"
+      }
+    },
+    "restore": {
+      "label": "恢复",
+      "description": "设置恢复的会话在浏览器中的打开方式。",
+      "targetWindow": {
+        "label": "恢复目标窗口",
+        "description": "在当前窗口或新窗口中打开恢复的标签页。"
+      },
+      "openInBackground": {
+        "label": "在后台打开恢复的标签页",
+        "description": "恢复标签页时，不将焦点从当前标签页移开。"
+      },
+      "skipExisting": {
+        "label": "跳过已打开的标签页",
+        "description": "不重新打开浏览器中已经打开的 URL。"
+      }
+    },
+    "clipboard": {
+      "label": "剪贴板",
+      "description": "选择复制标签页时使用的格式。",
+      "format": {
+        "label": "复制格式",
+        "description": "复制会话标签页时使用的格式：纯 URL、Markdown 链接，或标题加 URL。"
+      }
+    },
+    "contextMenu": {
+      "label": "右键菜单",
+      "description": "选择右键菜单中显示的操作。",
+      "enabled": {
+        "label": "启用右键菜单项",
+        "description": "在浏览器右键菜单中显示 SaveTabs 操作。"
+      },
+      "saveTab": {
+        "label": "保存当前标签页",
+        "description": "添加一个保存当前标签页的右键菜单项。"
+      },
+      "saveWindow": {
+        "label": "保存当前窗口",
+        "description": "添加一个保存当前窗口中所有标签页的右键菜单项。"
+      },
+      "saveSelection": {
+        "label": "保存选中的标签页",
+        "description": "添加一个保存选中标签页的右键菜单项。"
+      }
+    },
+    "memory": {
+      "label": "内存节省",
+      "description": "自动丢弃不活跃的标签页以释放内存。",
+      "autoDiscard": {
+        "label": "自动丢弃不活跃的标签页",
+        "description": "丢弃超过下方超时时间未活动的标签页以释放内存。"
+      },
+      "timeoutMinutes": {
+        "label": "不活跃超时",
+        "description": "标签页需要不活跃多少分钟才能被丢弃。"
+      },
+      "keepAudible": {
+        "label": "保留正在播放音频的标签页",
+        "description": "永不丢弃正在播放声音的标签页。"
+      },
+      "keepPinned": {
+        "label": "保留固定标签页",
+        "description": "永不丢弃固定标签页。"
+      },
+      "discardNow": "立即丢弃",
+      "discardNowSuccess": "已丢弃 {count} 个标签页。",
+      "discardNowFailed": "无法丢弃标签页：{message}"
+    },
+    "shortcuts": {
+      "label": "快捷键",
+      "description": "查看分配给 SaveTabs 的键盘快捷键。",
+      "tableCaption": "SaveTabs 键盘快捷键",
+      "commandHeader": "命令",
+      "bindingHeader": "快捷键",
+      "notSet": "未设置",
+      "instructions": "要更改快捷键，请打开下方的快捷键页面并编辑 SaveTabs 的快捷键。",
+      "pagePathLabel": "快捷键页面路径",
+      "copyPath": "复制路径",
+      "copySuccess": "路径已复制到剪贴板。",
+      "copyFailed": "无法复制路径。",
+      "commandLabel": {
+        "save-tabs": "保存当前窗口中的所有标签页",
+        "open-sessions": "打开会话页面",
+        "discard-now": "立即丢弃不活跃的标签页"
+      }
+    },
+    "incognito": {
+      "label": "无痕模式",
+      "description": "控制如何处理隐私窗口。",
+      "includeInSaveAll": {
+        "label": "包含无痕窗口",
+        "description": "保存所有窗口时包含隐私窗口。需要无痕访问权限。"
+      },
+      "status": {
+        "label": "无痕访问权限",
+        "allowed": "已允许",
+        "denied": "未允许"
+      },
+      "deniedNote": "此设置已禁用，因为 SaveTabs 不允许在无痕窗口中运行。",
+      "enableInstructions": "要允许访问，请打开下方的扩展程序页面，打开 SaveTabs 详情，并允许该扩展程序在隐私窗口中运行。",
+      "pagePathLabel": "扩展程序页面路径",
+      "copyPath": "复制路径",
+      "copySuccess": "路径已复制到剪贴板。",
+      "copyFailed": "无法复制路径。"
+    },
+    "sync": {
+      "label": "同步",
+      "description": "使用端到端加密备份和恢复会话。",
+      "enabled": {
+        "label": "启用端到端加密同步",
+        "description": "使用端到端加密将会话备份到你的同步账户。"
+      },
+      "autoUpload": {
+        "label": "自动上传更改",
+        "description": "自动上传新增和变更的会话。"
+      },
+      "autoDownload": {
+        "label": "自动下载更改",
+        "description": "自动下载并合并其他设备上保存的会话。"
+      },
+      "keyTitle": "你的同步密钥",
+      "keyLabel": "同步密钥值",
+      "keyMaskedHint": "密钥保持隐藏，因为它是你加密数据的唯一凭据。",
+      "revealKey": "显示密钥",
+      "hideKey": "隐藏密钥",
+      "copyKey": "复制密钥",
+      "copied": "密钥已复制到剪贴板。",
+      "copyFailed": "无法复制密钥。",
+      "importLabel": "导入密钥",
+      "importPlaceholder": "粘贴你的 ST-… 密钥",
+      "invalidKey": "这不是有效的 SaveTabs 密钥。",
+      "importPrompt": "在新密钥下上传本地会话？",
+      "importPromptHint": "推荐。本地会话将使用新密钥加密并上传。",
+      "importUpload": "上传本地会话",
+      "importSkip": "跳过上传",
+      "importSuccess": "密钥已导入。本地会话将使用该密钥上传。",
+      "importSkipped": "密钥已导入。本地会话将不会上传。",
+      "rotateKey": "轮换密钥",
+      "rotateTitle": "轮换同步密钥",
+      "rotateWarning": "轮换会创建新密钥，并尝试删除用旧密钥加密的云端数据。本地会话将使用新密钥上传。",
+      "rotateConfirmLabel": "输入 ROTATE 以确认",
+      "rotateConfirmPlaceholder": "ROTATE",
+      "rotateConfirm": "创建新密钥",
+      "rotateSuccess": "新密钥已创建。本地会话将使用该密钥上传。",
+      "rotateSuccessRevoked": "新密钥已创建。旧云端数据已删除。本地会话将使用新密钥上传。",
+      "rotateSuccessRevokeFailed": "新密钥已创建，但无法删除旧云端数据。本地会话将使用新密钥上传。",
+      "loseKeyWarning": "如果你丢失此密钥，同步的数据将无法恢复。",
+      "onlyCredentialWarning": "此密钥是你同步数据的唯一凭据。任何持有它的人都可以读取、更改或删除这些数据。",
+      "actionFailed": "操作失败：{message}",
+      "statusTitle": "同步状态",
+      "statusOn": "同步已开启。",
+      "statusOff": "同步已关闭。云端数据会保留，直到你将其删除。",
+      "lastSyncLabel": "上次同步",
+      "neverSynced": "从未",
+      "pendingLabel": "待上传项目",
+      "syncing": "正在同步…",
+      "syncResult": "已上传 {uploaded}，已下载 {downloaded}，已删除 {deleted}。",
+      "syncErrorsTitle": "部分项目无法同步：",
+      "authError": "同步密钥被拒绝，或无法解密云端数据。请重新导入或轮换密钥。",
+      "deleteCloud": "删除云端数据",
+      "deleteCloudTitle": "删除云端数据？",
+      "deleteCloudMessage": "这将删除该密钥在服务器上存储的所有已同步会话，然后关闭同步，以免本地会话再次上传。本地会话仍保留在此设备上。此操作无法撤销。",
+      "deleteCloudConfirm": "删除云端数据",
+      "deleteCloudSuccess": "云端数据已删除。同步已关闭，以免本地会话再次上传。你可以稍后重新启用同步。",
+      "enableConfirmTitle": "启用加密同步？",
+      "enableConfirmMessage": "请确保已保存你的同步密钥。它是恢复同步数据的唯一方式。你可以在“同步”部分显示并复制它。",
+      "enableConfirm": "启用同步",
+      "accountPasswordLabel": "账户密码",
+      "accountPasswordHint": "更新与账户关联的密钥时需要。",
+      "accountPasswordRequired": "输入账户密码以更改同步密钥。",
+      "keyRelinkFailed": "无法更新账户密钥。你的同步密钥未更改。"
+    },
+    "account": {
+      "title": "账户",
+      "description": "登录后可在任何设备上恢复同步密钥。你的数据始终保持端到端加密。",
+      "emailLabel": "邮箱",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "密码",
+      "signIn": "登录",
+      "signingIn": "正在登录…",
+      "createAccount": "创建账户",
+      "creatingAccount": "正在创建账户…",
+      "useKeyInstead": "改用密钥",
+      "useAccount": "使用账户",
+      "keyOnlyHint": "同步保持仅使用密钥。你的密钥在下方管理。",
+      "signOut": "退出登录",
+      "signedOut": "已退出登录。你的同步密钥和同步设置未更改。",
+      "signOutFailed": "无法退出登录。请重试。",
+      "verified": "已验证",
+      "unverified": "邮箱未验证",
+      "passwordTooShort": "请使用至少 12 个字符的密码。",
+      "signInFailed": "无法登录。请检查邮箱和密码。",
+      "signUpFailed": "无法创建账户。请重试。",
+      "loadFailed": "无法加载你的账户。",
+      "recoveryTitle": "保存你的恢复密钥",
+      "recoveryMessage": "此密钥是恢复加密会话的唯一方式。它不会再次显示。",
+      "recoveryKeyLabel": "你的密钥",
+      "recoveryConfirm": "我已保存",
+      "recoveryContinue": "继续",
+      "changePassword": "更改密码",
+      "currentPasswordLabel": "当前密码",
+      "newPasswordLabel": "新密码",
+      "changePasswordSubmit": "更改密码",
+      "changePasswordSubmitting": "正在更改密码…",
+      "changePasswordSuccess": "密码已更改。其他会话已退出登录。",
+      "changePasswordFailed": "无法更改密码。请检查当前密码。",
+      "uploadPromptTitle": "上传本地会话？",
+      "uploadPrompt": "将这些会话上传到此账户？",
+      "uploadPromptUpload": "上传会话",
+      "uploadPromptSkip": "仅保留在本地"
+    },
+    "advanced": {
+      "label": "高级",
+      "description": "导入、导出、重置和维护操作。",
+      "storageUsage": "已用存储：{sessions} 个会话，{tabs} 个标签页",
+      "storageNearLimit": "本地存储即将满。请导出或删除会话以释放空间。",
+      "exportSettings": "导出设置",
+      "importSettings": "导入设置",
+      "exportSessions": "导出会话",
+      "importSessions": "导入会话",
+      "resetToDefaults": "重置为默认值",
+      "clearSessions": "清除本地会话",
+      "sessionsPlaintextWarning": "会话导出包含明文的标题和 URL。请将文件存放在私密位置。",
+      "exportSuccess": "已导出 {filename}。",
+      "importSettingsSuccess": "设置已导入。",
+      "importSettingsSyncStaysOff": "导入设置后同步保持关闭。请通过开关启用；该流程会确认你的密钥。",
+      "importSettingsFailed": "设置导入失败：",
+      "importSessionsSuccess": "已导入 {added} 个会话，更新 {updated} 个。",
+      "importSessionsPartial": "已导入 {added} 个会话，更新 {updated} 个。部分会话无法保存：",
+      "importSessionsFailed": "会话导入失败：",
+      "actionFailed": "操作失败：{message}",
+      "resetTitle": "重置所有设置？",
+      "resetMessage": "所有设置将恢复为默认值。已保存的会话不受影响。",
+      "resetConfirm": "重置设置",
+      "resetSuccess": "设置已重置为默认值。",
+      "clearTitle": "删除所有本地会话？",
+      "clearMessage": "此设备上保存的所有会话将被永久删除。已同步到云端的会话不会被删除，并可能在下次同步时再次下载。如需备份，请先导出。",
+      "clearConfirm": "删除会话",
+      "clearSuccess": "所有本地会话已删除。"
+    },
+    "option": {
+      "general": {
+        "theme": {
+          "system": "跟随系统",
+          "light": "浅色",
+          "dark": "深色"
+        },
+        "language": {
+          "auto": "自动",
+          "en": "英语",
+          "vi": "越南语",
+          "zh-CN": "简体中文",
+          "es": "西班牙语"
+        }
+      },
+      "duplicates": {
+        "matchMode": {
+          "exact": "精确 URL",
+          "ignore-hash": "忽略 #片段",
+          "ignore-query": "忽略 ?查询"
+        }
+      },
+      "open": {
+        "toolbarAction": {
+          "popup": "打开弹出窗口",
+          "save": "立即保存标签页",
+          "sessions": "打开会话页面"
+        }
+      },
+      "urlDisplay": {
+        "mode": {
+          "title": "标题",
+          "domain": "域名",
+          "full-url": "完整 URL"
+        }
+      },
+      "restore": {
+        "targetWindow": {
+          "current": "当前窗口",
+          "new": "新窗口"
+        }
+      },
+      "clipboard": {
+        "format": {
+          "plain-urls": "纯 URL",
+          "markdown": "Markdown 链接",
+          "titled": "标题加 URL"
+        }
+      },
+      "memory": {
+        "timeoutMinutes": {
+          "5": "5 分钟",
+          "15": "15 分钟",
+          "30": "30 分钟",
+          "60": "60 分钟",
+          "120": "120 分钟"
+        }
+      }
+    }
+  },
+  "options": {
+    "search": "搜索设置",
+    "searchPlaceholder": "搜索设置…",
+    "expandAll": "全部展开",
+    "collapseAll": "全部折叠",
+    "categories": "设置类别",
+    "settingCount": "{count} 项设置",
+    "saved": "已保存",
+    "noResults": "没有与你的搜索匹配的设置。",
+    "tooltip": "关于 {setting} 的更多信息",
+    "memoryUnsupported": "此浏览器不支持丢弃标签页。",
+    "stringList": {
+      "placeholder": "添加域名…",
+      "add": "添加",
+      "remove": "移除 {item}"
+    },
+    "validation": {
+      "numberRange": "请输入 {min} 到 {max} 之间的整数。",
+      "maxItems": "最多可添加 {count} 项。",
+      "duplicateEntry": "此条目已在列表中。",
+      "emptyEntry": "请先输入值再添加。"
+    },
+    "theme": {
+      "system": "跟随系统",
+      "light": "浅色",
+      "dark": "深色",
+      "toggle": "主题：{theme}"
+    }
+  },
+  "contextMenu": {
+    "saveTab": "保存此标签页",
+    "saveWindow": "保存此窗口中的所有标签页",
+    "saveSelection": "保存选中的标签页"
+  },
+  "popup": {
+    "saveTabs": "保存 {count} 个标签页",
+    "openSessions": "打开会话页面",
+    "syncOn": "同步已开启",
+    "syncOff": "同步已关闭",
+    "discardOff": "自动丢弃：关闭",
+    "discardStatus": "自动丢弃：{minutes} 分钟 · 今日已丢弃 {count} 个",
+    "recentTitle": "最近的会话",
+    "empty": "尚无已保存的会话。",
+    "restoreSession": "恢复 {time}",
+    "loadFailed": "无法加载弹出窗口数据。"
+  },
+  "update": {
+    "title": "有可用更新",
+    "message": "SaveTabs {version} 已可安装。",
+    "action": "在商店中查看"
+  },
+  "sessions": {
+    "title": "已保存的会话",
+    "searchLabel": "搜索会话",
+    "searchPlaceholder": "搜索会话…",
+    "saveWindow": "保存窗口",
+    "saveConfirmTitle": "保存并关闭标签页？",
+    "saveConfirmMessage": "保存将关闭 {count} 个标签页。是否继续？",
+    "saveConfirm": "保存并关闭",
+    "invalidResponse": "扩展返回了意外的响应。",
+    "empty": "尚无会话。使用“保存窗口”按钮保存打开的标签页。",
+    "noResults": "没有与你的搜索匹配的会话。",
+    "private": "私密",
+    "moreActions": "更多操作",
+    "rename": "重命名",
+    "exportSession": "导出会话 JSON",
+    "renameLabel": "会话名称",
+    "renameSuccess": "会话已重命名。",
+    "restoreSuccess": "已恢复 {count} 个标签页。",
+    "saveSuccess": "已保存 {count} 个标签页。",
+    "saveOverflow": "已保存 {saved} 个标签页；{overflow} 个因会话上限而保持打开。",
+    "saveEmpty": "没有可保存的标签页。",
+    "copySuccess": "已将 {count} 个标签页复制到剪贴板。",
+    "copyFailed": "无法复制标签页。",
+    "exportSuccess": "已导出 {filename}。",
+    "deleteTitle": "删除此会话？",
+    "deleteMessage": "此会话将被永久删除。此操作无法撤销。",
+    "deleteConfirm": "删除会话",
+    "deleteSuccess": "会话已删除。",
+    "sessionMissing": "该会话已不存在。",
+    "actionFailed": "操作失败：{message}",
+    "loadFailed": "无法加载已保存的会话。",
+    "noTabs": "此会话没有标签页。",
+    "expand": "显示标签页",
+    "collapse": "隐藏标签页",
+    "time": {
+      "justNow": "刚刚",
+      "minutesAgo": "{count} 分钟前",
+      "hoursAgo": "{count} 小时前",
+      "daysAgo": "{count} 天前"
+    }
+  },
+  "web": {
+    "signup": {
+      "title": "创建你的账户",
+      "description": "使用端到端加密备份已保存的会话，并在任何设备上打开。所有内容都在你的浏览器中加密。",
+      "emailLabel": "邮箱",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "密码",
+      "passwordHint": "请使用至少 12 个字符。",
+      "confirmLabel": "确认密码",
+      "submit": "创建账户",
+      "submitting": "正在创建账户…",
+      "passwordTooShort": "请使用至少 12 个字符的密码。",
+      "passwordMismatch": "两次输入的密码不一致。",
+      "error": "无法创建你的账户。请重试。",
+      "recoveryTitle": "保存你的恢复密钥",
+      "recoveryMessage": "此密钥是恢复加密会话的唯一方式。它不会再次显示。",
+      "recoveryKeyLabel": "你的密钥",
+      "recoveryConfirm": "我已保存",
+      "continue": "继续",
+      "back": "返回 SaveTabs"
+    },
+    "login": {
+      "title": "登录",
+      "description": "输入邮箱和密码，在此设备上解锁你的加密会话。",
+      "emailLabel": "邮箱",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "密码",
+      "rememberLabel": "在此设备上记住",
+      "rememberWarning": "仅在你信任的设备上使用。在你清除之前，密钥会一直保留在此浏览器中。",
+      "submit": "登录",
+      "submitting": "正在登录…",
+      "error": "无法登录。请检查邮箱和密码后重试。",
+      "recoveryLink": "忘记密码？使用你的恢复密钥",
+      "createAccount": "创建账户",
+      "back": "返回 SaveTabs"
+    },
+    "recover": {
+      "title": "重置你的密码",
+      "description": "输入恢复密钥并选择新密码。所有内容都在你的浏览器中加密。",
+      "emailLabel": "邮箱",
+      "emailPlaceholder": "you@example.com",
+      "keyLabel": "恢复密钥",
+      "keyPlaceholder": "ST-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-X",
+      "passwordLabel": "新密码",
+      "passwordHint": "请使用至少 12 个字符。",
+      "confirmLabel": "确认新密码",
+      "submit": "重置密码",
+      "submitting": "正在重置密码…",
+      "passwordTooShort": "请使用至少 12 个字符的密码。",
+      "passwordMismatch": "两次输入的密码不一致。",
+      "error": "无法重置你的密码。请检查邮箱和恢复密钥后重试。",
+      "cancel": "返回登录"
+    },
+    "verify": {
+      "title": "邮箱验证",
+      "checking": "正在验证你的邮箱…",
+      "successTitle": "邮箱已验证",
+      "success": "你的邮箱地址已验证。你可以关闭此页面并返回 SaveTabs。",
+      "expiredTitle": "链接已过期",
+      "expired": "此验证链接无效或已过期。请登录并请求新的邮件。",
+      "errorTitle": "验证失败",
+      "error": "无法验证你的邮箱。请稍后重试。",
+      "back": "返回 SaveTabs"
+    },
+    "account": {
+      "title": "你的账户",
+      "description": "管理你的账户、密码和恢复密钥。",
+      "emailLabel": "邮箱",
+      "verified": "已验证",
+      "unverified": "你的邮箱地址尚未验证。",
+      "resend": "重新发送验证邮件",
+      "resending": "正在发送…",
+      "resendSuccess": "验证邮件已发送。",
+      "resendFailed": "无法发送验证邮件。请稍后重试。",
+      "changePasswordTitle": "更改密码",
+      "changePasswordDescription": "输入当前密码并选择新密码。所有内容都在你的浏览器中加密。",
+      "currentPasswordLabel": "当前密码",
+      "newPasswordLabel": "新密码",
+      "confirmPasswordLabel": "确认新密码",
+      "passwordHint": "请使用至少 12 个字符。",
+      "passwordTooShort": "请使用至少 12 个字符的密码。",
+      "passwordMismatch": "两次输入的密码不一致。",
+      "passwordRequired": "请输入你的密码。",
+      "changePasswordSubmit": "更改密码",
+      "changePasswordSubmitting": "正在更改密码…",
+      "passwordChanged": "密码已更改。",
+      "passwordChangeFailed": "无法更改密码。请检查当前密码后重试。",
+      "noVault": "此账户尚未关联同步密钥。",
+      "recoveryKeyTitle": "恢复密钥",
+      "recoveryKeyDescription": "重新输入密码以查看此账户的恢复密钥。",
+      "passwordLabel": "密码",
+      "viewKeySubmit": "查看恢复密钥",
+      "viewKeySubmitting": "正在检查…",
+      "viewKeyLabel": "你的恢复密钥",
+      "viewKeyFailed": "无法显示恢复密钥。请检查密码后重试。",
+      "hideKey": "隐藏",
+      "logout": "退出登录",
+      "deleteTitle": "删除账户",
+      "deleteDescription": "删除账户会移除你的邮箱和登录信息。除非你同时删除云端数据，否则加密会话仍保留在同步服务器上。",
+      "deletePasswordLabel": "你的密码",
+      "deleteCloudLabel": "同时删除与此账户同步的云端数据",
+      "deleteCloudHint": "这将删除为此账户同步密钥存储的所有加密会话。此操作无法撤销。",
+      "deleteSubmit": "删除账户",
+      "deleteConfirmTitle": "删除你的账户？",
+      "deleteConfirmMessage": "你的账户和登录信息将被永久删除。此操作无法撤销。你的同步密钥仍可在此设备上使用。",
+      "deleteCloudConfirmMessage": "你的账户、登录信息及其同步密钥的云端数据将被永久删除。此操作无法撤销。",
+      "deleteConfirm": "删除账户",
+      "deleteDeleting": "正在删除账户…",
+      "deleteFailed": "无法删除你的账户。请检查密码后重试。",
+      "loadFailed": "无法加载你的账户。",
+      "home": "首页",
+      "sessionsLink": "已保存的会话",
+      "unlockTitle": "使用密码解锁",
+      "unlockDescription": "你的账户已在此设备上登录，但同步密钥已锁定。输入密码以打开已保存的会话。",
+      "unlockAccount": "已登录为 {email}",
+      "unlockSubmit": "解锁",
+      "unlockSubmitting": "正在解锁…",
+      "unlockError": "无法解锁你的会话。请检查密码后重试。"
+    },
+    "landing": {
+      "title": "打开你保存的标签页",
+      "description": "输入同步密钥以查看已保存的会话。所有内容都在你的浏览器中解密。",
+      "keyLabel": "同步密钥",
+      "keyPlaceholder": "ST-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-X",
+      "continue": "继续",
+      "invalidKey": "该同步密钥无效。请检查后重试。",
+      "loseKeyWarning": "你的同步密钥是解密会话的唯一方式。如果丢失，已保存的数据将无法恢复。",
+      "rememberLabel": "在此设备上记住",
+      "rememberWarning": "仅在你信任的设备上使用。在你清除之前，密钥会一直保留在此浏览器中。",
+      "privacyLink": "隐私政策",
+      "header": {
+        "account": "账户"
+      },
+      "hero": {
+        "title": "保存每个标签页。以后随时找回。",
+        "description": "SaveTabs 将整个浏览器窗口保存为一个会话，关闭这些标签页，并在你需要时重新打开。它在你的浏览器中运行，会话保留在你的设备上。",
+        "chrome": "添加到 Chrome",
+        "firefox": "Firefox",
+        "comingSoon": "即将推出",
+        "noAccount": "无需账户。本地使用无需注册。",
+        "mockup": {
+          "save": "保存 12 个标签页",
+          "sessions": "最近的会话",
+          "sessionOne": "设计参考",
+          "sessionTwo": "阅读清单",
+          "restore": "恢复",
+          "sync": "同步已开启"
+        }
+      },
+      "howItWorks": {
+        "title": "工作原理",
+        "steps": {
+          "save": {
+            "title": "保存窗口",
+            "body": "打开扩展，将当前窗口中的每个标签页保存为一个会话。"
+          },
+          "close": {
+            "title": "标签页关闭",
+            "body": "SaveTabs 会关闭已保存的标签页，让浏览器保持整洁。"
+          },
+          "restore": {
+            "title": "以后恢复",
+            "body": "打开会话，即可在新窗口中找回每个已保存的标签页。"
+          }
+        }
+      },
+      "privacy": {
+        "title": "隐私",
+        "items": {
+          "e2ee": {
+            "title": "端到端加密",
+            "body": "会话在浏览器中加密后才上传。服务器只存储无法读取的密文。"
+          },
+          "keyOnly": {
+            "title": "你的密钥，你的数据",
+            "body": "同步基于你的同步密钥运行。无需账户，密钥永远不会离开你的浏览器。"
+          },
+          "localFirst": {
+            "title": "本地优先",
+            "body": "如果不启用同步，每个会话都保留在浏览器的扩展存储中。"
+          },
+          "privateWindows": {
+            "title": "隐私窗口保持本地",
+            "body": "从隐私或无痕窗口保存的会话永远不会上传。"
+          }
+        },
+        "link": "阅读隐私政策"
+      },
+      "features": {
+        "title": "功能",
+        "items": {
+          "search": {
+            "title": "搜索会话",
+            "body": "按名称或所含标签页查找已保存的会话。"
+          },
+          "rename": {
+            "title": "重命名会话",
+            "body": "为会话设置清晰的名称，方便以后查找。"
+          },
+          "exportImport": {
+            "title": "导出和导入",
+            "body": "使用 JSON 文件在浏览器之间迁移会话。"
+          },
+          "autoDiscard": {
+            "title": "自动丢弃",
+            "body": "在你选择的超时时间后丢弃空闲标签页，同时保留固定和正在播放音频的标签页。"
+          },
+          "sync": {
+            "title": "多设备同步",
+            "body": "使用同步密钥在你的设备之间同步加密会话。"
+          },
+          "privateWindows": {
+            "title": "隐私窗口",
+            "body": "来自隐私窗口的会话保留在设备上，永远不会上传。"
+          }
+        }
+      },
+      "account": {
+        "title": "让你的会话遍布每台设备",
+        "description": "账户允许新设备仅使用邮箱和密码解锁你的会话。你的同步密钥仍会加密所有内容，服务器永远不会看到它。",
+        "create": "创建账户",
+        "signIn": "登录",
+        "useKey": "或使用同步密钥"
+      },
+      "install": {
+        "title": "安装和故障排除",
+        "items": {
+          "install": {
+            "title": "安装",
+            "body": "打开 Chrome Web Store 页面，选择“添加到 Chrome”，并将 SaveTabs 固定到工具栏。Firefox 尚未发布。"
+          },
+          "uninstall": {
+            "title": "卸载",
+            "body": "从浏览器的扩展程序页面移除 SaveTabs。在清除扩展数据之前，已保存的会话会保留在浏览器存储中。"
+          },
+          "troubleshooting": {
+            "title": "故障排除",
+            "body": "如果保存或恢复失败，请确认 SaveTabs 已启用并重新加载页面。然后尝试仅使用一个窗口再试一次。"
+          }
+        }
+      },
+      "footer": {
+        "privacy": "隐私",
+        "store": "Chrome Web Store"
+      }
+    },
+    "privacy": {
+      "back": "Back to SaveTabs",
+      "title": "Privacy policy",
+      "intro": "SaveTabs keeps your saved tab sessions on your device. If you turn on end-to-end encrypted sync, an encrypted copy is stored on the sync server. This page lists exactly what that copy contains and what never leaves your browser.",
+      "sections": {
+        "data": {
+          "title": "What the sync server stores",
+          "lead": "The sync server stores the following data for your key:",
+          "authId": "A public account id derived from your sync key. It appears in API URLs and cannot be turned back into the key.",
+          "authKeyHash": "A SHA-256 hash of the bearer credential derived from your sync key. The hash verifies requests and cannot be reversed into the credential.",
+          "blobs": "Encrypted session blobs: AES-GCM 256 ciphertext encoded as base64url, with a session id, update timestamp and byte size.",
+          "tombstones": "Deletion tombstones: a deleted session id and its deletion time. Tombstones sync deletions to your other devices and are pruned during later deletions once they are 30 days old.",
+          "timestamps": "Timestamps for when a sync key was first seen and last uploaded.",
+          "footer": "URLs, page titles, favicons and all other session data travel only inside the encrypted blobs. The server cannot read them, and we never receive your sync key. The server also keeps short-lived abuse-prevention rate-limit records keyed by client IP address and authId, plus daily aggregate request and key-registration counters; none of these contain URLs or page titles."
+        },
+        "e2ee": {
+          "title": "End-to-end encryption",
+          "body": "Encryption and decryption happen in your browser with the Web Crypto API. Session blobs use AES-GCM 256, and the encryption key is derived from your sync key with HKDF-SHA256. The key stays in your browser; the web app keeps it in this tab's session storage, or in local storage when you choose Remember on this device. Only ciphertext is uploaded. Without your key, the server and anyone else who obtains a blob cannot read it."
+        },
+        "incognito": {
+          "title": "Private and incognito sessions",
+          "body": "Sessions saved from private or incognito windows are marked local-only by the extension. They are never uploaded to the sync server and never appear in the web app."
+        },
+        "keyLoss": {
+          "title": "If you lose your sync key",
+          "body": "There is no account, email address or password to reset. The sync key is the only credential that can decrypt synced sessions. If you lose it, the encrypted data on the server cannot be recovered. Keep a safe copy; you can reveal and copy the key in the extension under Settings → Sync."
+        },
+        "delete": {
+          "title": "Deleting your data",
+          "body": "Local sessions stay in your browser until you delete them in the extension; clearing the extension's data or uninstalling it also removes them. To delete all cloud data for a sync key, open the extension, go to Settings → Sync and choose Delete cloud data. This removes the encrypted sessions, deletion tombstones and the key record for that sync key, and turns sync off so local sessions are not uploaded again. Rotating the sync key also deletes the data stored under the old key; if that deletion fails, import the old key and use Delete cloud data."
+        },
+        "analytics": {
+          "title": "No analytics or third parties",
+          "body": "The web app and extension contain no analytics, tracking pixels, advertising or third-party scripts. The web app loads only its own code and styles and uses no external fonts."
+        },
+        "contact": {
+          "title": "Contact",
+          "body": "Questions about this policy can be sent to support@azcom.dev."
+        }
+      }
+    },
+    "sessions": {
+      "title": "已保存的会话",
+      "searchLabel": "搜索会话",
+      "searchPlaceholder": "搜索会话…",
+      "noResults": "没有与你的搜索匹配的会话。",
+      "empty": "尚无会话。使用 SaveTabs 扩展保存标签页，然后再次打开此页面。",
+      "unknownKeyTitle": "此密钥没有同步数据",
+      "unknownKey": "此同步密钥没有已同步的会话。请检查输入是否正确，或更换其他密钥。",
+      "restore": "恢复",
+      "restoreHint": "恢复会在新的浏览器标签页中打开每个标签页。如果浏览器询问，请允许弹出窗口。",
+      "restoreSuccess": "已打开 {count} 个标签页。",
+      "popupBlocked": "浏览器阻止了 {count} 个标签页。请允许此网站弹出窗口，或逐个打开标签页。",
+      "copy": "复制",
+      "copySuccess": "已将 {count} 个标签页复制到剪贴板。",
+      "copyFailed": "无法复制标签页。",
+      "export": "导出 JSON",
+      "exportSuccess": "已导出 {filename}。",
+      "exportFailed": "无法导出会话：{message}",
+      "delete": "删除",
+      "deleteTitle": "删除此会话？",
+      "deleteMessage": "此会话将被永久删除。此操作无法撤销。",
+      "deleteConfirm": "删除会话",
+      "deleteSuccess": "会话已删除。",
+      "deleteFailed": "无法删除会话：{message}",
+      "authError": "你的同步密钥被拒绝。请重新输入密钥以继续。",
+      "changeKey": "更换密钥",
+      "forgetKey": "忘记密钥",
+      "forgetKeyTitle": "忘记同步密钥？",
+      "forgetKeyMessage": "密钥将从此浏览器中移除。已同步的数据仍保留在服务器上，以后输入密钥即可再次打开。",
+      "forgetKeyConfirm": "忘记密钥",
+      "home": "首页",
+      "privacy": "隐私",
+      "decryptError": "部分会话无法解密，已跳过（{count}）。",
+      "loadFailed": "无法加载已保存的会话。",
+      "noTabs": "此会话没有标签页。"
+    },
+    "language": {
+      "toggle": "切换语言"
+    },
+    "theme": {
+      "toggle": "更改主题",
+      "system": "跟随系统",
+      "light": "浅色",
+      "dark": "深色"
+    }
+  }
+}

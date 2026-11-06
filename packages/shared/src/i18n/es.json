@@ -1,0 +1,847 @@
+{
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "copy": "Copiar",
+    "confirm": "Confirmar",
+    "restore": "Restaurar",
+    "settings": "Ajustes",
+    "openSessions": "Abrir sesiones",
+    "syncNow": "Sincronizar ahora",
+    "retry": "Reintentar",
+    "loading": "Cargando…",
+    "error": "Algo salió mal",
+    "empty": "Aún no hay nada",
+    "tabsCount": "{count} pestañas"
+  },
+  "settings": {
+    "general": {
+      "label": "General",
+      "description": "Preferencias de apariencia, idioma y recuento de pestañas.",
+      "theme": {
+        "label": "Tema",
+        "description": "Elige claro, oscuro o sigue la apariencia del sistema."
+      },
+      "language": {
+        "label": "Idioma",
+        "description": "Elige el idioma de la interfaz o sigue automáticamente el idioma del navegador."
+      },
+      "showBadgeCount": {
+        "label": "Mostrar el contador de pestañas",
+        "description": "Muestra el número de pestañas abiertas en el icono de la barra de herramientas."
+      },
+      "confirmThreshold": {
+        "label": "Confirmar antes de cerrar muchas pestañas",
+        "description": "Pide confirmación cuando guardar vaya a cerrar al menos esta cantidad de pestañas. Usa 0 para desactivarlo."
+      }
+    },
+    "tabs": {
+      "label": "Pestañas",
+      "description": "Elige qué pestañas se guardan y qué ocurre después de guardar.",
+      "saveAllWindows": {
+        "label": "Guardar todas las ventanas",
+        "description": "Incluye las pestañas de todas las ventanas del navegador, no solo de la actual."
+      },
+      "closeAfterSave": {
+        "label": "Cerrar las pestañas después de guardar",
+        "description": "Cierra las pestañas guardadas una vez almacenada la sesión."
+      },
+      "skipAudible": {
+        "label": "Omitir pestañas con audio",
+        "description": "Deja abiertas las pestañas que están reproduciendo sonido."
+      },
+      "excludedDomains": {
+        "label": "Dominios excluidos",
+        "description": "Las pestañas de estos dominios nunca se guardan ni se cierran. Un dominio por línea."
+      },
+      "includeFileUrls": {
+        "label": "Incluir URL de archivos locales",
+        "description": "Permite guardar pestañas que apuntan a archivos de este equipo. Requiere permiso de acceso a archivos."
+      }
+    },
+    "duplicates": {
+      "label": "Duplicados",
+      "description": "Controla cómo se gestionan las pestañas y URL repetidas.",
+      "removeOnSave": {
+        "label": "Eliminar pestañas duplicadas",
+        "description": "Cierra las pestañas repetidas y conserva una sola copia de cada URL en la sesión."
+      },
+      "matchMode": {
+        "label": "Coincidencia de duplicados",
+        "description": "Cómo se comparan las URL: exacta, ignorando el fragmento hash o ignorando los parámetros de consulta."
+      },
+      "skipAlreadySaved": {
+        "label": "Omitir pestañas ya guardadas",
+        "description": "No guardes URL que ya existan en otra sesión."
+      }
+    },
+    "pinned": {
+      "label": "Pestañas fijadas",
+      "description": "Decide si las pestañas fijadas se guardan o se restauran.",
+      "skipOnSave": {
+        "label": "Omitir pestañas fijadas al guardar",
+        "description": "Deja las pestañas fijadas abiertas y fuera de las sesiones nuevas."
+      },
+      "restoreAsPinned": {
+        "label": "Restaurar pestañas fijadas como fijadas",
+        "description": "Vuelve a abrir como fijadas las pestañas fijadas guardadas al restaurar una sesión."
+      }
+    },
+    "open": {
+      "label": "Abrir sesiones",
+      "description": "Configura qué ocurre al abrir la extensión y las sesiones.",
+      "toolbarAction": {
+        "label": "Acción del botón de la barra",
+        "description": "Qué ocurre al pulsar el icono de la barra: abrir la ventana emergente, guardar las pestañas ahora u abrir la página de sesiones."
+      },
+      "openSessionsAfterSave": {
+        "label": "Abrir la página de sesiones después de guardar",
+        "description": "Muestra la sesión guardada en la página de sesiones justo después de guardarla."
+      },
+      "reuseSessionsTab": {
+        "label": "Reutilizar la pestaña de sesiones",
+        "description": "Abre las sesiones en una pestaña de sesiones existente en lugar de crear una nueva."
+      }
+    },
+    "urlDisplay": {
+      "label": "Visualización de URL",
+      "description": "Elige cómo se muestran las pestañas y sesiones guardadas.",
+      "mode": {
+        "label": "Modo de visualización de URL",
+        "description": "Muestra las pestañas guardadas por título, por dominio o como URL completa."
+      },
+      "showFavicons": {
+        "label": "Mostrar iconos del sitio",
+        "description": "Muestra el icono de cada sitio en las listas de sesiones."
+      },
+      "showTabCount": {
+        "label": "Mostrar el número de pestañas",
+        "description": "Muestra cuántas pestañas contiene cada sesión."
+      }
+    },
+    "restore": {
+      "label": "Restauración",
+      "description": "Define cómo se abren las sesiones restauradas en el navegador.",
+      "targetWindow": {
+        "label": "Ventana de destino de la restauración",
+        "description": "Abre las pestañas restauradas en la ventana actual o en una ventana nueva."
+      },
+      "openInBackground": {
+        "label": "Abrir las pestañas restauradas en segundo plano",
+        "description": "Restaura las pestañas sin quitar el foco de la pestaña actual."
+      },
+      "skipExisting": {
+        "label": "Omitir pestañas ya abiertas",
+        "description": "No vuelvas a abrir URL que ya estén abiertas en el navegador."
+      }
+    },
+    "clipboard": {
+      "label": "Portapapeles",
+      "description": "Elige el formato que se usa al copiar pestañas.",
+      "format": {
+        "label": "Formato de copia",
+        "description": "Formato usado al copiar las pestañas de una sesión: URL simples, enlaces Markdown o títulos con URL."
+      }
+    },
+    "contextMenu": {
+      "label": "Menú contextual",
+      "description": "Elige qué acciones aparecen en el menú del botón derecho.",
+      "enabled": {
+        "label": "Activar elementos del menú contextual",
+        "description": "Muestra las acciones de SaveTabs en el menú contextual del navegador."
+      },
+      "saveTab": {
+        "label": "Guardar la pestaña actual",
+        "description": "Añade un elemento al menú contextual que guarda la pestaña actual."
+      },
+      "saveWindow": {
+        "label": "Guardar la ventana actual",
+        "description": "Añade un elemento al menú contextual que guarda todas las pestañas de la ventana actual."
+      },
+      "saveSelection": {
+        "label": "Guardar las pestañas seleccionadas",
+        "description": "Añade un elemento al menú contextual que guarda las pestañas seleccionadas."
+      }
+    },
+    "memory": {
+      "label": "Ahorro de memoria",
+      "description": "Libera memoria descartando automáticamente las pestañas inactivas.",
+      "autoDiscard": {
+        "label": "Descartar automáticamente las pestañas inactivas",
+        "description": "Libera memoria descartando las pestañas que lleven inactivas el tiempo indicado abajo."
+      },
+      "timeoutMinutes": {
+        "label": "Tiempo de inactividad",
+        "description": "Cuántos minutos debe estar inactiva una pestaña antes de poder descartarse."
+      },
+      "keepAudible": {
+        "label": "Conservar pestañas con audio",
+        "description": "Nunca descartes pestañas que estén reproduciendo sonido."
+      },
+      "keepPinned": {
+        "label": "Conservar pestañas fijadas",
+        "description": "Nunca descartes pestañas fijadas."
+      },
+      "discardNow": "Descartar ahora",
+      "discardNowSuccess": "Se descartaron {count} pestañas.",
+      "discardNowFailed": "No se pudieron descartar las pestañas: {message}"
+    },
+    "shortcuts": {
+      "label": "Atajos de teclado",
+      "description": "Consulta los atajos de teclado asignados a SaveTabs.",
+      "tableCaption": "Atajos de teclado de SaveTabs",
+      "commandHeader": "Comando",
+      "bindingHeader": "Atajo",
+      "notSet": "Sin asignar",
+      "instructions": "Para cambiar un atajo, abre la página de atajos de abajo y edita el atajo de SaveTabs.",
+      "pagePathLabel": "Ruta de la página de atajos",
+      "copyPath": "Copiar ruta",
+      "copySuccess": "Ruta copiada al portapapeles.",
+      "copyFailed": "No se pudo copiar la ruta.",
+      "commandLabel": {
+        "save-tabs": "Guardar todas las pestañas de la ventana actual",
+        "open-sessions": "Abrir la página de sesiones",
+        "discard-now": "Descartar ahora las pestañas inactivas"
+      }
+    },
+    "incognito": {
+      "label": "Incógnito",
+      "description": "Controla cómo se gestionan las ventanas privadas.",
+      "includeInSaveAll": {
+        "label": "Incluir ventanas de incógnito",
+        "description": "Incluye las ventanas privadas al guardar todas las ventanas. Requiere permiso de acceso en incógnito."
+      },
+      "status": {
+        "label": "Acceso en incógnito",
+        "allowed": "Permitido",
+        "denied": "No permitido"
+      },
+      "deniedNote": "Este ajuste está desactivado porque SaveTabs no tiene permitido ejecutarse en ventanas de incógnito.",
+      "enableInstructions": "Para permitir el acceso, abre la página de extensiones de abajo, abre los detalles de SaveTabs y permite la extensión en ventanas privadas.",
+      "pagePathLabel": "Ruta de la página de extensiones",
+      "copyPath": "Copiar ruta",
+      "copySuccess": "Ruta copiada al portapapeles.",
+      "copyFailed": "No se pudo copiar la ruta."
+    },
+    "sync": {
+      "label": "Sincronización",
+      "description": "Haz copias de seguridad y restaura sesiones con cifrado de extremo a extremo.",
+      "enabled": {
+        "label": "Activar la sincronización cifrada de extremo a extremo",
+        "description": "Haz copias de seguridad de las sesiones en tu cuenta de sincronización con cifrado de extremo a extremo."
+      },
+      "autoUpload": {
+        "label": "Subir cambios automáticamente",
+        "description": "Sube automáticamente las sesiones nuevas y modificadas."
+      },
+      "autoDownload": {
+        "label": "Descargar cambios automáticamente",
+        "description": "Descarga y combina automáticamente las sesiones guardadas en otros dispositivos."
+      },
+      "keyTitle": "Tu clave de sincronización",
+      "keyLabel": "Valor de la clave de sincronización",
+      "keyMaskedHint": "La clave permanece oculta porque es la única credencial de tus datos cifrados.",
+      "revealKey": "Mostrar clave",
+      "hideKey": "Ocultar clave",
+      "copyKey": "Copiar clave",
+      "copied": "Clave copiada al portapapeles.",
+      "copyFailed": "No se pudo copiar la clave.",
+      "importLabel": "Importar clave",
+      "importPlaceholder": "Pega tu clave ST-…",
+      "invalidKey": "Esa no es una clave de SaveTabs válida.",
+      "importPrompt": "¿Subir las sesiones locales con esta clave nueva?",
+      "importPromptHint": "Recomendado. Las sesiones locales se cifrarán y se subirán con la clave nueva.",
+      "importUpload": "Subir sesiones locales",
+      "importSkip": "Omitir la subida",
+      "importSuccess": "Clave importada. Las sesiones locales se subirán con ella.",
+      "importSkipped": "Clave importada. Las sesiones locales no se subirán.",
+      "rotateKey": "Rotar clave",
+      "rotateTitle": "Rotar la clave de sincronización",
+      "rotateWarning": "Rotar crea una clave nueva e intenta eliminar los datos en la nube cifrados con la clave anterior. Las sesiones locales se subirán con la clave nueva.",
+      "rotateConfirmLabel": "Escribe ROTATE para confirmar",
+      "rotateConfirmPlaceholder": "ROTATE",
+      "rotateConfirm": "Crear clave nueva",
+      "rotateSuccess": "Clave nueva creada. Las sesiones locales se subirán con ella.",
+      "rotateSuccessRevoked": "Clave nueva creada. Se eliminaron los datos antiguos de la nube. Las sesiones locales se subirán con la clave nueva.",
+      "rotateSuccessRevokeFailed": "Clave nueva creada, pero no se pudieron eliminar los datos antiguos de la nube. Las sesiones locales se subirán con la clave nueva.",
+      "loseKeyWarning": "Si pierdes esta clave, no se podrán recuperar tus datos sincronizados.",
+      "onlyCredentialWarning": "Esta clave es la única credencial de tus datos sincronizados. Cualquiera que la tenga puede leer, modificar o eliminar esos datos.",
+      "actionFailed": "La acción falló: {message}",
+      "statusTitle": "Estado de sincronización",
+      "statusOn": "La sincronización está activada.",
+      "statusOff": "La sincronización está desactivada. Los datos en la nube se conservan hasta que los elimines.",
+      "lastSyncLabel": "Última sincronización",
+      "neverSynced": "Nunca",
+      "pendingLabel": "Subidas pendientes",
+      "syncing": "Sincronizando…",
+      "syncResult": "Subidas: {uploaded}; descargadas: {downloaded}; eliminadas: {deleted}.",
+      "syncErrorsTitle": "Algunos elementos no se pudieron sincronizar:",
+      "authError": "Se rechazó la clave de sincronización o no se pueden descifrar los datos en la nube. Vuelve a importar o rota tu clave.",
+      "deleteCloud": "Eliminar datos en la nube",
+      "deleteCloudTitle": "¿Eliminar los datos en la nube?",
+      "deleteCloudMessage": "Esto elimina todas las sesiones sincronizadas guardadas en el servidor para esta clave y luego desactiva la sincronización para que tus sesiones locales no se vuelvan a subir. Las sesiones locales permanecen en este dispositivo. Esta acción no se puede deshacer.",
+      "deleteCloudConfirm": "Eliminar datos en la nube",
+      "deleteCloudSuccess": "Datos en la nube eliminados. La sincronización se desactivó para que las sesiones locales no se vuelvan a subir. Puedes volver a activarla más adelante.",
+      "enableConfirmTitle": "¿Activar la sincronización cifrada?",
+      "enableConfirmMessage": "Asegúrate de haber guardado tu clave de sincronización. Es la única forma de recuperar los datos sincronizados. Puedes mostrarla y copiarla en la sección Sincronización.",
+      "enableConfirm": "Activar sincronización",
+      "accountPasswordLabel": "Contraseña de la cuenta",
+      "accountPasswordHint": "Necesaria para actualizar la clave vinculada a tu cuenta.",
+      "accountPasswordRequired": "Introduce la contraseña de tu cuenta para cambiar la clave de sincronización.",
+      "keyRelinkFailed": "No se pudo actualizar la clave de la cuenta. Tu clave de sincronización no cambió."
+    },
+    "account": {
+      "title": "Cuenta",
+      "description": "Inicia sesión para recuperar tu clave de sincronización en cualquier dispositivo. Tus datos siguen cifrados de extremo a extremo.",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Contraseña",
+      "signIn": "Iniciar sesión",
+      "signingIn": "Iniciando sesión…",
+      "createAccount": "Crear cuenta",
+      "creatingAccount": "Creando cuenta…",
+      "useKeyInstead": "Usar una clave",
+      "useAccount": "Usar una cuenta",
+      "keyOnlyHint": "La sincronización sigue usando solo la clave. Tu clave se gestiona abajo.",
+      "signOut": "Cerrar sesión",
+      "signedOut": "Sesión cerrada. Tu clave de sincronización y los ajustes de sincronización no han cambiado.",
+      "signOutFailed": "No pudimos cerrar la sesión. Inténtalo de nuevo.",
+      "verified": "Verificado",
+      "unverified": "Correo sin verificar",
+      "passwordTooShort": "Usa una contraseña de al menos 12 caracteres.",
+      "signInFailed": "No pudimos iniciar tu sesión. Comprueba tu correo y contraseña.",
+      "signUpFailed": "No pudimos crear tu cuenta. Inténtalo de nuevo.",
+      "loadFailed": "No pudimos cargar tu cuenta.",
+      "recoveryTitle": "Guarda tu clave de recuperación",
+      "recoveryMessage": "Esta clave es la única forma de recuperar tus sesiones cifradas. No se volverá a mostrar.",
+      "recoveryKeyLabel": "Tu clave",
+      "recoveryConfirm": "La he guardado",
+      "recoveryContinue": "Continuar",
+      "changePassword": "Cambiar contraseña",
+      "currentPasswordLabel": "Contraseña actual",
+      "newPasswordLabel": "Contraseña nueva",
+      "changePasswordSubmit": "Cambiar contraseña",
+      "changePasswordSubmitting": "Cambiando contraseña…",
+      "changePasswordSuccess": "Contraseña cambiada. Se cerró la sesión en los demás dispositivos.",
+      "changePasswordFailed": "No pudimos cambiar tu contraseña. Comprueba tu contraseña actual.",
+      "uploadPromptTitle": "¿Subir las sesiones locales?",
+      "uploadPrompt": "¿Subir estas sesiones a esta cuenta?",
+      "uploadPromptUpload": "Subir sesiones",
+      "uploadPromptSkip": "Mantener solo en local"
+    },
+    "advanced": {
+      "label": "Avanzado",
+      "description": "Acciones de importación, exportación, restablecimiento y mantenimiento.",
+      "storageUsage": "Almacenamiento usado: {sessions} sesiones, {tabs} pestañas",
+      "storageNearLimit": "El almacenamiento local está casi lleno. Exporta o elimina sesiones para liberar espacio.",
+      "exportSettings": "Exportar ajustes",
+      "importSettings": "Importar ajustes",
+      "exportSessions": "Exportar sesiones",
+      "importSessions": "Importar sesiones",
+      "resetToDefaults": "Restablecer valores predeterminados",
+      "clearSessions": "Borrar sesiones locales",
+      "sessionsPlaintextWarning": "Las exportaciones de sesiones contienen títulos y URL en texto plano. Guarda el archivo en un lugar privado.",
+      "exportSuccess": "Se exportó {filename}.",
+      "importSettingsSuccess": "Ajustes importados.",
+      "importSettingsSyncStaysOff": "La sincronización permanece desactivada después de importar ajustes. Actívala con el interruptor; ese flujo confirma tu clave.",
+      "importSettingsFailed": "Error al importar los ajustes:",
+      "importSessionsSuccess": "Se importaron {added} sesiones y se actualizaron {updated}.",
+      "importSessionsPartial": "Se importaron {added} sesiones y se actualizaron {updated}. Algunas sesiones no se pudieron guardar:",
+      "importSessionsFailed": "Error al importar las sesiones:",
+      "actionFailed": "La acción falló: {message}",
+      "resetTitle": "¿Restablecer todos los ajustes?",
+      "resetMessage": "Todos los ajustes vuelven a sus valores predeterminados. Las sesiones guardadas no se ven afectadas.",
+      "resetConfirm": "Restablecer ajustes",
+      "resetSuccess": "Ajustes restablecidos a los valores predeterminados.",
+      "clearTitle": "¿Eliminar todas las sesiones locales?",
+      "clearMessage": "Todas las sesiones guardadas en este dispositivo se eliminarán de forma permanente. Las sesiones sincronizadas en la nube no se eliminan y pueden volver a descargarse en la próxima sincronización. Exporta una copia de seguridad primero si la necesitas.",
+      "clearConfirm": "Eliminar sesiones",
+      "clearSuccess": "Se eliminaron todas las sesiones locales."
+    },
+    "option": {
+      "general": {
+        "theme": {
+          "system": "Sistema",
+          "light": "Claro",
+          "dark": "Oscuro"
+        },
+        "language": {
+          "auto": "Automático",
+          "en": "Inglés",
+          "vi": "Vietnamita",
+          "zh-CN": "Chino simplificado",
+          "es": "Español"
+        }
+      },
+      "duplicates": {
+        "matchMode": {
+          "exact": "URL exacta",
+          "ignore-hash": "Ignorar #fragmento",
+          "ignore-query": "Ignorar ?consulta"
+        }
+      },
+      "open": {
+        "toolbarAction": {
+          "popup": "Abrir ventana emergente",
+          "save": "Guardar pestañas ahora",
+          "sessions": "Abrir página de sesiones"
+        }
+      },
+      "urlDisplay": {
+        "mode": {
+          "title": "Título",
+          "domain": "Dominio",
+          "full-url": "URL completa"
+        }
+      },
+      "restore": {
+        "targetWindow": {
+          "current": "Ventana actual",
+          "new": "Ventana nueva"
+        }
+      },
+      "clipboard": {
+        "format": {
+          "plain-urls": "URL simples",
+          "markdown": "Enlaces Markdown",
+          "titled": "Títulos con URL"
+        }
+      },
+      "memory": {
+        "timeoutMinutes": {
+          "5": "5 minutos",
+          "15": "15 minutos",
+          "30": "30 minutos",
+          "60": "60 minutos",
+          "120": "120 minutos"
+        }
+      }
+    }
+  },
+  "options": {
+    "search": "Buscar ajustes",
+    "searchPlaceholder": "Buscar ajustes…",
+    "expandAll": "Expandir todo",
+    "collapseAll": "Contraer todo",
+    "categories": "Categorías de ajustes",
+    "settingCount": "{count} ajustes",
+    "saved": "Guardado",
+    "noResults": "Ningún ajuste coincide con tu búsqueda.",
+    "tooltip": "Más información sobre {setting}",
+    "memoryUnsupported": "El descarte de pestañas no está disponible en este navegador.",
+    "stringList": {
+      "placeholder": "Añadir un dominio…",
+      "add": "Añadir",
+      "remove": "Quitar {item}"
+    },
+    "validation": {
+      "numberRange": "Introduce un número entero entre {min} y {max}.",
+      "maxItems": "Puedes añadir como máximo {count} elementos.",
+      "duplicateEntry": "Esta entrada ya está en la lista.",
+      "emptyEntry": "Introduce un valor antes de añadirlo."
+    },
+    "theme": {
+      "system": "Sistema",
+      "light": "Claro",
+      "dark": "Oscuro",
+      "toggle": "Tema: {theme}"
+    }
+  },
+  "contextMenu": {
+    "saveTab": "Guardar esta pestaña",
+    "saveWindow": "Guardar todas las pestañas de esta ventana",
+    "saveSelection": "Guardar las pestañas seleccionadas"
+  },
+  "popup": {
+    "saveTabs": "Guardar {count} pestañas",
+    "openSessions": "Abrir página de sesiones",
+    "syncOn": "Sincronización activada",
+    "syncOff": "Sincronización desactivada",
+    "discardOff": "Descarte automático: desactivado",
+    "discardStatus": "Descarte automático: {minutes} min · {count} descartadas hoy",
+    "recentTitle": "Sesiones recientes",
+    "empty": "Aún no hay sesiones guardadas.",
+    "restoreSession": "Restaurar {time}",
+    "loadFailed": "No se pudieron cargar los datos de la ventana emergente."
+  },
+  "update": {
+    "title": "Actualización disponible",
+    "message": "SaveTabs {version} está listo para instalarse.",
+    "action": "Ver en la tienda"
+  },
+  "sessions": {
+    "title": "Sesiones guardadas",
+    "searchLabel": "Buscar sesiones",
+    "searchPlaceholder": "Buscar sesiones…",
+    "saveWindow": "Guardar ventana",
+    "saveConfirmTitle": "¿Guardar y cerrar las pestañas?",
+    "saveConfirmMessage": "Al guardar se cerrarán {count} pestañas. ¿Continuar?",
+    "saveConfirm": "Guardar y cerrar",
+    "invalidResponse": "La extensión devolvió una respuesta inesperada.",
+    "empty": "Aún no hay sesiones. Guarda tus pestañas abiertas con el botón Guardar ventana.",
+    "noResults": "Ninguna sesión coincide con tu búsqueda.",
+    "private": "Privada",
+    "moreActions": "Más acciones",
+    "rename": "Renombrar",
+    "exportSession": "Exportar sesión JSON",
+    "renameLabel": "Nombre de la sesión",
+    "renameSuccess": "Sesión renombrada.",
+    "restoreSuccess": "Se restauraron {count} pestañas.",
+    "saveSuccess": "Se guardaron {count} pestañas.",
+    "saveOverflow": "Se guardaron {saved} pestañas; {overflow} quedaron abiertas (límite de sesión).",
+    "saveEmpty": "No hay pestañas que guardar.",
+    "copySuccess": "Se copiaron {count} pestañas al portapapeles.",
+    "copyFailed": "No se pudieron copiar las pestañas.",
+    "exportSuccess": "Se exportó {filename}.",
+    "deleteTitle": "¿Eliminar esta sesión?",
+    "deleteMessage": "Esta sesión se eliminará de forma permanente. Esta acción no se puede deshacer.",
+    "deleteConfirm": "Eliminar sesión",
+    "deleteSuccess": "Sesión eliminada.",
+    "sessionMissing": "Esa sesión ya no existe.",
+    "actionFailed": "La acción falló: {message}",
+    "loadFailed": "No se pudieron cargar las sesiones guardadas.",
+    "noTabs": "Esta sesión no tiene pestañas.",
+    "expand": "Mostrar pestañas",
+    "collapse": "Ocultar pestañas",
+    "time": {
+      "justNow": "Ahora mismo",
+      "minutesAgo": "Hace {count} minutos",
+      "hoursAgo": "Hace {count} horas",
+      "daysAgo": "Hace {count} días"
+    }
+  },
+  "web": {
+    "signup": {
+      "title": "Crea tu cuenta",
+      "description": "Haz copias de seguridad de tus sesiones guardadas con cifrado de extremo a extremo y ábrelas en cualquier dispositivo. Todo se cifra en tu navegador.",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Contraseña",
+      "passwordHint": "Usa al menos 12 caracteres.",
+      "confirmLabel": "Confirmar contraseña",
+      "submit": "Crear cuenta",
+      "submitting": "Creando cuenta…",
+      "passwordTooShort": "Usa una contraseña de al menos 12 caracteres.",
+      "passwordMismatch": "Las contraseñas no coinciden.",
+      "error": "No pudimos crear tu cuenta. Inténtalo de nuevo.",
+      "recoveryTitle": "Guarda tu clave de recuperación",
+      "recoveryMessage": "Esta clave es la única forma de recuperar tus sesiones cifradas. No se volverá a mostrar.",
+      "recoveryKeyLabel": "Tu clave",
+      "recoveryConfirm": "La he guardado",
+      "continue": "Continuar",
+      "back": "Volver a SaveTabs"
+    },
+    "login": {
+      "title": "Iniciar sesión",
+      "description": "Introduce tu correo y contraseña para desbloquear tus sesiones cifradas en este dispositivo.",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Contraseña",
+      "rememberLabel": "Recordar en este dispositivo",
+      "rememberWarning": "Úsalo solo en un dispositivo de confianza. La clave permanece en este navegador hasta que la borres.",
+      "submit": "Iniciar sesión",
+      "submitting": "Iniciando sesión…",
+      "error": "No pudimos iniciar tu sesión. Comprueba tu correo y contraseña e inténtalo de nuevo.",
+      "recoveryLink": "¿Olvidaste tu contraseña? Usa tu clave de recuperación",
+      "createAccount": "Crear una cuenta",
+      "back": "Volver a SaveTabs"
+    },
+    "recover": {
+      "title": "Restablece tu contraseña",
+      "description": "Introduce tu clave de recuperación y elige una contraseña nueva. Todo se cifra en tu navegador.",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "you@example.com",
+      "keyLabel": "Clave de recuperación",
+      "keyPlaceholder": "ST-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-X",
+      "passwordLabel": "Contraseña nueva",
+      "passwordHint": "Usa al menos 12 caracteres.",
+      "confirmLabel": "Confirmar contraseña nueva",
+      "submit": "Restablecer contraseña",
+      "submitting": "Restableciendo contraseña…",
+      "passwordTooShort": "Usa una contraseña de al menos 12 caracteres.",
+      "passwordMismatch": "Las contraseñas no coinciden.",
+      "error": "No pudimos restablecer tu contraseña. Comprueba tu correo y tu clave de recuperación e inténtalo de nuevo.",
+      "cancel": "Volver a iniciar sesión"
+    },
+    "verify": {
+      "title": "Verificación de correo",
+      "checking": "Verificando tu correo…",
+      "successTitle": "Correo verificado",
+      "success": "Tu dirección de correo está verificada. Puedes cerrar esta página y volver a SaveTabs.",
+      "expiredTitle": "Enlace caducado",
+      "expired": "Este enlace de verificación no es válido o ha caducado. Inicia sesión y solicita un correo nuevo.",
+      "errorTitle": "Error de verificación",
+      "error": "No pudimos verificar tu correo. Inténtalo más tarde.",
+      "back": "Volver a SaveTabs"
+    },
+    "account": {
+      "title": "Tu cuenta",
+      "description": "Gestiona tu cuenta, contraseña y clave de recuperación.",
+      "emailLabel": "Correo electrónico",
+      "verified": "Verificado",
+      "unverified": "Tu dirección de correo aún no está verificada.",
+      "resend": "Reenviar correo de verificación",
+      "resending": "Enviando…",
+      "resendSuccess": "Correo de verificación enviado.",
+      "resendFailed": "No pudimos enviar el correo de verificación. Inténtalo más tarde.",
+      "changePasswordTitle": "Cambiar contraseña",
+      "changePasswordDescription": "Introduce tu contraseña actual y elige una nueva. Todo se cifra en tu navegador.",
+      "currentPasswordLabel": "Contraseña actual",
+      "newPasswordLabel": "Contraseña nueva",
+      "confirmPasswordLabel": "Confirmar contraseña nueva",
+      "passwordHint": "Usa al menos 12 caracteres.",
+      "passwordTooShort": "Usa una contraseña de al menos 12 caracteres.",
+      "passwordMismatch": "Las contraseñas no coinciden.",
+      "passwordRequired": "Introduce tu contraseña.",
+      "changePasswordSubmit": "Cambiar contraseña",
+      "changePasswordSubmitting": "Cambiando contraseña…",
+      "passwordChanged": "Contraseña cambiada.",
+      "passwordChangeFailed": "No pudimos cambiar tu contraseña. Comprueba tu contraseña actual e inténtalo de nuevo.",
+      "noVault": "Esta cuenta aún no tiene una clave de sincronización vinculada.",
+      "recoveryKeyTitle": "Clave de recuperación",
+      "recoveryKeyDescription": "Vuelve a introducir tu contraseña para ver la clave de recuperación de esta cuenta.",
+      "passwordLabel": "Contraseña",
+      "viewKeySubmit": "Ver clave de recuperación",
+      "viewKeySubmitting": "Comprobando…",
+      "viewKeyLabel": "Tu clave de recuperación",
+      "viewKeyFailed": "No pudimos mostrar la clave de recuperación. Comprueba tu contraseña e inténtalo de nuevo.",
+      "hideKey": "Ocultar",
+      "logout": "Cerrar sesión",
+      "deleteTitle": "Eliminar cuenta",
+      "deleteDescription": "Eliminar tu cuenta quita tu correo y tu inicio de sesión. Tus sesiones cifradas permanecen en el servidor de sincronización a menos que también elimines los datos en la nube.",
+      "deletePasswordLabel": "Tu contraseña",
+      "deleteCloudLabel": "Eliminar también los datos en la nube sincronizados con esta cuenta",
+      "deleteCloudHint": "Esto elimina todas las sesiones cifradas guardadas para la clave de sincronización de esta cuenta. Esta acción no se puede deshacer.",
+      "deleteSubmit": "Eliminar cuenta",
+      "deleteConfirmTitle": "¿Eliminar tu cuenta?",
+      "deleteConfirmMessage": "Tu cuenta y tus datos de inicio de sesión se eliminarán de forma permanente. Esta acción no se puede deshacer. Tu clave de sincronización seguirá funcionando en este dispositivo.",
+      "deleteCloudConfirmMessage": "Tu cuenta, tus datos de inicio de sesión y los datos en la nube de su clave de sincronización se eliminarán de forma permanente. Esta acción no se puede deshacer.",
+      "deleteConfirm": "Eliminar cuenta",
+      "deleteDeleting": "Eliminando cuenta…",
+      "deleteFailed": "No pudimos eliminar tu cuenta. Comprueba tu contraseña e inténtalo de nuevo.",
+      "loadFailed": "No pudimos cargar tu cuenta.",
+      "home": "Inicio",
+      "sessionsLink": "Sesiones guardadas",
+      "unlockTitle": "Desbloquea con tu contraseña",
+      "unlockDescription": "Tu cuenta ha iniciado sesión en este dispositivo, pero la clave de sincronización está bloqueada. Introduce tu contraseña para abrir tus sesiones guardadas.",
+      "unlockAccount": "Sesión iniciada como {email}",
+      "unlockSubmit": "Desbloquear",
+      "unlockSubmitting": "Desbloqueando…",
+      "unlockError": "No pudimos desbloquear tus sesiones. Comprueba tu contraseña e inténtalo de nuevo."
+    },
+    "landing": {
+      "title": "Abre tus pestañas guardadas",
+      "description": "Introduce tu clave de sincronización para ver tus sesiones guardadas. Todo se descifra en tu navegador.",
+      "keyLabel": "Clave de sincronización",
+      "keyPlaceholder": "ST-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-X",
+      "continue": "Continuar",
+      "invalidKey": "Esa clave de sincronización no es válida. Compruébala e inténtalo de nuevo.",
+      "loseKeyWarning": "Tu clave de sincronización es la única forma de descifrar tus sesiones. Si la pierdes, tus datos guardados no se podrán recuperar.",
+      "rememberLabel": "Recordar en este dispositivo",
+      "rememberWarning": "Úsalo solo en un dispositivo de confianza. La clave permanece en este navegador hasta que la borres.",
+      "privacyLink": "Política de privacidad",
+      "header": {
+        "account": "Cuenta"
+      },
+      "hero": {
+        "title": "Guarda cada pestaña. Recupéralas más tarde.",
+        "description": "SaveTabs guarda toda una ventana del navegador como una sesión, cierra las pestañas y las vuelve a abrir cuando las necesitas. Se ejecuta en tu navegador y mantiene tus sesiones en tu dispositivo.",
+        "chrome": "Añadir a Chrome",
+        "firefox": "Firefox",
+        "comingSoon": "Próximamente",
+        "noAccount": "No necesitas cuenta. El uso local funciona sin registrarte.",
+        "mockup": {
+          "save": "Guardar 12 pestañas",
+          "sessions": "Sesiones recientes",
+          "sessionOne": "Referencias de diseño",
+          "sessionTwo": "Lista de lectura",
+          "restore": "Restaurar",
+          "sync": "Sincronización activada"
+        }
+      },
+      "howItWorks": {
+        "title": "Cómo funciona",
+        "steps": {
+          "save": {
+            "title": "Guarda una ventana",
+            "body": "Abre la extensión y guarda todas las pestañas de la ventana actual como una sola sesión."
+          },
+          "close": {
+            "title": "Las pestañas se cierran",
+            "body": "SaveTabs cierra las pestañas guardadas para que tu navegador quede despejado."
+          },
+          "restore": {
+            "title": "Restaura más tarde",
+            "body": "Abre la sesión para recuperar todas las pestañas guardadas en una ventana nueva."
+          }
+        }
+      },
+      "privacy": {
+        "title": "Privacidad",
+        "items": {
+          "e2ee": {
+            "title": "Cifrado de extremo a extremo",
+            "body": "Las sesiones se cifran en tu navegador antes de subirse. El servidor almacena texto cifrado que no puede leer."
+          },
+          "keyOnly": {
+            "title": "Tu clave, tus datos",
+            "body": "La sincronización funciona con tu clave de sincronización. No se necesita cuenta y la clave nunca sale de tu navegador."
+          },
+          "localFirst": {
+            "title": "Local primero",
+            "body": "Sin sincronización, cada sesión permanece en el almacenamiento de la extensión de tu navegador."
+          },
+          "privateWindows": {
+            "title": "Las ventanas privadas se quedan en local",
+            "body": "Las sesiones guardadas desde ventanas privadas o de incógnito nunca se suben."
+          }
+        },
+        "link": "Leer la política de privacidad"
+      },
+      "features": {
+        "title": "Funciones",
+        "items": {
+          "search": {
+            "title": "Buscar sesiones",
+            "body": "Encuentra una sesión guardada por su nombre o por las pestañas que contiene."
+          },
+          "rename": {
+            "title": "Renombrar sesiones",
+            "body": "Dale a una sesión un nombre claro para encontrarla fácilmente más tarde."
+          },
+          "exportImport": {
+            "title": "Exportar e importar",
+            "body": "Mueve sesiones entre navegadores con un archivo JSON."
+          },
+          "autoDiscard": {
+            "title": "Descarte automático",
+            "body": "Descarta pestañas inactivas tras el tiempo que elijas, manteniendo abiertas las fijadas y las que reproducen audio."
+          },
+          "sync": {
+            "title": "Sincronización entre dispositivos",
+            "body": "Sincroniza sesiones cifradas entre tus dispositivos con tu clave de sincronización."
+          },
+          "privateWindows": {
+            "title": "Ventanas privadas",
+            "body": "Las sesiones de ventanas privadas se quedan en el dispositivo y nunca se suben."
+          }
+        }
+      },
+      "account": {
+        "title": "Mantén tus sesiones en todos tus dispositivos",
+        "description": "Una cuenta permite que un dispositivo nuevo desbloquee tus sesiones solo con tu correo y contraseña. Tu clave de sincronización sigue cifrándolo todo y el servidor nunca la ve.",
+        "create": "Crear cuenta",
+        "signIn": "Iniciar sesión",
+        "useKey": "o usa una clave de sincronización"
+      },
+      "install": {
+        "title": "Instalación y solución de problemas",
+        "items": {
+          "install": {
+            "title": "Instalación",
+            "body": "Abre la página de Chrome Web Store, elige Añadir a Chrome y fija SaveTabs en la barra de herramientas. Firefox aún no está publicado."
+          },
+          "uninstall": {
+            "title": "Desinstalación",
+            "body": "Elimina SaveTabs desde la página de extensiones de tu navegador. Las sesiones guardadas permanecen en el almacenamiento del navegador hasta que se borren los datos de la extensión."
+          },
+          "troubleshooting": {
+            "title": "Solución de problemas",
+            "body": "Si falla el guardado o la restauración, comprueba que SaveTabs esté activado y recarga la página. Después, inténtalo de nuevo con una sola ventana."
+          }
+        }
+      },
+      "footer": {
+        "privacy": "Privacidad",
+        "store": "Chrome Web Store"
+      }
+    },
+    "privacy": {
+      "back": "Back to SaveTabs",
+      "title": "Privacy policy",
+      "intro": "SaveTabs keeps your saved tab sessions on your device. If you turn on end-to-end encrypted sync, an encrypted copy is stored on the sync server. This page lists exactly what that copy contains and what never leaves your browser.",
+      "sections": {
+        "data": {
+          "title": "What the sync server stores",
+          "lead": "The sync server stores the following data for your key:",
+          "authId": "A public account id derived from your sync key. It appears in API URLs and cannot be turned back into the key.",
+          "authKeyHash": "A SHA-256 hash of the bearer credential derived from your sync key. The hash verifies requests and cannot be reversed into the credential.",
+          "blobs": "Encrypted session blobs: AES-GCM 256 ciphertext encoded as base64url, with a session id, update timestamp and byte size.",
+          "tombstones": "Deletion tombstones: a deleted session id and its deletion time. Tombstones sync deletions to your other devices and are pruned during later deletions once they are 30 days old.",
+          "timestamps": "Timestamps for when a sync key was first seen and last uploaded.",
+          "footer": "URLs, page titles, favicons and all other session data travel only inside the encrypted blobs. The server cannot read them, and we never receive your sync key. The server also keeps short-lived abuse-prevention rate-limit records keyed by client IP address and authId, plus daily aggregate request and key-registration counters; none of these contain URLs or page titles."
+        },
+        "e2ee": {
+          "title": "End-to-end encryption",
+          "body": "Encryption and decryption happen in your browser with the Web Crypto API. Session blobs use AES-GCM 256, and the encryption key is derived from your sync key with HKDF-SHA256. The key stays in your browser; the web app keeps it in this tab's session storage, or in local storage when you choose Remember on this device. Only ciphertext is uploaded. Without your key, the server and anyone else who obtains a blob cannot read it."
+        },
+        "incognito": {
+          "title": "Private and incognito sessions",
+          "body": "Sessions saved from private or incognito windows are marked local-only by the extension. They are never uploaded to the sync server and never appear in the web app."
+        },
+        "keyLoss": {
+          "title": "If you lose your sync key",
+          "body": "There is no account, email address or password to reset. The sync key is the only credential that can decrypt synced sessions. If you lose it, the encrypted data on the server cannot be recovered. Keep a safe copy; you can reveal and copy the key in the extension under Settings → Sync."
+        },
+        "delete": {
+          "title": "Deleting your data",
+          "body": "Local sessions stay in your browser until you delete them in the extension; clearing the extension's data or uninstalling it also removes them. To delete all cloud data for a sync key, open the extension, go to Settings → Sync and choose Delete cloud data. This removes the encrypted sessions, deletion tombstones and the key record for that sync key, and turns sync off so local sessions are not uploaded again. Rotating the sync key also deletes the data stored under the old key; if that deletion fails, import the old key and use Delete cloud data."
+        },
+        "analytics": {
+          "title": "No analytics or third parties",
+          "body": "The web app and extension contain no analytics, tracking pixels, advertising or third-party scripts. The web app loads only its own code and styles and uses no external fonts."
+        },
+        "contact": {
+          "title": "Contact",
+          "body": "Questions about this policy can be sent to support@azcom.dev."
+        }
+      }
+    },
+    "sessions": {
+      "title": "Sesiones guardadas",
+      "searchLabel": "Buscar sesiones",
+      "searchPlaceholder": "Buscar sesiones…",
+      "noResults": "Ninguna sesión coincide con tu búsqueda.",
+      "empty": "Aún no hay sesiones. Guarda pestañas con la extensión SaveTabs y vuelve a abrir esta página.",
+      "unknownKeyTitle": "No hay datos sincronizados para esta clave",
+      "unknownKey": "Esta clave de sincronización no tiene sesiones sincronizadas. Comprueba que la introdujiste correctamente o cambia a otra clave.",
+      "restore": "Restaurar",
+      "restoreHint": "Restaurar abre cada pestaña en una pestaña nueva del navegador. Permite las ventanas emergentes si el navegador lo solicita.",
+      "restoreSuccess": "Se abrieron {count} pestañas.",
+      "popupBlocked": "El navegador bloqueó {count} pestañas. Permite las ventanas emergentes para este sitio o abre las pestañas una a una.",
+      "copy": "Copiar",
+      "copySuccess": "Se copiaron {count} pestañas al portapapeles.",
+      "copyFailed": "No se pudieron copiar las pestañas.",
+      "export": "Exportar JSON",
+      "exportSuccess": "Se exportó {filename}.",
+      "exportFailed": "No se pudo exportar la sesión: {message}",
+      "delete": "Eliminar",
+      "deleteTitle": "¿Eliminar esta sesión?",
+      "deleteMessage": "Esta sesión se eliminará de forma permanente. Esta acción no se puede deshacer.",
+      "deleteConfirm": "Eliminar sesión",
+      "deleteSuccess": "Sesión eliminada.",
+      "deleteFailed": "No se pudo eliminar la sesión: {message}",
+      "authError": "Se rechazó tu clave de sincronización. Vuelve a introducir tu clave para continuar.",
+      "changeKey": "Cambiar clave",
+      "forgetKey": "Olvidar clave",
+      "forgetKeyTitle": "¿Olvidar la clave de sincronización?",
+      "forgetKeyMessage": "La clave se elimina de este navegador. Tus datos sincronizados permanecen en el servidor y podrás volver a abrirlos introduciendo la clave más adelante.",
+      "forgetKeyConfirm": "Olvidar clave",
+      "home": "Inicio",
+      "privacy": "Privacidad",
+      "decryptError": "Algunas sesiones no se pudieron descifrar y se omitieron ({count}).",
+      "loadFailed": "No se pudieron cargar tus sesiones guardadas.",
+      "noTabs": "Esta sesión no tiene pestañas."
+    },
+    "language": {
+      "toggle": "Cambiar idioma"
+    },
+    "theme": {
+      "toggle": "Cambiar tema",
+      "system": "Sistema",
+      "light": "Claro",
+      "dark": "Oscuro"
+    }
+  }
+}

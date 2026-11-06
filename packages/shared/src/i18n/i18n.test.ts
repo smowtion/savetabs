@@ -1,8 +1,57 @@
 import { describe, it, expect } from "vitest";
 import { SETTINGS_SCHEMA } from "../settings-schema";
+import en from "./en.json";
 import { createTranslator, missingKeys, resolveLang } from "./index";
+import { LANGS, LOCALES, localeDir } from "./locales";
+
+type JsonObject = { readonly [key: string]: string | JsonObject };
+
+/** Flatten a dictionary into dotted keys, matching the runtime flattening. */
+function flattenKeys(dictionary: JsonObject, prefix = ""): string[] {
+  return Object.entries(dictionary).flatMap(([key, value]) => {
+    const path = prefix === "" ? key : `${prefix}.${key}`;
+    return typeof value === "string" ? [path] : flattenKeys(value, path);
+  });
+}
+
+const ALL_EN_KEYS = flattenKeys(en as JsonObject);
+
+/** Keys the policy page renders in English for every locale. */
+function requiredKeys(locale: string): string[] {
+  return locale === "en" || locale === "vi"
+    ? ALL_EN_KEYS
+    : ALL_EN_KEYS.filter((key) => !key.startsWith("web.privacy."));
+}
 
 describe("i18n", () => {
+  it("registers the supported locales with their direction", () => {
+    expect(LANGS).toEqual(["en", "vi", "zh-CN", "es"]);
+    expect(LOCALES.map((locale) => locale.name)).toEqual([
+      "English",
+      "Tiếng Việt",
+      "简体中文",
+      "Español",
+    ]);
+    for (const locale of LOCALES) expect(localeDir(locale.code)).toBe(locale.dir);
+  });
+
+  it("has every English key in every locale", () => {
+    for (const locale of LANGS) {
+      expect(missingKeys(locale, requiredKeys(locale)), locale).toEqual([]);
+    }
+  });
+
+  it("resolves browser language prefixes", () => {
+    expect(resolveLang("auto", "zh-TW")).toBe("zh-CN");
+    expect(resolveLang("auto", "es-419")).toBe("es");
+    expect(resolveLang("auto", "xx")).toBe("en");
+  });
+
+  it("honors explicit language preferences over the browser", () => {
+    expect(resolveLang("zh-CN", "en-US")).toBe("zh-CN");
+    expect(resolveLang("es", "vi-VN")).toBe("es");
+  });
+
   it("resolves language and covers every schema string", () => {
     expect(resolveLang("auto", "vi-VN")).toBe("vi");
     expect(resolveLang("auto", "en-US")).toBe("en");
@@ -49,7 +98,7 @@ describe("i18n", () => {
     expect(missingKeys("vi", shellKeys)).toEqual([]);
   });
 
-  it("labels every enum option in both languages", () => {
+  it("labels every enum option in every language", () => {
     const optionKeys = SETTINGS_SCHEMA.flatMap((category) =>
       category.settings.flatMap((setting) =>
         setting.type === "enum"
@@ -61,8 +110,9 @@ describe("i18n", () => {
     );
 
     expect(optionKeys.length).toBeGreaterThan(0);
-    expect(missingKeys("en", optionKeys)).toEqual([]);
-    expect(missingKeys("vi", optionKeys)).toEqual([]);
+    for (const locale of LANGS) {
+      expect(missingKeys(locale, optionKeys), locale).toEqual([]);
+    }
   });
 
   it("covers the advanced actions strings in both languages", () => {

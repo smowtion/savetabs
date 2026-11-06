@@ -369,7 +369,9 @@
         "language": {
           "auto": "Automatic",
           "en": "English",
-          "vi": "Vietnamese"
+          "vi": "Vietnamese",
+          "zh-CN": "Chinese (Simplified)",
+          "es": "Spanish"
         }
       },
       "duplicates": {

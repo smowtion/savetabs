@@ -8,13 +8,30 @@
  */
 
 import en from "./en.json";
+import es from "./es.json";
 import vi from "./vi.json";
+import zhCN from "./zh-CN.json";
+import { LANGS } from "./locales";
 
 /** Supported UI languages. */
-export type Lang = "en" | "vi";
+export type Lang = "en" | "vi" | "zh-CN" | "es";
 
 /** Stored `general.language` preference; "auto" follows the browser language. */
 export type LanguagePreference = "auto" | Lang;
+
+/** True when a stored value is a supported language code. */
+export function isLang(value: unknown): value is Lang {
+  return (
+    typeof value === "string" && (LANGS as readonly string[]).includes(value)
+  );
+}
+
+/** True when a stored value is a usable `general.language` preference. */
+export function isLanguagePreference(
+  value: unknown,
+): value is LanguagePreference {
+  return value === "auto" || isLang(value);
+}
 
 /** Values available to `{placeholder}` interpolation in dictionary strings. */
 export type TranslationVars = Record<string, string | number>;
@@ -45,18 +62,38 @@ function flattenDictionary(
 const FLAT_DICTIONARIES: Readonly<Record<Lang, FlatDictionary>> = {
   en: flattenDictionary(en as Dictionary),
   vi: flattenDictionary(vi as Dictionary),
+  "zh-CN": flattenDictionary(zhCN as Dictionary),
+  es: flattenDictionary(es as Dictionary),
 };
+
+/**
+ * Browser language prefixes mapped to the closest supported locale.
+ *
+ * Later locales append one entry here; order does not matter because the
+ * prefixes do not overlap.
+ */
+const BROWSER_LANG_PREFIXES: readonly (readonly [string, Lang])[] = [
+  ["zh", "zh-CN"],
+  ["es", "es"],
+  ["vi", "vi"],
+];
 
 /**
  * Resolve the language to render.
  *
- * An explicit `"en"`/`"vi"` preference always wins. `"auto"` (or any unknown
- * value) follows the browser language: `vi*` renders Vietnamese, everything
- * else falls back to English.
+ * An explicit supported preference always wins. `"auto"` (or any unknown
+ * value) follows the browser language through the prefix table above, with
+ * English as the final fallback. Regional variants (e.g. `zh-TW`) map to the
+ * closest supported locale.
  */
 export function resolveLang(preference: LanguagePreference, navigatorLang: string): Lang {
-  if (preference === "en" || preference === "vi") return preference;
-  return navigatorLang.toLowerCase().startsWith("vi") ? "vi" : "en";
+  if (isLang(preference)) return preference;
+
+  const browserLang = navigatorLang.toLowerCase();
+  const match = BROWSER_LANG_PREFIXES.find(([prefix]) =>
+    browserLang.startsWith(prefix),
+  );
+  return match?.[1] ?? "en";
 }
 
 /** Replace `{name}` placeholders; unknown placeholders are left untouched. */
@@ -87,3 +124,5 @@ export function missingKeys(lang: Lang, keys: readonly string[]): string[] {
   const dictionary = FLAT_DICTIONARIES[lang];
   return keys.filter((key) => !dictionary.has(key));
 }
+
+export * from "./locales";

@@ -8,6 +8,7 @@
 
 import {
   createTranslator,
+  isLanguagePreference,
   resolveLang,
   type Lang,
   type LanguagePreference,
@@ -21,7 +22,7 @@ export type UseI18nResult = {
 };
 
 function normalizePreference(value: unknown): LanguagePreference {
-  return value === "en" || value === "vi" || value === "auto" ? value : "auto";
+  return isLanguagePreference(value) ? value : "auto";
 }
 
 function browserLanguage(): string {

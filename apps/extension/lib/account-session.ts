@@ -27,6 +27,7 @@ import {
   encodeSalt,
   formatKey,
   generateKey,
+  isLanguagePreference,
   parseKey,
   resolveLang,
   unwrapSyncKey,
@@ -64,10 +65,6 @@ export type AccountSessionResult = {
 /** Create a client bound to the configured account API. */
 export function createAccountClient(): AccountClient {
   return new AccountClient(API_BASE);
-}
-
-function isLanguagePreference(value: unknown): value is LanguagePreference {
-  return value === "auto" || value === "en" || value === "vi";
 }
 
 async function currentLocale(): Promise<LanguagePreference> {

@@ -8,6 +8,7 @@
  * coverage test in the extension package enforces that.
  */
 
+import { LANGS } from "./i18n/locales";
 import type { Settings } from "./types";
 
 /** Categories shown in the options sidebar, in display order. */
@@ -73,11 +74,11 @@ export const SETTINGS_SCHEMA: readonly SettingsCategory[] = [
       {
         key: "general.language",
         type: "enum",
-        values: ["auto", "en", "vi"],
+        values: ["auto", ...LANGS],
         default: "auto",
         labelKey: "settings.general.language.label",
         descriptionKey: "settings.general.language.description",
-        keywords: ["language", "locale", "english", "vietnamese", "i18n"],
+        keywords: ["language", "locale", "english", "vietnamese", "chinese", "spanish", "i18n"],
       },
       {
         key: "general.showBadgeCount",

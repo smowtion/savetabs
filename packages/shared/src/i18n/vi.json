@@ -369,7 +369,9 @@
         "language": {
           "auto": "Tự động",
           "en": "Tiếng Anh",
-          "vi": "Tiếng Việt"
+          "vi": "Tiếng Việt",
+          "zh-CN": "Tiếng Trung (Giản thể)",
+          "es": "Tiếng Tây Ban Nha"
         }
       },
       "duplicates": {

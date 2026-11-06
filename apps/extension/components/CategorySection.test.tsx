@@ -183,7 +183,13 @@ describe("CategorySection", () => {
       within(language)
         .getAllByRole("option")
         .map((option) => option.textContent),
-    ).toEqual(["Automatic", "English", "Vietnamese"]);
+    ).toEqual([
+      "Automatic",
+      "English",
+      "Vietnamese",
+      "Chinese (Simplified)",
+      "Spanish",
+    ]);
   });
 
   it("saves numeric enum values as numbers", async () => {
