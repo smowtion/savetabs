@@ -22,16 +22,18 @@ import {
   SyncClient,
   SyncHttpError,
   deriveKeys,
+  generateKey,
   parseKey,
   type Session,
   type Settings,
 } from "@savetabs/shared";
 import { browser } from "wxt/browser";
 
+import { loadAccountToken, reLinkAfterKeyChange } from "../account-session";
 import { API_BASE } from "../config";
 import { listSessions, updateSession } from "../sessions-repo";
 import { loadSettings, saveSettingNow } from "../settings";
-import { getKey, rotateKey } from "./key-store";
+import { getKey, setKey } from "./key-store";
 import {
   applySkipRebindIfPending,
   enqueueUpload,
@@ -233,30 +235,50 @@ export type RotateKeyResult = {
 /**
  * Rotate the sync key and revoke the old key's cloud data.
  *
- * The new key and its "upload" rebind decision are stored first, so a failed
- * revocation never rolls the rotation back. Deleting the old data is
- * best-effort: a 404 means it was already gone, and any other failure is
- * reported in the result instead of thrown. The old key is never logged.
+ * While signed in, the account password is required: the new key is linked to
+ * the account before anything else changes, because an account that still
+ * points at the old key would strand every later sign-in. A failed re-link
+ * aborts the rotation with the stored key untouched.
+ *
+ * Only after a successful re-link is the new key and its "upload" rebind
+ * decision stored. Deleting the old data is best-effort: a 404 means it was
+ * already gone, and any other failure is reported in the result instead of
+ * thrown. The old key is never logged.
  */
-export async function rotateSyncKey(): Promise<RotateKeyResult> {
-  const oldKey = await getKey();
-  const key = await rotateKey();
+export async function rotateSyncKey(
+  password?: string,
+): Promise<RotateKeyResult> {
+  const accountPassword = password ?? "";
+  const signedIn = (await loadAccountToken()) !== null;
+  if (signedIn && accountPassword.length === 0) {
+    throw new Error(
+      "Your account password is required to rotate the sync key.",
+    );
+  }
 
-  if (oldKey === undefined) return { key, revocation: "none" };
+  const oldKey = await getKey();
+  const key = generateKey();
+
+  // Persist the new key only after the account accepts it: on failure the
+  // stored key and the old cloud data both stay exactly as they were.
+  if (signedIn) await reLinkAfterKeyChange(key, accountPassword);
+  const storedKey = await setKey(key, "upload");
+
+  if (oldKey === undefined) return { key: storedKey, revocation: "none" };
 
   try {
     const derived = await deriveKeys(parseKey(oldKey));
     const client = new SyncClient(API_BASE, derived.authId, derived.authKey);
     await client.deleteAll();
-    return { key, revocation: "deleted" };
+    return { key: storedKey, revocation: "deleted" };
   } catch (error) {
     if (error instanceof SyncHttpError && error.status === 404) {
-      return { key, revocation: "deleted" };
+      return { key: storedKey, revocation: "deleted" };
     }
     console.error(
       "[savetabs] failed to delete cloud data for the previous key",
       error,
     );
-    return { key, revocation: "failed" };
+    return { key: storedKey, revocation: "failed" };
   }
 }

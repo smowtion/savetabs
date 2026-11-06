@@ -36,6 +36,8 @@ import { fakeBrowser } from "wxt/testing/fake-browser";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EXTENSION_ACCOUNT_TOKEN_KEY } from "../lib/account-session";
+import { SESSIONS_DB_NAME, closeSessionsDb } from "../lib/sessions-db";
+import { addSession } from "../lib/sessions-repo";
 import {
   SYNC_KEY_REBIND_STORAGE_KEY,
   getKey,
@@ -59,6 +61,7 @@ const { clientMock } = vi.hoisted(() => ({
     logout: vi.fn(),
     me: vi.fn(),
     linkKey: vi.fn(),
+    changePassword: vi.fn(),
   },
 }));
 
@@ -75,7 +78,9 @@ vi.mock("@savetabs/shared", async (importOriginal) => {
 const t = createTranslator("en");
 const EMAIL = "a@example.com";
 const PASSWORD = "a-long-password-123";
+const NEW_PASSWORD = "another-long-password-456";
 const TOKEN = "extension-account-token";
+const NEW_TOKEN = "replacement-account-token";
 const AUTH_ID = "vault-auth-id";
 const ACCOUNT_KEY = formatKey(new Uint8Array(16).fill(7));
 const DEVICE_KEY = formatKey(new Uint8Array(16).fill(9));
@@ -107,17 +112,32 @@ beforeAll(async () => {
   };
 }, 30_000);
 
-beforeEach(() => {
+function deleteSessionsDatabase(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.deleteDatabase(SESSIONS_DB_NAME);
+    request.onsuccess = () => resolve();
+    request.onerror = () =>
+      reject(request.error ?? new Error("deleteDatabase failed"));
+    request.onblocked = () => reject(new Error("deleteDatabase blocked"));
+  });
+}
+
+beforeEach(async () => {
   fakeBrowser.reset();
+  await closeSessionsDb();
+  await deleteSessionsDatabase();
   for (const mock of Object.values(clientMock)) mock.mockReset();
   clientMock.signup.mockResolvedValue({ ok: true });
   clientMock.logout.mockResolvedValue(undefined);
 });
 
-afterEach(() => {
+afterEach(async () => {
   cleanup();
   fakeBrowser.reset();
+  vi.unstubAllGlobals();
   vi.restoreAllMocks();
+  await closeSessionsDb();
+  await deleteSessionsDatabase();
 });
 
 function renderCard(): void {
@@ -359,4 +379,72 @@ describe("AccountCard", () => {
     await user.click(screen.getByRole("button", { name: "Use an account" }));
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
   });
+
+  it("asks before uploading local sessions when adopting a different vault", async () => {
+    await setKey(DEVICE_KEY, "skip");
+    await addSession({
+      id: "local-1",
+      createdAt: 1,
+      updatedAt: 1,
+      source: "window",
+      tabs: [],
+    });
+    clientMock.login.mockResolvedValue(await loginResult(ACCOUNT_KEY));
+    const confirmPrompt = vi.fn(() => true);
+    vi.stubGlobal("confirm", confirmPrompt);
+
+    const user = userEvent.setup();
+    renderCard();
+    await fillForm(user);
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    await screen.findByRole(
+      "button",
+      { name: "Sign out" },
+      { timeout: 15_000 },
+    );
+
+    expect(confirmPrompt).toHaveBeenCalledWith(
+      "Upload these sessions to this account?",
+    );
+    expect(await getKey()).toBe(ACCOUNT_KEY);
+    const rebind = await fakeBrowser.storage.local.get(
+      SYNC_KEY_REBIND_STORAGE_KEY,
+    );
+    expect(rebind[SYNC_KEY_REBIND_STORAGE_KEY]).toBe("upload");
+  }, 30_000);
+
+  it("changes the password and stores the replacement token", async () => {
+    await fakeBrowser.storage.local.set({
+      [EXTENSION_ACCOUNT_TOKEN_KEY]: TOKEN,
+    });
+    clientMock.me.mockResolvedValue(ACCOUNT);
+    clientMock.login.mockResolvedValue(await loginResult(ACCOUNT_KEY));
+    clientMock.changePassword.mockResolvedValue({ token: NEW_TOKEN });
+
+    const user = userEvent.setup();
+    renderCard();
+    await screen.findByRole(
+      "button",
+      { name: "Change password" },
+      { timeout: 15_000 },
+    );
+    await user.click(screen.getByRole("button", { name: "Change password" }));
+    await user.type(screen.getByLabelText("Current password"), PASSWORD);
+    await user.type(screen.getByLabelText("New password"), NEW_PASSWORD);
+    await user.click(screen.getByRole("button", { name: "Change password" }));
+
+    expect(
+      await screen.findByText(
+        "Password changed. Other sessions were signed out.",
+        {},
+        { timeout: 20_000 },
+      ),
+    ).toBeInTheDocument();
+    expect(clientMock.changePassword).toHaveBeenCalledTimes(1);
+    const [tokenArg, input] = clientMock.changePassword.mock.calls[0];
+    expect(tokenArg).toBe(TOKEN);
+    expect(input.oldAuthHash).toBe(material.authHash);
+    expect(typeof input.wrappedKey).toBe("string");
+    await expect(storedToken()).resolves.toBe(NEW_TOKEN);
+  }, 40_000);
 });

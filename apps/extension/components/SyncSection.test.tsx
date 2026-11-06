@@ -1,15 +1,44 @@
-import { createTranslator, formatKey, generateKey, parseKey } from "@savetabs/shared";
+import {
+  createTranslator,
+  deriveKeys,
+  formatKey,
+  generateKey,
+  parseKey,
+  type AccountProfile,
+} from "@savetabs/shared";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { fakeBrowser } from "wxt/testing/fake-browser";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { EXTENSION_ACCOUNT_TOKEN_KEY } from "../lib/account-session";
 import {
   SYNC_KEY_REBIND_STORAGE_KEY,
   SYNC_KEY_STORAGE_KEY,
 } from "../lib/sync/key-store";
 import { syncNow } from "../lib/sync/sync-service";
 import { SyncSection, maskKey } from "./SyncSection";
+
+const { clientMock } = vi.hoisted(() => ({
+  clientMock: {
+    signup: vi.fn(),
+    login: vi.fn(),
+    logout: vi.fn(),
+    me: vi.fn(),
+    linkKey: vi.fn(),
+    changePassword: vi.fn(),
+  },
+}));
+
+vi.mock("@savetabs/shared", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@savetabs/shared")>();
+  return {
+    ...actual,
+    AccountClient: function AccountClientMock() {
+      return clientMock;
+    },
+  };
+});
 
 vi.mock("../lib/sync/sync-service", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../lib/sync/sync-service")>();
@@ -18,6 +47,16 @@ vi.mock("../lib/sync/sync-service", async (importOriginal) => {
 
 const t = createTranslator("en");
 const syncNowMock = vi.mocked(syncNow);
+const EMAIL = "a@example.com";
+const PASSWORD = "a-long-password-123";
+const TOKEN = "extension-account-token";
+const ACCOUNT: AccountProfile = {
+  id: "account-1",
+  email: EMAIL,
+  emailVerified: true,
+  authId: "vault-auth-id",
+  locale: "en",
+};
 
 const originalClipboard = Object.getOwnPropertyDescriptor(
   navigator,
@@ -378,4 +417,117 @@ describe("SyncSection", () => {
       ),
     );
   });
+});
+
+describe("SyncSection with a signed-in account", () => {
+  beforeEach(async () => {
+    await fakeBrowser.storage.local.set({
+      [EXTENSION_ACCOUNT_TOKEN_KEY]: TOKEN,
+    });
+    clientMock.me.mockResolvedValue(ACCOUNT);
+    clientMock.linkKey.mockResolvedValue({ ok: true });
+  });
+
+  it("re-links the account before rotating and deleting old data", async () => {
+    const order: string[] = [];
+    clientMock.linkKey.mockImplementation(async () => {
+      order.push("relink");
+      return { ok: true };
+    });
+    const fetchMock = vi.fn<typeof fetch>().mockImplementation(async () => {
+      order.push("delete-old-data");
+      return new Response(null, { status: 204 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<SyncSection t={t} />);
+    await screen.findByTestId("sync-key-value");
+    const previous = await storedKey();
+
+    await userEvent.click(screen.getByRole("button", { name: "Rotate key" }));
+    await userEvent.type(
+      screen.getByLabelText("Type ROTATE to confirm"),
+      "ROTATE",
+    );
+    await userEvent.type(
+      await screen.findByLabelText("Account password"),
+      PASSWORD,
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Create new key" }));
+
+    expect(
+      await screen.findByText(
+        "New key created. Old cloud data was deleted. Local sessions will be uploaded under the new key.",
+        {},
+        { timeout: 20_000 },
+      ),
+    ).toBeInTheDocument();
+    expect(order).toEqual(["relink", "delete-old-data"]);
+
+    const rotated = await storedKey();
+    expect(rotated).not.toBe(previous);
+    const derived = await deriveKeys(parseKey(rotated));
+    const [tokenArg, body] = clientMock.linkKey.mock.calls[0];
+    expect(tokenArg).toBe(TOKEN);
+    expect(body).toMatchObject({
+      authId: derived.authId,
+      replace: true,
+    });
+  }, 40_000);
+
+  it("requires the account password before rotating", async () => {
+    render(<SyncSection t={t} />);
+    await screen.findByTestId("sync-key-value");
+    const previous = await storedKey();
+
+    await userEvent.click(screen.getByRole("button", { name: "Rotate key" }));
+    await userEvent.type(
+      screen.getByLabelText("Type ROTATE to confirm"),
+      "ROTATE",
+    );
+    await screen.findByLabelText("Account password");
+    await userEvent.click(screen.getByRole("button", { name: "Create new key" }));
+
+    expect(
+      await screen.findByText(
+        "Enter your account password to change the sync key.",
+      ),
+    ).toBeInTheDocument();
+    await expect(storedKey()).resolves.toBe(previous);
+    expect(clientMock.linkKey).not.toHaveBeenCalled();
+  });
+
+  it("aborts an import when the account re-link fails", async () => {
+    clientMock.linkKey.mockRejectedValue(new Error("link rejected"));
+
+    render(<SyncSection t={t} />);
+    await screen.findByTestId("sync-key-value");
+    const previous = await storedKey();
+
+    await userEvent.type(
+      screen.getByLabelText("Import key"),
+      generateKey(),
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Import key" }));
+    await userEvent.type(
+      await screen.findByLabelText("Account password"),
+      PASSWORD,
+    );
+    await userEvent.click(
+      screen.getByRole("button", { name: "Upload local sessions" }),
+    );
+
+    expect(
+      await screen.findByText(
+        "Could not update the account key. Your sync key was not changed.",
+        {},
+        { timeout: 20_000 },
+      ),
+    ).toBeInTheDocument();
+    await expect(storedKey()).resolves.toBe(previous);
+    expect(clientMock.linkKey).toHaveBeenCalledTimes(1);
+    expect(clientMock.linkKey.mock.calls[0][1]).toMatchObject({
+      replace: true,
+    });
+  }, 40_000);
 });

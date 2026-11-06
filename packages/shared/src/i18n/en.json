@@ -285,7 +285,11 @@
       "deleteCloudSuccess": "Cloud data deleted. Sync was turned off so local sessions are not uploaded again. You can re-enable sync later.",
       "enableConfirmTitle": "Enable encrypted sync?",
       "enableConfirmMessage": "Make sure you saved your sync key. It is the only way to recover synced data. You can reveal and copy it in the Sync section.",
-      "enableConfirm": "Enable sync"
+      "enableConfirm": "Enable sync",
+      "accountPasswordLabel": "Account password",
+      "accountPasswordHint": "Required to update the key linked to your account.",
+      "accountPasswordRequired": "Enter your account password to change the sync key.",
+      "keyRelinkFailed": "Could not update the account key. Your sync key was not changed."
     },
     "account": {
       "title": "Account",
@@ -313,7 +317,14 @@
       "recoveryMessage": "This key is the only way to recover your encrypted sessions. It will not be shown again.",
       "recoveryKeyLabel": "Your key",
       "recoveryConfirm": "I saved it",
-      "recoveryContinue": "Continue"
+      "recoveryContinue": "Continue",
+      "changePassword": "Change password",
+      "currentPasswordLabel": "Current password",
+      "newPasswordLabel": "New password",
+      "changePasswordSubmit": "Change password",
+      "changePasswordSubmitting": "Changing password…",
+      "changePasswordSuccess": "Password changed. Other sessions were signed out.",
+      "changePasswordFailed": "We could not change your password. Check your current password."
     },
     "advanced": {
       "label": "Advanced",

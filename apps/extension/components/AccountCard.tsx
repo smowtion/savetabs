@@ -3,9 +3,9 @@
  *
  * Signed out, it offers email/password sign-in, inline account creation and a
  * "use a key instead" exit that leaves the existing key management visible.
- * Signed in, it shows the account email, its verification state and sign-out.
- * Password change is intentionally not offered yet: it needs the key
- * re-link flow, so the button is absent rather than nonfunctional.
+ * Signed in, it shows the account email, its verification state, sign-out and
+ * password change. Changing the password re-wraps the account's sync key, so
+ * the form asks for the current password before calling the session module.
  *
  * The card never owns key material. All derivations, vault operations and
  * token storage live in `lib/account-session`; this component only holds form
@@ -16,6 +16,7 @@ import type { AccountProfile, Translator } from "@savetabs/shared";
 import { useEffect, useId, useState, type FormEvent } from "react";
 
 import {
+  changePassword,
   getAccount,
   signIn,
   signOut,
@@ -38,7 +39,7 @@ export type AccountCardProps = {
   t: Translator;
 };
 
-type PendingAction = "sign-in" | "sign-up" | "sign-out";
+type PendingAction = "sign-in" | "sign-up" | "sign-out" | "change-password";
 
 type Status = {
   kind: "success" | "error";
@@ -90,8 +91,13 @@ export function AccountCard({ t }: AccountCardProps) {
   const [status, setStatus] = useState<Status | null>(null);
   const [recoveryKey, setRecoveryKey] = useState<string | null>(null);
   const [keyOnly, setKeyOnly] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const emailId = useId();
   const passwordId = useId();
+  const currentPasswordId = useId();
+  const newPasswordId = useId();
 
   // A token from an earlier session opens the card signed in. A revoked token
   // is cleared by `getAccount`, which leaves the sign-in form in place.
@@ -188,6 +194,56 @@ export function AccountCard({ t }: AccountCardProps) {
     }
   }
 
+  function beginPasswordChange(): void {
+    setChangingPassword(true);
+    setCurrentPassword("");
+    setNewPassword("");
+    setStatus(null);
+  }
+
+  function cancelPasswordChange(): void {
+    setChangingPassword(false);
+    setCurrentPassword("");
+    setNewPassword("");
+  }
+
+  async function submitPasswordChange(
+    event: FormEvent<HTMLFormElement>,
+  ): Promise<void> {
+    event.preventDefault();
+    if (pending !== null) return;
+    if (newPassword.length < MIN_PASSWORD_LENGTH) {
+      setStatus({
+        kind: "error",
+        message: t("settings.account.passwordTooShort"),
+      });
+      return;
+    }
+
+    setPending("change-password");
+    setStatus(null);
+
+    try {
+      // The session module proves the current password, re-wraps the account's
+      // key under the new one and stores the replacement token.
+      await changePassword(currentPassword, newPassword);
+      setChangingPassword(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setStatus({
+        kind: "success",
+        message: t("settings.account.changePasswordSuccess"),
+      });
+    } catch {
+      setStatus({
+        kind: "error",
+        message: t("settings.account.changePasswordFailed"),
+      });
+    } finally {
+      setPending(null);
+    }
+  }
+
   const statusBanner =
     status !== null ? <StatusBanner status={status} /> : null;
 
@@ -214,7 +270,7 @@ export function AccountCard({ t }: AccountCardProps) {
             <VerificationBadge verified={account.emailVerified} t={t} />
           </div>
         </div>
-        <div>
+        <div className="flex flex-wrap gap-2">
           <button
             type="button"
             disabled={pending !== null}
@@ -223,7 +279,80 @@ export function AccountCard({ t }: AccountCardProps) {
           >
             {t("settings.account.signOut")}
           </button>
+          {!changingPassword && (
+            <button
+              type="button"
+              disabled={pending !== null}
+              onClick={beginPasswordChange}
+              className={BUTTON_CLASS}
+            >
+              {t("settings.account.changePassword")}
+            </button>
+          )}
         </div>
+        {changingPassword && (
+          <form
+            onSubmit={(event) => void submitPasswordChange(event)}
+            noValidate
+            className="flex flex-col gap-2"
+          >
+            <div>
+              <label
+                htmlFor={currentPasswordId}
+                className="block text-xs font-medium text-neutral-700 dark:text-neutral-300"
+              >
+                {t("settings.account.currentPasswordLabel")}
+              </label>
+              <input
+                id={currentPasswordId}
+                type="password"
+                autoComplete="current-password"
+                value={currentPassword}
+                onChange={(event) => setCurrentPassword(event.target.value)}
+                className={INPUT_CLASS}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor={newPasswordId}
+                className="block text-xs font-medium text-neutral-700 dark:text-neutral-300"
+              >
+                {t("settings.account.newPasswordLabel")}
+              </label>
+              <input
+                id={newPasswordId}
+                type="password"
+                autoComplete="new-password"
+                value={newPassword}
+                onChange={(event) => setNewPassword(event.target.value)}
+                className={INPUT_CLASS}
+              />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="submit"
+                disabled={
+                  pending !== null ||
+                  currentPassword === "" ||
+                  newPassword === ""
+                }
+                className={PRIMARY_BUTTON_CLASS}
+              >
+                {pending === "change-password"
+                  ? t("settings.account.changePasswordSubmitting")
+                  : t("settings.account.changePasswordSubmit")}
+              </button>
+              <button
+                type="button"
+                disabled={pending === "change-password"}
+                onClick={cancelPasswordChange}
+                className={BUTTON_CLASS}
+              >
+                {t("common.cancel")}
+              </button>
+            </div>
+          </form>
+        )}
         {statusBanner}
         {recoveryDialog}
       </div>

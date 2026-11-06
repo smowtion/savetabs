@@ -285,7 +285,11 @@
       "deleteCloudSuccess": "Đã xóa dữ liệu đám mây. Đồng bộ đã được tắt để các phiên cục bộ không bị tải lên lại. Bạn có thể bật lại đồng bộ sau.",
       "enableConfirmTitle": "Bật đồng bộ mã hóa đầu cuối?",
       "enableConfirmMessage": "Hãy đảm bảo bạn đã lưu khóa đồng bộ. Đây là cách duy nhất để khôi phục dữ liệu đã đồng bộ. Bạn có thể hiện và sao chép khóa trong mục Đồng bộ.",
-      "enableConfirm": "Bật đồng bộ"
+      "enableConfirm": "Bật đồng bộ",
+      "accountPasswordLabel": "Mật khẩu tài khoản",
+      "accountPasswordHint": "Cần thiết để cập nhật khóa liên kết với tài khoản.",
+      "accountPasswordRequired": "Nhập mật khẩu tài khoản để đổi khóa đồng bộ.",
+      "keyRelinkFailed": "Không thể cập nhật khóa tài khoản. Khóa đồng bộ của bạn không thay đổi."
     },
     "account": {
       "title": "Tài khoản",
@@ -313,7 +317,14 @@
       "recoveryMessage": "Đây là cách duy nhất để khôi phục các phiên đã mã hóa của bạn. Khóa sẽ không được hiển thị lại.",
       "recoveryKeyLabel": "Khóa của bạn",
       "recoveryConfirm": "Tôi đã lưu rồi",
-      "recoveryContinue": "Tiếp tục"
+      "recoveryContinue": "Tiếp tục",
+      "changePassword": "Đổi mật khẩu",
+      "currentPasswordLabel": "Mật khẩu hiện tại",
+      "newPasswordLabel": "Mật khẩu mới",
+      "changePasswordSubmit": "Đổi mật khẩu",
+      "changePasswordSubmitting": "Đang đổi mật khẩu…",
+      "changePasswordSuccess": "Đã đổi mật khẩu. Các phiên khác đã được đăng xuất.",
+      "changePasswordFailed": "Không thể đổi mật khẩu. Hãy kiểm tra mật khẩu hiện tại."
     },
     "advanced": {
       "label": "Nâng cao",

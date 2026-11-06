@@ -11,12 +11,21 @@
  * deleting cloud data) live in the {@link SyncStatus} panel it renders first.
  * Enabling sync itself is guarded by the options shell, which asks the user to
  * confirm the key was saved before flipping `sync.enabled`.
+ *
+ * While an account is signed in, a key change must re-point the account at the
+ * new key before it takes effect locally, so rotation and import ask for the
+ * account password and call the re-link helper first.
  */
 
 import { formatKey, parseKey, type Translator } from "@savetabs/shared";
 import { useEffect, useId, useState, type FormEvent } from "react";
 import { browser } from "wxt/browser";
 
+import {
+  EXTENSION_ACCOUNT_TOKEN_KEY,
+  loadAccountToken,
+  reLinkAfterKeyChange,
+} from "../lib/account-session";
 import { copyText } from "../lib/clipboard-write";
 import {
   SYNC_KEY_REBIND_STORAGE_KEY,
@@ -79,8 +88,28 @@ export function SyncSection({ t, syncEnabled = false }: SyncSectionProps) {
   const [pendingImport, setPendingImport] = useState<string | null>(null);
   const [rotating, setRotating] = useState(false);
   const [rotateConfirm, setRotateConfirm] = useState("");
+  // Key changes re-link the account while signed in, so both flows collect the
+  // account password. The state follows the account token across contexts.
+  const [signedIn, setSignedIn] = useState(false);
+  const [accountPassword, setAccountPassword] = useState("");
   const importInputId = useId();
+  const importPasswordId = useId();
   const rotateConfirmId = useId();
+  const rotatePasswordId = useId();
+
+  useEffect(() => {
+    let active = true;
+    loadAccountToken()
+      .then((token) => {
+        if (active) setSignedIn(token !== null);
+      })
+      .catch(() => {
+        if (active) setSignedIn(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -125,12 +154,23 @@ export function SyncSection({ t, syncEnabled = false }: SyncSectionProps) {
       typeof browser.storage.onChanged.addListener
     >[0] = (changes, areaName) => {
       if (areaName !== "local") return;
-      if (
-        !(SYNC_KEY_STORAGE_KEY in changes) &&
-        !(SYNC_KEY_REBIND_STORAGE_KEY in changes)
-      ) {
-        return;
+      const keyChanged =
+        SYNC_KEY_STORAGE_KEY in changes ||
+        SYNC_KEY_REBIND_STORAGE_KEY in changes;
+      const tokenChanged = EXTENSION_ACCOUNT_TOKEN_KEY in changes;
+      if (!keyChanged && !tokenChanged) return;
+
+      if (tokenChanged) {
+        void loadAccountToken()
+          .then((token) => {
+            if (active) setSignedIn(token !== null);
+          })
+          .catch(() => {
+            if (active) setSignedIn(false);
+          });
       }
+      if (!keyChanged) return;
+
       void refresh().catch((error) => {
         if (!active) return;
         setStatus({
@@ -163,11 +203,34 @@ export function SyncSection({ t, syncEnabled = false }: SyncSectionProps) {
 
   async function applyImport(rebind: RebindMode): Promise<void> {
     if (pendingImport === null) return;
+    if (signedIn && accountPassword.length === 0) {
+      setStatus({
+        kind: "error",
+        message: t("settings.sync.accountPasswordRequired"),
+      });
+      return;
+    }
+
+    // Point the account at the imported key before it becomes the local key:
+    // a failed re-link aborts the import with the old key still in place.
+    if (signedIn) {
+      try {
+        await reLinkAfterKeyChange(pendingImport, accountPassword);
+      } catch {
+        setStatus({
+          kind: "error",
+          message: t("settings.sync.keyRelinkFailed"),
+        });
+        return;
+      }
+    }
+
     try {
       const stored = await setKey(pendingImport, rebind);
       setKeyValue(stored);
       setPendingImport(null);
       setImportValue("");
+      setAccountPassword("");
       setRevealed(false);
       setStatus({
         kind: "success",
@@ -200,22 +263,34 @@ export function SyncSection({ t, syncEnabled = false }: SyncSectionProps) {
   function beginRotation(): void {
     setRotating(true);
     setRotateConfirm("");
+    setAccountPassword("");
     setStatus(null);
   }
 
   function cancelRotation(): void {
     setRotating(false);
     setRotateConfirm("");
+    setAccountPassword("");
   }
 
   async function confirmRotation(): Promise<void> {
     if (rotateConfirm !== ROTATE_CONFIRMATION) return;
+    if (signedIn && accountPassword.length === 0) {
+      setStatus({
+        kind: "error",
+        message: t("settings.sync.accountPasswordRequired"),
+      });
+      return;
+    }
     try {
-      const result = await rotateSyncKey();
+      const result = await rotateSyncKey(
+        signedIn ? accountPassword : undefined,
+      );
       setKeyValue(result.key);
       setRevealed(false);
       setRotating(false);
       setRotateConfirm("");
+      setAccountPassword("");
       setStatus({
         kind: "success",
         message:
@@ -328,6 +403,27 @@ export function SyncSection({ t, syncEnabled = false }: SyncSectionProps) {
           <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
             {t("settings.sync.importPromptHint")}
           </p>
+          {signedIn && (
+            <div className="mt-2">
+              <label
+                htmlFor={importPasswordId}
+                className="block text-xs font-medium text-neutral-700 dark:text-neutral-300"
+              >
+                {t("settings.sync.accountPasswordLabel")}
+              </label>
+              <input
+                id={importPasswordId}
+                type="password"
+                autoComplete="current-password"
+                value={accountPassword}
+                onChange={(event) => setAccountPassword(event.target.value)}
+                className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-2 py-1.5 text-sm dark:border-neutral-700 dark:bg-neutral-900"
+              />
+              <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                {t("settings.sync.accountPasswordHint")}
+              </p>
+            </div>
+          )}
           <div className="mt-2 flex flex-wrap gap-2">
             <button
               type="button"
@@ -369,6 +465,27 @@ export function SyncSection({ t, syncEnabled = false }: SyncSectionProps) {
           <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
             {t("settings.sync.rotateWarning")}
           </p>
+          {signedIn && (
+            <div className="mt-2">
+              <label
+                htmlFor={rotatePasswordId}
+                className="block text-xs font-medium text-neutral-700 dark:text-neutral-300"
+              >
+                {t("settings.sync.accountPasswordLabel")}
+              </label>
+              <input
+                id={rotatePasswordId}
+                type="password"
+                autoComplete="current-password"
+                value={accountPassword}
+                onChange={(event) => setAccountPassword(event.target.value)}
+                className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-2 py-1.5 text-sm dark:border-neutral-700 dark:bg-neutral-900"
+              />
+              <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                {t("settings.sync.accountPasswordHint")}
+              </p>
+            </div>
+          )}
           <label
             htmlFor={rotateConfirmId}
             className="mt-2 block text-xs font-medium text-neutral-700 dark:text-neutral-300"
