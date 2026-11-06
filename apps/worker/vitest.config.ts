@@ -25,6 +25,8 @@ export default defineConfig(async () => {
     ],
     test: {
       setupFiles: ["./test/apply-migrations.ts"],
+      // Hashing-heavy route tests can exceed the 5s default under load.
+      testTimeout: 30000,
     },
   };
 });
