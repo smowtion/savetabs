@@ -458,7 +458,8 @@
       "light": "فاتح",
       "dark": "داكن",
       "toggle": "المظهر: {theme}"
-    }
+    },
+    "changelog": "سجل التغييرات"
   },
   "contextMenu": {
     "saveTab": "حفظ علامة التبويب هذه",
@@ -822,7 +823,8 @@
       "footer": {
         "privacy": "الخصوصية",
         "store": "Chrome Web Store",
-        "firefoxStore": "إضافات Firefox"
+        "firefoxStore": "إضافات Firefox",
+        "changelog": "سجل التغييرات"
       },
       "faq": {
         "title": "أسئلتك وإجاباتها",
@@ -900,6 +902,12 @@
       "system": "النظام",
       "light": "فاتح",
       "dark": "داكن"
+    },
+    "changelog": {
+      "title": "سجل التغييرات",
+      "subtitle": "ما تغير في كل إصدار من SaveTabs.",
+      "back": "العودة إلى SaveTabs",
+      "latest": "الأحدث"
     }
   }
 }

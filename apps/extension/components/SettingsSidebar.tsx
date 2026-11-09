@@ -9,6 +9,24 @@ import {
   type CategoryId,
   type Translator,
 } from "@savetabs/shared";
+import {
+  Clipboard,
+  Cloud,
+  Copy,
+  EyeOff,
+  Gauge,
+  History,
+  Keyboard,
+  Layers,
+  Link as LinkIcon,
+  MousePointerClick,
+  PanelTopOpen,
+  Pin,
+  RotateCcw,
+  Settings,
+  Wrench,
+} from "lucide-react";
+import { browser } from "wxt/browser";
 
 export type SettingsSidebarProps = {
   activeCategory: CategoryId;
@@ -23,14 +41,49 @@ const CATEGORIES = SETTINGS_SCHEMA.map((category) => ({
   count: category.settings.length,
 }));
 
+const CATEGORY_ICONS = {
+  general: Settings,
+  tabs: Layers,
+  duplicates: Copy,
+  pinned: Pin,
+  open: PanelTopOpen,
+  urlDisplay: LinkIcon,
+  restore: RotateCcw,
+  clipboard: Clipboard,
+  contextMenu: MousePointerClick,
+  memory: Gauge,
+  shortcuts: Keyboard,
+  incognito: EyeOff,
+  sync: Cloud,
+  advanced: Wrench,
+} as const;
+
+const CHANGELOG_URL = "https://savetabs.azcom.dev/changelog";
+
 export function SettingsSidebar({
   activeCategory,
   onSelect,
   t,
 }: SettingsSidebarProps) {
+  let version = "";
+  try {
+    version = browser.runtime.getManifest().version ?? "";
+  } catch {
+    // The fake browser used by unit tests does not implement getManifest.
+  }
+
   return (
     <aside className="flex w-full shrink-0 flex-col gap-3 border-b border-neutral-200 bg-white px-3 py-4 dark:border-neutral-800 dark:bg-neutral-950 min-[900px]:sticky min-[900px]:top-0 min-[900px]:h-screen min-[900px]:w-[220px] min-[900px]:border-b-0 min-[900px]:border-e">
-      <div className="px-2 text-lg font-semibold tracking-tight">SaveTabs</div>
+      <div className="flex items-center gap-2 px-2">
+        <img
+          src="/icon/icon-32.png"
+          alt=""
+          width={28}
+          height={28}
+          className="size-7 rounded-lg"
+        />
+        <span className="text-lg font-semibold tracking-tight">SaveTabs</span>
+      </div>
 
       <select
         aria-label={t("options.categories")}
@@ -54,19 +107,23 @@ export function SettingsSidebar({
         <ul className="flex flex-col gap-1">
           {CATEGORIES.map((category) => {
             const active = category.id === activeCategory;
+            const Icon = CATEGORY_ICONS[category.id];
             return (
               <li key={category.id}>
                 <button
                   type="button"
                   aria-current={active ? "page" : undefined}
                   onClick={() => onSelect(category.id)}
-                  className={`flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-start text-sm transition-colors ${
+                  className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-start text-sm transition-colors ${
                     active
                       ? "bg-neutral-900 font-medium text-white dark:bg-neutral-100 dark:text-neutral-900"
                       : "text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-900"
                   }`}
                 >
-                  <span>{t(category.labelKey)}</span>
+                  <Icon aria-hidden="true" className="size-4 shrink-0" />
+                  <span className="min-w-0 flex-1 truncate">
+                    {t(category.labelKey)}
+                  </span>
                   <span
                     className={`rounded-full px-1.5 text-xs tabular-nums ${
                       active
@@ -82,6 +139,19 @@ export function SettingsSidebar({
           })}
         </ul>
       </nav>
+
+      <div className="mt-auto flex flex-col gap-1 border-t border-neutral-200 px-2 pt-3 text-xs text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
+        {version !== "" && <span className="tabular-nums">v{version}</span>}
+        <a
+          href={CHANGELOG_URL}
+          target="_blank"
+          rel="noreferrer noopener"
+          className="inline-flex items-center gap-1.5 font-medium text-indigo-600 underline-offset-4 hover:underline dark:text-indigo-400"
+        >
+          <History aria-hidden="true" className="size-3.5" />
+          {t("options.changelog")}
+        </a>
+      </div>
     </aside>
   );
 }

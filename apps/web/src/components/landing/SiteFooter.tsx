@@ -35,6 +35,9 @@ export function SiteFooter({ t }: Props) {
           <Link to="/privacy" className={TEXT_LINK_CLASS}>
             {t("web.landing.footer.privacy")}
           </Link>
+          <Link to="/changelog" className={TEXT_LINK_CLASS}>
+            {t("web.landing.footer.changelog")}
+          </Link>
           <a
             href={CHROME_STORE_URL}
             target="_blank"

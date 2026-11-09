@@ -18,6 +18,7 @@
  */
 
 import { formatKey, parseKey, type Translator } from "@savetabs/shared";
+import { Copy, Download, Eye, EyeOff, KeyRound, Upload, X } from "lucide-react";
 import { useEffect, useId, useState, type FormEvent } from "react";
 import { browser } from "wxt/browser";
 
@@ -43,11 +44,11 @@ import { SyncStatus } from "./SyncStatus";
 const ROTATE_CONFIRMATION = "ROTATE";
 
 const BUTTON_CLASS =
-  "rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800";
+  "inline-flex items-center gap-1.5 rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800";
 const PRIMARY_BUTTON_CLASS =
-  "rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50";
+  "inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50";
 const DANGER_BUTTON_CLASS =
-  "rounded-md border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-50 disabled:opacity-50 dark:border-red-900 dark:bg-neutral-900 dark:text-red-400 dark:hover:bg-red-950";
+  "inline-flex items-center gap-1.5 rounded-md border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-50 disabled:opacity-50 dark:border-red-900 dark:bg-neutral-900 dark:text-red-400 dark:hover:bg-red-950";
 
 export type SyncSectionProps = {
   t: Translator;
@@ -335,6 +336,11 @@ export function SyncSection({ t, syncEnabled = false }: SyncSectionProps) {
             onClick={() => setRevealed((current) => !current)}
             className={BUTTON_CLASS}
           >
+            {revealed ? (
+              <EyeOff aria-hidden="true" className="size-4" />
+            ) : (
+              <Eye aria-hidden="true" className="size-4" />
+            )}
             {revealed ? t("settings.sync.hideKey") : t("settings.sync.revealKey")}
           </button>
           <button
@@ -343,6 +349,7 @@ export function SyncSection({ t, syncEnabled = false }: SyncSectionProps) {
             onClick={() => void copyKey()}
             className={BUTTON_CLASS}
           >
+            <Copy aria-hidden="true" className="size-4" />
             {t("settings.sync.copyKey")}
           </button>
         </div>
@@ -387,6 +394,7 @@ export function SyncSection({ t, syncEnabled = false }: SyncSectionProps) {
           disabled={importValue.trim() === ""}
           className={BUTTON_CLASS}
         >
+          <Download aria-hidden="true" className="size-4" />
           {t("settings.sync.importLabel")}
         </button>
       </form>
@@ -431,6 +439,7 @@ export function SyncSection({ t, syncEnabled = false }: SyncSectionProps) {
               onClick={() => void applyImport("upload")}
               className={PRIMARY_BUTTON_CLASS}
             >
+              <Upload aria-hidden="true" className="size-4" />
               {t("settings.sync.importUpload")}
             </button>
             <button
@@ -438,6 +447,7 @@ export function SyncSection({ t, syncEnabled = false }: SyncSectionProps) {
               onClick={() => void applyImport("skip")}
               className={BUTTON_CLASS}
             >
+              <X aria-hidden="true" className="size-4" />
               {t("settings.sync.importSkip")}
             </button>
           </div>
@@ -452,6 +462,7 @@ export function SyncSection({ t, syncEnabled = false }: SyncSectionProps) {
             onClick={beginRotation}
             className={DANGER_BUTTON_CLASS}
           >
+            <KeyRound aria-hidden="true" className="size-4" />
             {t("settings.sync.rotateKey")}
           </button>
         </div>
@@ -509,6 +520,7 @@ export function SyncSection({ t, syncEnabled = false }: SyncSectionProps) {
               onClick={() => void confirmRotation()}
               className={DANGER_BUTTON_CLASS}
             >
+              <KeyRound aria-hidden="true" className="size-4" />
               {t("settings.sync.rotateConfirm")}
             </button>
             <button

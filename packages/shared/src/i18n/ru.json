@@ -458,7 +458,8 @@
       "light": "Светлая",
       "dark": "Темная",
       "toggle": "Тема: {theme}"
-    }
+    },
+    "changelog": "Журнал изменений"
   },
   "contextMenu": {
     "saveTab": "Сохранить эту вкладку",
@@ -822,7 +823,8 @@
       "footer": {
         "privacy": "Конфиденциальность",
         "store": "Chrome Web Store",
-        "firefoxStore": "Дополнения Firefox"
+        "firefoxStore": "Дополнения Firefox",
+        "changelog": "Журнал изменений"
       },
       "faq": {
         "title": "Ответы на вопросы",
@@ -900,6 +902,12 @@
       "system": "Системная",
       "light": "Светлая",
       "dark": "Темная"
+    },
+    "changelog": {
+      "title": "Журнал изменений",
+      "subtitle": "Что изменилось в каждой версии SaveTabs.",
+      "back": "Назад в SaveTabs",
+      "latest": "Последняя"
     }
   }
 }

@@ -458,7 +458,8 @@
       "light": "Hell",
       "dark": "Dunkel",
       "toggle": "Design: {theme}"
-    }
+    },
+    "changelog": "Änderungsprotokoll"
   },
   "contextMenu": {
     "saveTab": "Diesen Tab speichern",
@@ -822,7 +823,8 @@
       "footer": {
         "privacy": "Datenschutz",
         "store": "Chrome Web Store",
-        "firefoxStore": "Firefox-Add-ons"
+        "firefoxStore": "Firefox-Add-ons",
+        "changelog": "Änderungsprotokoll"
       },
       "faq": {
         "title": "Deine Fragen, beantwortet",
@@ -900,6 +902,12 @@
       "system": "System",
       "light": "Hell",
       "dark": "Dunkel"
+    },
+    "changelog": {
+      "title": "Änderungsprotokoll",
+      "subtitle": "Was sich in jeder SaveTabs-Version geändert hat.",
+      "back": "Zurück zu SaveTabs",
+      "latest": "Neueste"
     }
   }
 }

@@ -110,6 +110,7 @@ const WEB_TRANSLATION_KEYS = [
   "web.landing.footer.privacy",
   "web.landing.footer.store",
   "web.landing.footer.firefoxStore",
+  "web.landing.footer.changelog",
   "web.landing.faq.title",
   "web.landing.faq.subtitle",
   "web.landing.faq.items.account.q",
@@ -425,6 +426,10 @@ describe("Landing", () => {
     expect(
       screen.getByRole("link", { name: "Firefox Add-ons" }),
     ).toHaveAttribute("href", FIREFOX_STORE_URL);
+    expect(screen.getByRole("link", { name: "Changelog" })).toHaveAttribute(
+      "href",
+      "/changelog",
+    );
   });
 
   it("answers the first FAQ entry on demand", async () => {

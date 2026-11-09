@@ -458,7 +458,8 @@
       "light": "Sáng",
       "dark": "Tối",
       "toggle": "Giao diện: {theme}"
-    }
+    },
+    "changelog": "Nhật ký thay đổi"
   },
   "contextMenu": {
     "saveTab": "Lưu tab này",
@@ -822,7 +823,8 @@
       "footer": {
         "privacy": "Quyền riêng tư",
         "store": "Chrome Web Store",
-        "firefoxStore": "Tiện ích Firefox"
+        "firefoxStore": "Tiện ích Firefox",
+        "changelog": "Nhật ký thay đổi"
       },
       "faq": {
         "title": "Câu hỏi thường gặp",
@@ -952,6 +954,12 @@
       "system": "Theo hệ thống",
       "light": "Sáng",
       "dark": "Tối"
+    },
+    "changelog": {
+      "title": "Nhật ký thay đổi",
+      "subtitle": "Những thay đổi trong từng bản phát hành SaveTabs.",
+      "back": "Về SaveTabs",
+      "latest": "Mới nhất"
     }
   }
 }

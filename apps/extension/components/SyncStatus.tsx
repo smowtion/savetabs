@@ -12,6 +12,7 @@
  */
 
 import { SyncAuthError, type Translator } from "@savetabs/shared";
+import { RefreshCw, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 import { listSessions, onSessionsChanged } from "../lib/sessions-repo";
@@ -25,11 +26,11 @@ import { formatLastSync } from "../lib/sync/sync-time";
 import { ConfirmDialog } from "./ConfirmDialog";
 
 const BUTTON_CLASS =
-  "rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800";
+  "inline-flex items-center gap-1.5 rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800";
 const PRIMARY_BUTTON_CLASS =
-  "rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50";
+  "inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50";
 const DANGER_BUTTON_CLASS =
-  "rounded-md border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-50 disabled:opacity-50 dark:border-red-900 dark:bg-neutral-900 dark:text-red-400 dark:hover:bg-red-950";
+  "inline-flex items-center gap-1.5 rounded-md border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-50 disabled:opacity-50 dark:border-red-900 dark:bg-neutral-900 dark:text-red-400 dark:hover:bg-red-950";
 
 type Feedback = {  kind: "success" | "error";
   message: string;
@@ -198,6 +199,10 @@ export function SyncStatus({ t, enabled }: SyncStatusProps) {
           onClick={() => void handleSyncNow()}
           className={PRIMARY_BUTTON_CLASS}
         >
+          <RefreshCw
+            aria-hidden="true"
+            className={`size-4 ${running ? "animate-spin" : ""}`}
+          />
           {running ? t("settings.sync.syncing") : t("common.syncNow")}
         </button>
         <button
@@ -206,6 +211,7 @@ export function SyncStatus({ t, enabled }: SyncStatusProps) {
           onClick={() => setDeleteConfirmOpen(true)}
           className={DANGER_BUTTON_CLASS}
         >
+          <Trash2 aria-hidden="true" className="size-4" />
           {t("settings.sync.deleteCloud")}
         </button>
       </div>

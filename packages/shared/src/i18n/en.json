@@ -458,7 +458,8 @@
       "light": "Light",
       "dark": "Dark",
       "toggle": "Theme: {theme}"
-    }
+    },
+    "changelog": "Changelog"
   },
   "contextMenu": {
     "saveTab": "Save this tab",
@@ -822,7 +823,8 @@
       "footer": {
         "privacy": "Privacy",
         "store": "Chrome Web Store",
-        "firefoxStore": "Firefox Add-ons"
+        "firefoxStore": "Firefox Add-ons",
+        "changelog": "Changelog"
       },
       "faq": {
         "title": "Questions, answered",
@@ -952,6 +954,12 @@
       "system": "System",
       "light": "Light",
       "dark": "Dark"
+    },
+    "changelog": {
+      "title": "Changelog",
+      "subtitle": "What changed in each SaveTabs release.",
+      "back": "Back to SaveTabs",
+      "latest": "Latest"
     }
   }
 }

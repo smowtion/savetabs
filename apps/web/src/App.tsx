@@ -5,6 +5,7 @@ import { ThemeProvider } from "./hooks/useTheme";
 import { loadAccountToken } from "./lib/account-session";
 import { loadKey } from "./lib/key-session";
 import Account from "./pages/Account";
+import Changelog from "./pages/Changelog";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Privacy from "./pages/Privacy";
@@ -43,6 +44,7 @@ export default function App() {
         <Route path="/verify" element={<Verify />} />
         <Route path="/reset" element={<Reset />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/changelog" element={<Changelog />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </ThemeProvider>

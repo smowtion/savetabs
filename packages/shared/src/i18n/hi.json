@@ -458,7 +458,8 @@
       "light": "लाइट",
       "dark": "डार्क",
       "toggle": "थीम: {theme}"
-    }
+    },
+    "changelog": "परिवर्तन लॉग"
   },
   "contextMenu": {
     "saveTab": "यह टैब सहेजें",
@@ -822,7 +823,8 @@
       "footer": {
         "privacy": "गोपनीयता",
         "store": "Chrome Web Store",
-        "firefoxStore": "Firefox ऐड-ऑन"
+        "firefoxStore": "Firefox ऐड-ऑन",
+        "changelog": "परिवर्तन लॉग"
       },
       "faq": {
         "title": "आपके सवालों के जवाब",
@@ -900,6 +902,12 @@
       "system": "सिस्टम",
       "light": "लाइट",
       "dark": "डार्क"
+    },
+    "changelog": {
+      "title": "परिवर्तन लॉग",
+      "subtitle": "हर SaveTabs रिलीज़ में क्या बदला।",
+      "back": "SaveTabs पर वापस",
+      "latest": "नवीनतम"
     }
   }
 }

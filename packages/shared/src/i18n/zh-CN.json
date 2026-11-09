@@ -458,7 +458,8 @@
       "light": "浅色",
       "dark": "深色",
       "toggle": "主题：{theme}"
-    }
+    },
+    "changelog": "更新日志"
   },
   "contextMenu": {
     "saveTab": "保存此标签页",
@@ -822,7 +823,8 @@
       "footer": {
         "privacy": "隐私",
         "store": "Chrome Web Store",
-        "firefoxStore": "Firefox 附加组件"
+        "firefoxStore": "Firefox 附加组件",
+        "changelog": "更新日志"
       },
       "faq": {
         "title": "常见问题",
@@ -900,6 +902,12 @@
       "system": "跟随系统",
       "light": "浅色",
       "dark": "深色"
+    },
+    "changelog": {
+      "title": "更新日志",
+      "subtitle": "每个 SaveTabs 版本的更新内容。",
+      "back": "返回 SaveTabs",
+      "latest": "最新"
     }
   }
 }
