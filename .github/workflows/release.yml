@@ -4,6 +4,11 @@ name: Release
 # pushes never deploy or publish anything.
 on:
   workflow_dispatch:
+    inputs:
+      cancel_pending_review:
+        description: Cancel a Chrome Web Store submission that is still in review before uploading
+        type: boolean
+        default: false
   push:
     tags:
       - "v*"
@@ -177,6 +182,18 @@ jobs:
       # A store that is mid-review rejects new uploads (Chrome returns
       # NOT_UPDATEABLE), so the two submissions run independently: one store
       # being blocked must not skip the other.
+      # Chrome refuses any upload while a previous version is mid-review
+      # (NOT_UPDATEABLE). Cancelling that submission first returns it to a
+      # draft, so this run can upload the new version instead of skipping.
+      - name: Cancel pending Chrome Web Store review
+        if: inputs.cancel_pending_review
+        env:
+          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CHROME_PUBLISHER_ID: ${{ secrets.CHROME_PUBLISHER_ID }}
+          CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL: ${{ secrets.CHROME_SERVICE_ACCOUNT_EMAIL }}
+          CHROME_SERVICE_ACCOUNT_PRIVATE_KEY: ${{ secrets.CHROME_SERVICE_ACCOUNT_PRIVATE_KEY }}
+        run: node scripts/cancel-chrome-submission.mjs
+
       - name: Submit to Chrome Web Store
         id: chrome-submit
         continue-on-error: true
