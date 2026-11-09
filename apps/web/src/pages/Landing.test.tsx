@@ -405,6 +405,29 @@ describe("Landing", () => {
     ).toHaveAttribute("id", "use-sync-key");
   });
 
+  it("puts the sync-key form under the hero and links to it from the header and hero", () => {
+    const { container } = renderLanding();
+
+    const form = screen
+      .getByRole("heading", { name: "Open your saved tabs" })
+      .closest("section");
+    expect(form).toHaveAttribute("id", "use-sync-key");
+
+    // The hero is the first section; the form follows it before the marketing
+    // sections, so returning users reach it without scrolling the whole page.
+    const sections = container.querySelectorAll("main > section");
+    expect(sections[0]).not.toBe(form);
+    expect(sections[1]).toBe(form);
+
+    const links = screen.getAllByRole("link", { name: "Open your saved tabs" });
+    expect(links).toHaveLength(2);
+    for (const link of links) {
+      expect(link).toHaveAttribute("href", "#use-sync-key");
+    }
+    expect(links[0].closest("header")).not.toBeNull();
+    expect(links[1].closest("section")).not.toBeNull();
+  });
+
   it("points the header account link at the account page when signed in", () => {
     saveAccountToken("account-token");
 

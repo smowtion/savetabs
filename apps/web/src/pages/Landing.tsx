@@ -22,11 +22,11 @@ import { loadAccountToken } from "../lib/account-session";
 /**
  * Public landing page.
  *
- * Sections follow the product spec: hero with install actions, how it works,
- * privacy, features, account actions, the key-only entry path, install help
- * and the footer. Account creation and sign-in are the primary paths; the
- * sync-key form stays reachable as a secondary path through the account
- * section anchor.
+ * Sections follow the product spec: hero with install actions, the key-only
+ * entry form, how it works, privacy, features, account actions, install help
+ * and the footer. The sync-key form sits directly under the hero so returning
+ * users can reach it without scrolling the whole marketing page; the header
+ * and hero both anchor to it.
  *
  * All copy comes from the shared dictionaries. The page makes no memory or
  * performance claims and the copy avoids percentage signs.
@@ -93,6 +93,12 @@ export default function Landing() {
             >
               <ThemeIcon aria-hidden="true" size={16} />
             </button>
+            <a
+              href="#use-sync-key"
+              className={`${HEADER_CONTROL_CLASS} hidden whitespace-nowrap md:inline-flex`}
+            >
+              {t("web.landing.title")}
+            </a>
             <Link to={accountPath} className={HEADER_CONTROL_CLASS}>
               {t("web.landing.header.account")}
             </Link>
@@ -102,6 +108,7 @@ export default function Landing() {
 
       <main className="flex-1">
         <Hero t={t} />
+        <SyncKeyPanel t={t} />
         <TrustStrip t={t} />
         <MemoryCalculator t={t} lang={lang} />
         <ScreenshotGallery t={t} />
@@ -110,7 +117,6 @@ export default function Landing() {
         <FeatureGrid t={t} />
         <FaqSection t={t} />
         <AccountCta t={t} />
-        <SyncKeyPanel t={t} />
         <InstallHelp t={t} />
       </main>
 
