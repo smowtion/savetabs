@@ -174,7 +174,12 @@ jobs:
       # complete credential tuple is absent, so a partially configured store
       # fails loudly instead of silently publishing nothing. Secrets are
       # scoped to the step that needs them.
+      # A store that is mid-review rejects new uploads (Chrome returns
+      # NOT_UPDATEABLE), so the two submissions run independently: one store
+      # being blocked must not skip the other.
       - name: Submit to Chrome Web Store
+        id: chrome-submit
+        continue-on-error: true
         env:
           CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
           CHROME_PUBLISHER_ID: ${{ secrets.CHROME_PUBLISHER_ID }}
@@ -202,6 +207,8 @@ jobs:
             --chrome-zip "$GITHUB_WORKSPACE/apps/extension/.output/savetabs-${SAVETABS_VERSION}-chrome.zip"
 
       - name: Submit to Firefox Add-ons
+        id: firefox-submit
+        continue-on-error: true
         env:
           FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXTENSION_ID }}
           FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
@@ -229,3 +236,14 @@ jobs:
             --firefox-extension-id "$FIREFOX_EXTENSION_ID" \
             --firefox-zip "$GITHUB_WORKSPACE/apps/extension/.output/savetabs-${SAVETABS_VERSION}-firefox.zip" \
             --firefox-sources-zip "$GITHUB_WORKSPACE/apps/extension/.output/savetabs-${SAVETABS_VERSION}-sources.zip"
+
+      # Keep the release run red when a store submission failed, without
+      # hiding the other store's result.
+      - name: Report store submission failures
+        if: steps.chrome-submit.outcome == 'failure' || steps.firefox-submit.outcome == 'failure'
+        run: |
+          failed=""
+          if [ "${{ steps.chrome-submit.outcome }}" = "failure" ]; then failed="$failed Chrome"; fi
+          if [ "${{ steps.firefox-submit.outcome }}" = "failure" ]; then failed="$failed Firefox"; fi
+          echo "::error::Store submission failed for:$failed"
+          exit 1
