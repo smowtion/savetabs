@@ -3,6 +3,15 @@
   "version": "0.2.3",
   "private": true,
   "description": "SaveTabs — browser extension and E2EE sync backend monorepo",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smowtion/savetabs.git"
+  },
+  "homepage": "https://savetabs.azcom.dev",
+  "bugs": {
+    "url": "https://github.com/smowtion/savetabs/issues"
+  },
   "packageManager": "pnpm@10.33.0",
   "engines": {
     "node": ">=22.12.0"

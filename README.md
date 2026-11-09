@@ -5,10 +5,18 @@ Save a window in one click, close the tabs to free memory, then reopen the exact
 set in the same order. Sessions stay on the device unless the user enables
 optional end-to-end encrypted (E2EE) sync.
 
-> **Status:** SaveTabs is **not published yet**. The API and web origins, the
-> D1 database binding, and the store listing URLs are placeholders until the
-> live deployment and store submission are completed. See
-> [Status and placeholders](#status-and-placeholders).
+[Website](https://savetabs.azcom.dev) ·
+[Changelog](https://savetabs.azcom.dev/changelog) ·
+[GitHub](https://github.com/smowtion/savetabs) ·
+[MIT License](LICENSE)
+
+![SaveTabs overview](apps/web/public/screenshots/overview-showcase.webp)
+
+> **Status:** Open source under the MIT License. Chrome and Firefox listings
+> are live; the Chrome 0.2.2 update is in review. Safari has an MV3 build but
+> is not distributed yet. The API and web are deployed on Cloudflare.
+> Credential setup: `docs/store-publishing-setup.md`. Safari conversion:
+> `docs/safari-extension-guide.md`.
 
 ## Features
 
@@ -247,14 +255,15 @@ page.
 
 ## Deployment status
 
-v0.1.0 is live on Cloudflare:
+The production deployment runs the 0.2.x line:
 
 - API: `https://savetabs-api.azcom.dev` — Worker `savetabs`, D1 database
   `savetabs`, R2 bucket `savetabs-releases` (`versions.json` for the update
   check).
 - Web: `https://savetabs.azcom.dev` — static-assets Worker `savetabs-web` with
-  SPA fallback, so `/privacy` and `/sessions` resolve on first load.
-- Extension packages: `apps/extension/.output/savetabs-0.2.2-{chrome,firefox}.zip`,
+  SPA fallback, so `/privacy`, `/changelog` and `/sessions` resolve on first
+  load.
+- Extension packages: `apps/extension/.output/savetabs-0.2.3-{chrome,firefox}.zip`,
   built with `WXT_SAVETABS_API_BASE=https://savetabs-api.azcom.dev`.
 
 Chrome Web Store 0.2.2 is pending review
@@ -271,6 +280,21 @@ generated from the built extension:
 WXT_SAVETABS_API_BASE=https://savetabs-api.azcom.dev pnpm --filter @savetabs/extension build
 pnpm --filter @savetabs/extension screenshots
 ```
+
+## Contributing
+
+See `docs/contributing.md`. Keep changes scoped, add tests for behavior
+changes, preserve the E2EE and local-only guarantees, and never commit
+credentials or production user data.
+
+## Security
+
+Report vulnerabilities privately to **support@azcom.dev**; do not open a public
+issue. See `docs/security.md` for scope and handling.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
 
 ## Remaining placeholders
 

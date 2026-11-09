@@ -430,6 +430,10 @@ describe("Landing", () => {
       "href",
       "/changelog",
     );
+    expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute(
+      "href",
+      "https://github.com/smowtion/savetabs",
+    );
   });
 
   it("answers the first FAQ entry on demand", async () => {

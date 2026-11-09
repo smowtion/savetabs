@@ -53,6 +53,8 @@ The sync server stores a public account id derived from your sync key, a SHA-256
 ### Links
 
 - Website: https://savetabs.azcom.dev/
+- Changelog: https://savetabs.azcom.dev/changelog
+- GitHub: https://github.com/smowtion/savetabs
 - Privacy policy: https://savetabs.azcom.dev/privacy
 - Support: support@azcom.dev
 - Chrome Web Store: https://chromewebstore.google.com/detail/ajejilnkhplcpgcjfkidkdepjipmocfi
@@ -86,6 +88,8 @@ Máy chủ đồng bộ lưu id tài khoản công khai dẫn xuất từ khoá 
 ### Liên kết
 
 - Trang web: https://savetabs.azcom.dev/
+- Nhật ký thay đổi: https://savetabs.azcom.dev/changelog
+- GitHub: https://github.com/smowtion/savetabs
 - Chính sách riêng tư: https://savetabs.azcom.dev/privacy
 - Hỗ trợ: support@azcom.dev
 - Chrome Web Store: https://chromewebstore.google.com/detail/ajejilnkhplcpgcjfkidkdepjipmocfi
