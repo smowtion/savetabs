@@ -95,6 +95,11 @@ describe("rebuildContextMenus", () => {
         title: "Save selected tabs",
         contexts: ["tab"],
       },
+      {
+        id: CONTEXT_MENU_IDS.SETTINGS,
+        title: "Settings",
+        contexts: ["action"],
+      },
     ]);
     expect(removeAllSpy.mock.invocationCallOrder[0]).toBeLessThan(
       createSpy.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY,
@@ -104,11 +109,16 @@ describe("rebuildContextMenus", () => {
   it.each([
     [
       "vi",
-      ["Lưu tab này", "Lưu tất cả tab trong cửa sổ", "Lưu các tab đã chọn"],
+      [
+        "Lưu tab này",
+        "Lưu tất cả tab trong cửa sổ",
+        "Lưu các tab đã chọn",
+        "Cài đặt",
+      ],
     ],
     [
       "zh-CN",
-      ["保存此标签页", "保存此窗口中的所有标签页", "保存选中的标签页"],
+      ["保存此标签页", "保存此窗口中的所有标签页", "保存选中的标签页", "设置"],
     ],
     [
       "es",
@@ -116,6 +126,7 @@ describe("rebuildContextMenus", () => {
         "Guardar esta pestaña",
         "Guardar todas las pestañas de esta ventana",
         "Guardar las pestañas seleccionadas",
+        "Ajustes",
       ],
     ],
   ] as const)(
@@ -131,7 +142,7 @@ describe("rebuildContextMenus", () => {
     },
   );
 
-  it("removes every menu item when the context menu is disabled", async () => {
+  it("keeps only the toolbar settings item when the context menu is disabled", async () => {
     const removeAllSpy = vi.spyOn(fakeBrowser.contextMenus, "removeAll");
     const createSpy = vi.spyOn(fakeBrowser.contextMenus, "create");
 
@@ -140,7 +151,12 @@ describe("rebuildContextMenus", () => {
     );
 
     expect(removeAllSpy).toHaveBeenCalledTimes(1);
-    expect(createSpy).not.toHaveBeenCalled();
+    expect(createSpy).toHaveBeenCalledTimes(1);
+    expect(createSpy.mock.calls[0]?.[0]).toEqual({
+      id: CONTEXT_MENU_IDS.SETTINGS,
+      title: "Settings",
+      contexts: ["action"],
+    });
   });
 
   it.each([
@@ -154,7 +170,7 @@ describe("rebuildContextMenus", () => {
 
     const ids = createSpy.mock.calls.map(([props]) => props.id);
     expect(ids).not.toContain(absentId);
-    expect(ids).toHaveLength(2);
+    expect(ids).toHaveLength(3);
   });
 
   it("can rebuild repeatedly without leaving stale items", async () => {
@@ -165,7 +181,7 @@ describe("rebuildContextMenus", () => {
       settingsWith({ "contextMenu.saveSelection": false }),
     );
 
-    expect(createSpy).toHaveBeenCalledTimes(5);
+    expect(createSpy).toHaveBeenCalledTimes(7);
   });
 });
 
@@ -262,6 +278,17 @@ describe("handleContextMenuClick", () => {
       windowId: 7,
     });
 
+    expect(saveTabsMock).not.toHaveBeenCalled();
+  });
+
+  it("opens the options page for the settings item", async () => {
+    const openOptionsPage = vi
+      .spyOn(fakeBrowser.runtime, "openOptionsPage")
+      .mockResolvedValue(undefined);
+
+    await handleContextMenuClick({ menuItemId: CONTEXT_MENU_IDS.SETTINGS });
+
+    expect(openOptionsPage).toHaveBeenCalledTimes(1);
     expect(saveTabsMock).not.toHaveBeenCalled();
   });
 
