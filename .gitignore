@@ -9,5 +9,7 @@ dist/
 test-results/
 playwright-report/
 .superpowers/
+# Internal agent reports and scratch plans; not part of the public repository.
+plans/reports/
 .env*
 !.env.example

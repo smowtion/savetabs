@@ -4,6 +4,7 @@ import {
   DISABLED_BUTTON_CLASS,
   PRIMARY_LINK_CLASS,
   SECONDARY_LINK_CLASS,
+  TEXT_LINK_CLASS,
 } from "./landing-styles";
 import { CHROME_STORE_URL, FIREFOX_STORE_URL } from "./store-links";
 
@@ -14,7 +15,8 @@ import { CHROME_STORE_URL, FIREFOX_STORE_URL } from "./store-links";
  * The mockup is a visual aid only: it is hidden from assistive technology and
  * contains no links or controls, so it never competes with the real actions.
  * Chrome and Firefox are live; Safari stays disabled until its store listing
- * exists.
+ * exists. A text link under the install actions jumps straight to the sync-key
+ * form, which is the next section on the page.
  */
 
 type Props = { t: Translator };
@@ -96,6 +98,15 @@ export function Hero({ t }: Props) {
             style={{ animationDelay: "270ms" }}
           >
             {t("web.landing.hero.noAccount")}
+          </p>
+
+          <p
+            className="motion-fade-up mt-4 text-sm"
+            style={{ animationDelay: "320ms" }}
+          >
+            <a href="#use-sync-key" className={TEXT_LINK_CLASS}>
+              {t("web.landing.title")}
+            </a>
           </p>
         </div>
 

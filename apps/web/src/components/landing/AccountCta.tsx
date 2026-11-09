@@ -14,8 +14,8 @@ import {
 /**
  * Account call to action.
  *
- * Creating an account and signing in are the primary paths; the key-only
- * users keep a direct anchor to the sync-key form below this section.
+ * Creating an account and signing in are the primary paths; key-only users
+ * keep a direct anchor to the sync-key form at the top of the page.
  */
 
 type Props = { t: Translator };
