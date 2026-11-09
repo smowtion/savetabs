@@ -35,6 +35,7 @@ const WEB_TRANSLATION_KEYS = [
   "web.landing.header.account",
   "web.landing.hero.title",
   "web.landing.hero.description",
+  "web.landing.hero.eyebrow",
   "web.landing.hero.chrome",
   "web.landing.hero.firefox",
   "web.landing.hero.safari",
@@ -51,6 +52,15 @@ const WEB_TRANSLATION_KEYS = [
   "web.landing.trust.encrypted",
   "web.landing.trust.languages",
   "web.landing.trust.noAccount",
+  "web.landing.calculator.title",
+  "web.landing.calculator.subtitle",
+  "web.landing.calculator.tabsLabel",
+  "web.landing.calculator.memoryLabel",
+  "web.landing.calculator.result",
+  "web.landing.calculator.before",
+  "web.landing.calculator.after",
+  "web.landing.calculator.afterValue",
+  "web.landing.calculator.disclaimer",
   "web.landing.gallery.title",
   "web.landing.gallery.subtitle",
   "web.landing.gallery.tabs.sessions",
@@ -188,7 +198,7 @@ describe("Landing", () => {
 
     const headings = screen.getAllByRole("heading", { level: 1 });
     expect(headings).toHaveLength(1);
-    expect(headings[0]).toHaveTextContent(/save every tab/i);
+    expect(headings[0]).toHaveTextContent(/backup every tab/i);
 
     expect(
       screen.getByRole("heading", { name: "How it works" }),
@@ -224,6 +234,14 @@ describe("Landing", () => {
     expect(footerLogo).toHaveAttribute("src", "/icon.svg");
     expect(footerLogo).toHaveAttribute("alt", "");
     expect(footerLogo).toHaveAttribute("width", "28");
+  });
+
+  it("estimates memory savings from the tab count", () => {
+    renderLanding();
+
+    expect(screen.getByText("Backup & Sync")).toBeInTheDocument();
+    expect(screen.getByText("Save up to 2.4 GB")).toBeInTheDocument();
+    expect(screen.getByRole("slider")).toHaveValue("50");
   });
 
   it("shows the four trust chips under the hero", () => {
@@ -542,7 +560,7 @@ describe("Landing", () => {
 
     const select = screen.getByLabelText("Switch language");
     expect(select).toHaveValue("en");
-    expect(screen.getAllByRole("option")).toHaveLength(12);
+    expect(within(select).getAllByRole("option")).toHaveLength(12);
     expect(screen.getByRole("option", { name: "العربية" })).toHaveValue("ar");
 
     await user.selectOptions(select, "vi");
@@ -551,7 +569,7 @@ describe("Landing", () => {
       await screen.findByRole("heading", { name: "Mở các tab đã lưu" }),
     ).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Lưu mọi tab",
+      "Sao lưu mọi thẻ. Đồng bộ mọi nơi.",
     );
     expect(screen.getByRole("button", { name: "Tiếp tục" })).toBeInTheDocument();
     expect(localStorage.getItem("web-language")).toBe("vi");

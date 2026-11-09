@@ -683,8 +683,8 @@
         "account": "Konto"
       },
       "hero": {
-        "title": "Jeden Tab speichern. Später zurückholen.",
-        "description": "SaveTabs speichert ein ganzes Browserfenster als eine Sitzung, schließt die Tabs und öffnet sie bei Bedarf wieder. Die Erweiterung läuft im Browser und behält die Sitzungen auf diesem Gerät.",
+        "title": "Jeden Tab sichern. Überall synchronisieren.",
+        "description": "Speichern Sie ein ganzes Fenster als eine Sitzung, geben Sie Speicher frei, indem Sie überflüssige Tabs schließen, und stellen Sie sie später exakt wieder her. Optionale Ende-zu-Ende-verschlüsselte Synchronisierung.",
         "chrome": "Zu Chrome hinzufügen",
         "firefox": "Zu Firefox hinzufügen",
         "comingSoon": "Demnächst verfügbar",
@@ -697,7 +697,8 @@
           "restore": "Wiederherstellen",
           "sync": "Synchronisierung an"
         },
-        "safari": "Safari"
+        "safari": "Safari",
+        "eyebrow": "Backup & Synchronisierung"
       },
       "trust": {
         "label": "Produktmerkmale",
@@ -855,6 +856,17 @@
             "a": "Die Grundfunktionen der Erweiterung sind kostenlos: keine Werbung, kein Tracking, kein Konto nötig. Optionale Synchronisierung und Konten sind integriert."
           }
         }
+      },
+      "calculator": {
+        "title": "Speicher freigeben",
+        "subtitle": "Schätzen Sie, wie viel Speicher das Schließen eines gespeicherten Fensters freigeben kann.",
+        "tabsLabel": "Offene Tabs",
+        "memoryLabel": "Speicher pro Tab",
+        "result": "Bis zu {memory} sparen",
+        "before": "Vorher",
+        "after": "Nach SaveTabs",
+        "afterValue": "1 Sitzung",
+        "disclaimer": "Nur eine beispielhafte Schätzung. Der tatsächliche Speicherbedarf hängt von den Websites und dem Browser ab."
       }
     },
     "sessions": {

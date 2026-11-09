@@ -683,8 +683,8 @@
         "account": "Account"
       },
       "hero": {
-        "title": "Save every tab. Get them back later.",
-        "description": "SaveTabs stores a whole browser window as one session, closes the tabs, and reopens them when you need them. It runs in your browser and keeps your sessions on your device.",
+        "title": "Backup every tab. Sync anywhere.",
+        "description": "Save a whole window as one session, free memory by closing the clutter, and restore the exact tabs later. Optional end-to-end encrypted sync.",
         "chrome": "Add to Chrome",
         "firefox": "Add to Firefox",
         "comingSoon": "Coming soon",
@@ -697,7 +697,8 @@
           "restore": "Restore",
           "sync": "Sync on"
         },
-        "safari": "Safari"
+        "safari": "Safari",
+        "eyebrow": "Backup & Sync"
       },
       "trust": {
         "label": "Product highlights",
@@ -855,6 +856,17 @@
             "a": "The core extension is free: no ads, no tracking, no account required. Optional sync and accounts are built in."
           }
         }
+      },
+      "calculator": {
+        "title": "Free up memory",
+        "subtitle": "Estimate how much memory closing a saved window can free.",
+        "tabsLabel": "Open tabs",
+        "memoryLabel": "Memory per tab",
+        "result": "Save up to {memory}",
+        "before": "Before",
+        "after": "After SaveTabs",
+        "afterValue": "1 session",
+        "disclaimer": "Illustrative estimate only. Actual memory depends on the sites and browser."
       }
     },
     "privacy": {

@@ -683,8 +683,8 @@
         "account": "账户"
       },
       "hero": {
-        "title": "保存每个标签页。以后随时找回。",
-        "description": "SaveTabs 将整个浏览器窗口保存为一个会话，关闭这些标签页，并在你需要时重新打开。它在你的浏览器中运行，会话保留在你的设备上。",
+        "title": "备份每个标签页，随时随地同步。",
+        "description": "将整个窗口保存为一个会话，通过关闭杂乱标签释放内存，并在稍后精准恢复。可选端到端加密同步。",
         "chrome": "添加到 Chrome",
         "firefox": "添加到 Firefox",
         "comingSoon": "即将推出",
@@ -697,7 +697,8 @@
           "restore": "恢复",
           "sync": "同步已开启"
         },
-        "safari": "Safari"
+        "safari": "Safari",
+        "eyebrow": "备份与同步"
       },
       "trust": {
         "label": "产品亮点",
@@ -855,6 +856,17 @@
             "a": "核心扩展免费：无广告、不追踪、无需账号。内置可选的同步和账号功能。"
           }
         }
+      },
+      "calculator": {
+        "title": "释放内存",
+        "subtitle": "预估关闭已保存窗口可释放的内存量。",
+        "tabsLabel": "打开的标签页",
+        "memoryLabel": "每个标签页内存",
+        "result": "最高可节省 {memory}",
+        "before": "使用前",
+        "after": "使用 SaveTabs 后",
+        "afterValue": "1 个会话",
+        "disclaimer": "仅供参考估计。实际内存占用取决于具体网站和浏览器。"
       }
     },
     "sessions": {

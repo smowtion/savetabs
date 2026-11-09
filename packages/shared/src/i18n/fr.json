@@ -683,8 +683,8 @@
         "account": "Compte"
       },
       "hero": {
-        "title": "Enregistrez chaque onglet. Retrouvez-les plus tard.",
-        "description": "SaveTabs enregistre une fenêtre entière du navigateur comme une seule session, ferme les onglets et les rouvre lorsque vous en avez besoin. Il fonctionne dans votre navigateur et conserve vos sessions sur votre appareil.",
+        "title": "Sauvegardez chaque onglet. Synchronisez partout.",
+        "description": "Enregistrez une fenêtre entière en une seule session, libérez de la mémoire en fermant les onglets inutiles et restaurez-les exactement plus tard. Synchronisation chiffrée de bout en bout en option.",
         "chrome": "Ajouter à Chrome",
         "firefox": "Ajouter à Firefox",
         "comingSoon": "Bientôt disponible",
@@ -697,7 +697,8 @@
           "restore": "Restaurer",
           "sync": "Synchronisation activée"
         },
-        "safari": "Safari"
+        "safari": "Safari",
+        "eyebrow": "Sauvegarde & Synchronisation"
       },
       "trust": {
         "label": "Points forts",
@@ -855,6 +856,17 @@
             "a": "Les fonctions de base de l’extension sont gratuites : sans publicité, sans suivi et sans compte obligatoire. La synchronisation et les comptes sont intégrés et facultatifs."
           }
         }
+      },
+      "calculator": {
+        "title": "Libérer de la mémoire",
+        "subtitle": "Estimez la quantité de mémoire pouvant être libérée en fermant une fenêtre enregistrée.",
+        "tabsLabel": "Onglets ouverts",
+        "memoryLabel": "Mémoire par onglet",
+        "result": "Économisez jusqu'à {memory}",
+        "before": "Avant",
+        "after": "Après SaveTabs",
+        "afterValue": "1 session",
+        "disclaimer": "Estimation donnée à titre indicatif uniquement. La mémoire réelle dépend des sites et du navigateur."
       }
     },
     "sessions": {

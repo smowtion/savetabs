@@ -8,6 +8,7 @@ import { FeatureGrid } from "../components/landing/FeatureGrid";
 import { Hero } from "../components/landing/Hero";
 import { HowItWorks } from "../components/landing/HowItWorks";
 import { InstallHelp } from "../components/landing/InstallHelp";
+import { MemoryCalculator } from "../components/landing/MemoryCalculator";
 import { HEADER_CONTROL_CLASS } from "../components/landing/landing-styles";
 import { PrivacySection } from "../components/landing/PrivacySection";
 import { ScreenshotGallery } from "../components/landing/ScreenshotGallery";
@@ -102,6 +103,7 @@ export default function Landing() {
       <main className="flex-1">
         <Hero t={t} />
         <TrustStrip t={t} />
+        <MemoryCalculator t={t} lang={lang} />
         <ScreenshotGallery t={t} />
         <HowItWorks t={t} />
         <PrivacySection t={t} />
