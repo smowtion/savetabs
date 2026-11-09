@@ -12,6 +12,7 @@ SaveTabs
 
 ## Taglines
 
+- Backup & Sync.
 - Too many tabs? Save now. Restore anytime.
 - Your tabs. Your control. Private by default. Encrypted sync when you need it.
 
@@ -27,11 +28,11 @@ SaveTabs
 
 ## Short description (English, 123/132 characters)
 
-Save open tabs as sessions, restore them later, and keep end-to-end encrypted backups. No account needed; sync is optional.
+Backup & sync your tabs, free memory, and restore later. Optional end-to-end encryption; no account needed.
 
 ## Full description (English)
 
-SaveTabs turns the tabs in a window into a saved session you can restore later. Save a window in one click, close the tabs to free memory, then reopen the exact set — in the same order — whenever you need it. Everything stays on your device unless you turn on end-to-end encrypted sync.
+SaveTabs is **Backup & Sync** for your tabs. Turn the tabs in a window into one saved session, close the clutter to free memory, then restore the exact tabs — in the same order — later. Everything stays on your device unless you turn on end-to-end encrypted sync.
 
 ### Features
 
@@ -62,11 +63,11 @@ The sync server stores a public account id derived from your sync key, a SHA-256
 
 ## Short description (Vietnamese, 107/132 characters)
 
-Lưu tab thành phiên, khôi phục sau, đồng bộ mã hoá đầu-cuối tuỳ chọn. Không cần tài khoản, không analytics.
+Sao lưu & đồng bộ tab, giải phóng bộ nhớ, khôi phục sau. Mã hoá đầu-cuối tuỳ chọn, không cần tài khoản.
 
 ## Full description (Vietnamese)
 
-SaveTabs lưu các tab đang mở thành một phiên để bạn khôi phục sau. Lưu cả cửa sổ chỉ với một cú nhấp, đóng tab để giải phóng bộ nhớ, rồi mở lại đúng bộ tab đó — đúng thứ tự — khi cần. Mọi dữ liệu nằm trên máy bạn trừ khi bạn bật đồng bộ mã hoá đầu-cuối.
+SaveTabs là **Backup & Sync** cho tab của bạn. Biến các tab trong một cửa sổ thành một phiên đã lưu, đóng bớt tab để giải phóng bộ nhớ, rồi khôi phục đúng bộ tab đó — đúng thứ tự — khi cần. Mọi dữ liệu nằm trên máy bạn trừ khi bạn bật đồng bộ mã hoá đầu-cuối.
 
 ### Tính năng
 

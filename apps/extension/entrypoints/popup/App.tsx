@@ -27,6 +27,7 @@ import {
   type Session,
   type Settings,
 } from "@savetabs/shared";
+import { MousePointerClick } from "lucide-react";
 import { useEffect, useState } from "react";
 import { browser } from "wxt/browser";
 
@@ -59,6 +60,9 @@ import {
 
 type Status = { kind: "success" | "error"; message: string };
 type ErrorResponse = Extract<UiResponse, { ok: false }>;
+
+const TOOLBAR_ACTIONS = ["popup", "save", "sessions"] as const;
+type ToolbarAction = (typeof TOOLBAR_ACTIONS)[number];
 
 /** Sessions shown under "Recent sessions". */
 const MAX_RECENT_SESSIONS = 3;
@@ -294,6 +298,18 @@ export function App() {
     });
   }
 
+  function changeToolbarAction(value: ToolbarAction): void {
+    void saveSettingNow("open.toolbarAction", value).catch((error) => {
+      console.error("[savetabs] failed to save the toolbar action", error);
+    });
+  }
+
+  const storedToolbarAction = settings?.["open.toolbarAction"];
+  const toolbarAction: ToolbarAction =
+    storedToolbarAction === "save" || storedToolbarAction === "sessions"
+      ? storedToolbarAction
+      : "popup";
+
   const storedLanguage = settings?.["general.language"];
   const languagePreference = isLanguagePreference(storedLanguage)
     ? storedLanguage
@@ -443,7 +459,30 @@ export function App() {
           )}
         </section>
 
-        <footer className="mt-auto flex justify-end border-t border-neutral-200 pt-2 dark:border-neutral-800">
+        <footer className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-neutral-200 pt-2 dark:border-neutral-800">
+          <label
+            className="inline-flex min-w-0 items-center gap-1 text-[11px] text-neutral-500 dark:text-neutral-400"
+            title={t("settings.open.toolbarAction.description")}
+          >
+            <MousePointerClick aria-hidden="true" className="size-3.5 shrink-0" />
+            <span className="sr-only">
+              {t("settings.open.toolbarAction.label")}
+            </span>
+            <select
+              aria-label={t("settings.open.toolbarAction.label")}
+              value={toolbarAction}
+              onChange={(event) =>
+                changeToolbarAction(event.target.value as ToolbarAction)
+              }
+              className="max-w-[9rem] rounded-md border border-neutral-300 bg-white px-1.5 py-1 text-[11px] text-neutral-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
+            >
+              {TOOLBAR_ACTIONS.map((action) => (
+                <option key={action} value={action}>
+                  {t(`settings.option.open.toolbarAction.${action}`)}
+                </option>
+              ))}
+            </select>
+          </label>
           <button
             type="button"
             onClick={() => void openSettingsPage()}

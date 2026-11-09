@@ -26,9 +26,12 @@ export function Hero({ t }: Props) {
     <section aria-labelledby="landing-hero" className="relative overflow-hidden">
       <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 pb-16 pt-12 sm:px-6 sm:pb-24 sm:pt-20 lg:grid-cols-[1.05fr_0.95fr]">
         <div>
+          <span className="motion-fade-up inline-flex items-center rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-indigo-700 dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-300">
+            {t("web.landing.hero.eyebrow")}
+          </span>
           <h1
             id="landing-hero"
-            className="motion-fade-up text-balance text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl"
+            className="motion-fade-up mt-4 text-balance text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl"
           >
             {t("web.landing.hero.title")}
           </h1>

@@ -29,6 +29,7 @@ const RELEASES: readonly Release[] = [
     items: [
       "Options sidebar now shows the SaveTabs logo, version, category icons, and a changelog link.",
       "Action buttons across settings and sync now include icons.",
+      "Backup & Sync positioning plus an interactive memory-savings estimate.",
       "Public changelog page with the release history.",
     ],
   },

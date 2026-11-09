@@ -683,8 +683,8 @@
         "account": "Conta"
       },
       "hero": {
-        "title": "Salve cada aba. Recupere-as depois.",
-        "description": "O SaveTabs armazena uma janela inteira do navegador como uma sessão, fecha as abas e as reabre quando você precisa. Ele funciona no seu navegador e mantém suas sessões no seu dispositivo.",
+        "title": "Faça backup de cada aba. Sincronize em qualquer lugar.",
+        "description": "Salve uma janela inteira como uma única sessão, libere memória fechando abas acumuladas e restaure exatamente as mesmas abas depois. Sincronização opcional com criptografia de ponta a ponta.",
         "chrome": "Adicionar ao Chrome",
         "firefox": "Adicionar ao Firefox",
         "comingSoon": "Em breve",
@@ -697,7 +697,8 @@
           "restore": "Restaurar",
           "sync": "Sincronização ativada"
         },
-        "safari": "Safari"
+        "safari": "Safari",
+        "eyebrow": "Backup e Sincronização"
       },
       "trust": {
         "label": "Destaques do produto",
@@ -855,6 +856,17 @@
             "a": "A extensão básica é gratuita: sem anúncios, sem rastreamento e sem exigir conta. Inclui recursos opcionais de sincronização e contas."
           }
         }
+      },
+      "calculator": {
+        "title": "Liberar memória",
+        "subtitle": "Estime quanta memória pode ser liberada ao fechar uma janela salva.",
+        "tabsLabel": "Abas abertas",
+        "memoryLabel": "Memória por aba",
+        "result": "Economize até {memory}",
+        "before": "Antes",
+        "after": "Depois do SaveTabs",
+        "afterValue": "1 sessão",
+        "disclaimer": "Estimativa meramente ilustrativa. A memória real depende dos sites e do navegador."
       }
     },
     "sessions": {

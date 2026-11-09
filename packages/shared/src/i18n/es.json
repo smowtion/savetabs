@@ -683,8 +683,8 @@
         "account": "Cuenta"
       },
       "hero": {
-        "title": "Guarda cada pestaña. Recupéralas más tarde.",
-        "description": "SaveTabs guarda toda una ventana del navegador como una sesión, cierra las pestañas y las vuelve a abrir cuando las necesitas. Se ejecuta en tu navegador y mantiene tus sesiones en tu dispositivo.",
+        "title": "Guarda cada pestaña. Sincroniza en cualquier lugar.",
+        "description": "Guarda una ventana completa como una sola sesión, libera memoria cerrando pestañas innecesarias y restáuralas exactamente más tarde. Sincronización cifrada de extremo a extremo opcional.",
         "chrome": "Añadir a Chrome",
         "firefox": "Añadir a Firefox",
         "comingSoon": "Próximamente",
@@ -697,7 +697,8 @@
           "restore": "Restaurar",
           "sync": "Sincronización activada"
         },
-        "safari": "Safari"
+        "safari": "Safari",
+        "eyebrow": "Copia de seguridad y sincronización"
       },
       "trust": {
         "label": "Aspectos destacados",
@@ -855,6 +856,17 @@
             "a": "La extensión básica es gratuita: sin anuncios, sin rastreo y sin necesidad de cuenta. Incluye funciones opcionales de sincronización y cuentas."
           }
         }
+      },
+      "calculator": {
+        "title": "Libera memoria",
+        "subtitle": "Calcula cuánta memoria puedes liberar cerrando una ventana guardada.",
+        "tabsLabel": "Pestañas abiertas",
+        "memoryLabel": "Memoria por pestaña",
+        "result": "Ahorra hasta {memory}",
+        "before": "Antes",
+        "after": "Después de SaveTabs",
+        "afterValue": "1 sesión",
+        "disclaimer": "Estimación ilustrativa únicamente. La memoria real depende de los sitios web y del navegador."
       }
     },
     "sessions": {

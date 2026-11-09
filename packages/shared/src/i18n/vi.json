@@ -683,8 +683,8 @@
         "account": "Tài khoản"
       },
       "hero": {
-        "title": "Lưu mọi tab. Mở lại khi cần.",
-        "description": "SaveTabs lưu toàn bộ cửa sổ trình duyệt thành một phiên, đóng các tab rồi mở lại khi bạn cần. Tiện ích chạy trong trình duyệt và giữ các phiên trên thiết bị của bạn.",
+        "title": "Sao lưu mọi thẻ. Đồng bộ mọi nơi.",
+        "description": "Lưu toàn bộ cửa sổ thành một phiên, giải phóng bộ nhớ bằng cách đóng bớt các thẻ thừa và khôi phục chính xác sau này. Tùy chọn đồng bộ hóa mã hóa đầu cuối.",
         "chrome": "Thêm vào Chrome",
         "firefox": "Thêm vào Firefox",
         "comingSoon": "Sắp ra mắt",
@@ -697,7 +697,8 @@
           "restore": "Khôi phục",
           "sync": "Đang đồng bộ"
         },
-        "safari": "Safari"
+        "safari": "Safari",
+        "eyebrow": "Sao lưu & Đồng bộ"
       },
       "trust": {
         "label": "Điểm nổi bật",
@@ -855,6 +856,17 @@
             "a": "Phần lõi miễn phí: không quảng cáo, không theo dõi, không cần tài khoản. Đồng bộ và tài khoản là tuỳ chọn tích hợp sẵn."
           }
         }
+      },
+      "calculator": {
+        "title": "Giải phóng bộ nhớ",
+        "subtitle": "Ước tính lượng bộ nhớ có thể giải phóng khi đóng cửa sổ đã lưu.",
+        "tabsLabel": "Thẻ đang mở",
+        "memoryLabel": "Bộ nhớ mỗi thẻ",
+        "result": "Tiết kiệm tới {memory}",
+        "before": "Trước",
+        "after": "Sau khi dùng SaveTabs",
+        "afterValue": "1 phiên",
+        "disclaimer": "Chỉ là ước tính minh họa. Bộ nhớ thực tế phụ thuộc vào các trang web và trình duyệt."
       }
     },
     "privacy": {
