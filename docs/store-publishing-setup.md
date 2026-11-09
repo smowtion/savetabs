@@ -79,7 +79,7 @@ export CHROME_SERVICE_ACCOUNT_PRIVATE_KEY="$(jq -r '.private_key' service-accoun
 pnpm --filter @savetabs/extension exec wxt submit \
   --dry-run \
   --chrome-api-version v2 \
-  --chrome-zip /Users/admin/Workingspace/SaveTabs/apps/extension/.output/savetabs-0.2.2-chrome.zip
+  --chrome-zip "$PWD/apps/extension/.output/savetabs-0.2.3-chrome.zip"
 ```
 
 Pass the PEM through the environment, not as a CLI flag: a PEM starts with
