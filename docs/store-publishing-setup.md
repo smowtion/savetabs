@@ -71,15 +71,19 @@ multi-line secret file.
 
 ```bash
 cd ~/Workingspace/SaveTabs
+export CHROME_EXTENSION_ID="<extension-id>"
+export CHROME_PUBLISHER_ID="<publisher-uuid>"
+export CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL="<service-account-email>"
+export CHROME_SERVICE_ACCOUNT_PRIVATE_KEY="$(jq -r '.private_key' service-account.json)"
+
 pnpm --filter @savetabs/extension exec wxt submit \
   --dry-run \
   --chrome-api-version v2 \
-  --chrome-extension-id "$CHROME_EXTENSION_ID" \
-  --chrome-publisher-id "$CHROME_PUBLISHER_ID" \
-  --chrome-service-account-client-email "$CHROME_SERVICE_ACCOUNT_EMAIL" \
-  --chrome-service-account-private-key "$(cat chrome-service-account.pem)" \
-  --chrome-zip apps/extension/.output/savetabs-0.2.2-chrome.zip
+  --chrome-zip /Users/admin/Workingspace/SaveTabs/apps/extension/.output/savetabs-0.2.2-chrome.zip
 ```
+
+Pass the PEM through the environment, not as a CLI flag: a PEM starts with
+`-----`, which the argument parser treats as another option.
 
 ## Firefox Add-ons (AMO)
 
