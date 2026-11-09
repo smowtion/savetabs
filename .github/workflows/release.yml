@@ -202,9 +202,23 @@ jobs:
           # Pass credentials through the environment: a PEM value starts with
           # dashes, so passing it as a CLI flag makes the argument parser treat
           # it as another option.
+          set +e
           pnpm --filter @savetabs/extension exec wxt submit \
             --chrome-api-version v2 \
-            --chrome-zip "$GITHUB_WORKSPACE/apps/extension/.output/savetabs-${SAVETABS_VERSION}-chrome.zip"
+            --chrome-zip "$GITHUB_WORKSPACE/apps/extension/.output/savetabs-${SAVETABS_VERSION}-chrome.zip" \
+            > "$RUNNER_TEMP/chrome-submit.log" 2>&1
+          status=$?
+          set -e
+          cat "$RUNNER_TEMP/chrome-submit.log"
+          if [ "$status" -eq 0 ]; then exit 0; fi
+          # Chrome refuses any upload while a previous version is mid-review
+          # (NOT_UPDATEABLE). That is a waiting state, not a broken release:
+          # warn and let the run stay green, then submit after the review.
+          if grep -qE "NOT_UPDATEABLE|item that is in review" "$RUNNER_TEMP/chrome-submit.log"; then
+            echo "::warning::Chrome Web Store still reviews a previous version; this upload is skipped. Re-run after it is approved."
+            exit 0
+          fi
+          exit "$status"
 
       - name: Submit to Firefox Add-ons
         id: firefox-submit
@@ -232,10 +246,23 @@ jobs:
             echo "::error::FIREFOX_EXTENSION_ID ($FIREFOX_EXTENSION_ID) does not match the manifest gecko id ($gecko_id)."
             exit 1
           fi
+          set +e
           pnpm --filter @savetabs/extension exec wxt submit \
             --firefox-extension-id "$FIREFOX_EXTENSION_ID" \
             --firefox-zip "$GITHUB_WORKSPACE/apps/extension/.output/savetabs-${SAVETABS_VERSION}-firefox.zip" \
-            --firefox-sources-zip "$GITHUB_WORKSPACE/apps/extension/.output/savetabs-${SAVETABS_VERSION}-sources.zip"
+            --firefox-sources-zip "$GITHUB_WORKSPACE/apps/extension/.output/savetabs-${SAVETABS_VERSION}-sources.zip" \
+            > "$RUNNER_TEMP/firefox-submit.log" 2>&1
+          status=$?
+          set -e
+          cat "$RUNNER_TEMP/firefox-submit.log"
+          if [ "$status" -eq 0 ]; then exit 0; fi
+          # AMO rejects a version that is already uploaded; the release is
+          # already there, so treat it as a no-op instead of a failure.
+          if grep -qiE "already exists|already been uploaded|version .* already" "$RUNNER_TEMP/firefox-submit.log"; then
+            echo "::warning::Firefox Add-ons already has version ${SAVETABS_VERSION}; this upload is skipped."
+            exit 0
+          fi
+          exit "$status"
 
       # Keep the release run red when a store submission failed, without
       # hiding the other store's result.
