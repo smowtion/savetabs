@@ -24,6 +24,13 @@ type Release = {
 
 const RELEASES: readonly Release[] = [
   {
+    version: "0.2.4",
+    date: "2026-11-10",
+    items: [
+      "The toolbar icon's right-click menu now has a Settings item, so Options stay reachable when the icon is set to save tabs or open sessions instead of the popup.",
+    ],
+  },
+  {
     version: "0.2.3",
     date: "2026-11-10",
     items: [

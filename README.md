@@ -263,7 +263,7 @@ The production deployment runs the 0.2.x line:
 - Web: `https://savetabs.azcom.dev` — static-assets Worker `savetabs-web` with
   SPA fallback, so `/privacy`, `/changelog` and `/sessions` resolve on first
   load.
-- Extension packages: `apps/extension/.output/savetabs-0.2.3-{chrome,firefox}.zip`,
+- Extension packages: `apps/extension/.output/savetabs-0.2.4-{chrome,firefox}.zip`,
   built with `WXT_SAVETABS_API_BASE=https://savetabs-api.azcom.dev`.
 
 Chrome Web Store 0.2.2 is pending review

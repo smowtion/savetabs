@@ -25,12 +25,13 @@ export const CONTEXT_MENU_IDS = {
   SAVE_TAB: "save-tab",
   SAVE_WINDOW: "save-window",
   SAVE_SELECTION: "save-selection",
+  SETTINGS: "open-settings",
 } as const;
 
 export type ContextMenuId =
   (typeof CONTEXT_MENU_IDS)[keyof typeof CONTEXT_MENU_IDS];
 
-export type ContextMenuContext = "page" | "tab";
+export type ContextMenuContext = "action" | "page" | "tab";
 
 export type ContextMenuDefinition = {
   id: ContextMenuId;
@@ -47,6 +48,7 @@ const CONTEXT_MENU_TITLE_KEYS: Record<ContextMenuId, string> = {
   [CONTEXT_MENU_IDS.SAVE_TAB]: "contextMenu.saveTab",
   [CONTEXT_MENU_IDS.SAVE_WINDOW]: "contextMenu.saveWindow",
   [CONTEXT_MENU_IDS.SAVE_SELECTION]: "contextMenu.saveSelection",
+  [CONTEXT_MENU_IDS.SETTINGS]: "common.settings",
 };
 
 /** Browser UI language; falls back to English outside a browser context. */
@@ -63,37 +65,48 @@ function createMenuTranslator(settings: Settings): Translator {
   return createTranslator(resolveLang(language, getBrowserLanguage()));
 }
 
-/** Menu entries enabled by the current settings, in stable display order. */
+/**
+ * Menu entries enabled by the current settings, in stable display order.
+ *
+ * The toolbar-icon "Settings" item is always present. It is the way back to
+ * Options when `open.toolbarAction` makes the icon save or open sessions
+ * instead of the popup, so disabling the page menus must not remove it.
+ */
 export function getContextMenuDefinitions(
   settings: Settings,
 ): ContextMenuDefinition[] {
-  if (settings["contextMenu.enabled"] !== true) return [];
-
   const translate = createMenuTranslator(settings);
   const definitions: ContextMenuDefinition[] = [];
-  if (settings["contextMenu.saveTab"] === true) {
-    definitions.push({
-      id: CONTEXT_MENU_IDS.SAVE_TAB,
-      title: translate(CONTEXT_MENU_TITLE_KEYS[CONTEXT_MENU_IDS.SAVE_TAB]),
-      contexts: ["page", "tab"],
-    });
+  if (settings["contextMenu.enabled"] === true) {
+    if (settings["contextMenu.saveTab"] === true) {
+      definitions.push({
+        id: CONTEXT_MENU_IDS.SAVE_TAB,
+        title: translate(CONTEXT_MENU_TITLE_KEYS[CONTEXT_MENU_IDS.SAVE_TAB]),
+        contexts: ["page", "tab"],
+      });
+    }
+    if (settings["contextMenu.saveWindow"] === true) {
+      definitions.push({
+        id: CONTEXT_MENU_IDS.SAVE_WINDOW,
+        title: translate(CONTEXT_MENU_TITLE_KEYS[CONTEXT_MENU_IDS.SAVE_WINDOW]),
+        contexts: ["page", "tab"],
+      });
+    }
+    if (settings["contextMenu.saveSelection"] === true) {
+      definitions.push({
+        id: CONTEXT_MENU_IDS.SAVE_SELECTION,
+        title: translate(
+          CONTEXT_MENU_TITLE_KEYS[CONTEXT_MENU_IDS.SAVE_SELECTION],
+        ),
+        contexts: ["tab"],
+      });
+    }
   }
-  if (settings["contextMenu.saveWindow"] === true) {
-    definitions.push({
-      id: CONTEXT_MENU_IDS.SAVE_WINDOW,
-      title: translate(CONTEXT_MENU_TITLE_KEYS[CONTEXT_MENU_IDS.SAVE_WINDOW]),
-      contexts: ["page", "tab"],
-    });
-  }
-  if (settings["contextMenu.saveSelection"] === true) {
-    definitions.push({
-      id: CONTEXT_MENU_IDS.SAVE_SELECTION,
-      title: translate(
-        CONTEXT_MENU_TITLE_KEYS[CONTEXT_MENU_IDS.SAVE_SELECTION],
-      ),
-      contexts: ["tab"],
-    });
-  }
+  definitions.push({
+    id: CONTEXT_MENU_IDS.SETTINGS,
+    title: translate(CONTEXT_MENU_TITLE_KEYS[CONTEXT_MENU_IDS.SETTINGS]),
+    contexts: ["action"],
+  });
   return definitions;
 }
 
@@ -164,6 +177,10 @@ export async function handleContextMenuClick(
       });
       return;
     }
+
+    case CONTEXT_MENU_IDS.SETTINGS:
+      await browser.runtime.openOptionsPage();
+      return;
 
     default:
       return;
