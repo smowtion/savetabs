@@ -685,7 +685,7 @@
         "title": "Guarda cada pestaña. Recupéralas más tarde.",
         "description": "SaveTabs guarda toda una ventana del navegador como una sesión, cierra las pestañas y las vuelve a abrir cuando las necesitas. Se ejecuta en tu navegador y mantiene tus sesiones en tu dispositivo.",
         "chrome": "Añadir a Chrome",
-        "firefox": "Firefox",
+        "firefox": "Añadir a Firefox",
         "comingSoon": "Próximamente",
         "noAccount": "No necesitas cuenta. El uso local funciona sin registrarte.",
         "mockup": {
@@ -695,7 +695,8 @@
           "sessionTwo": "Lista de lectura",
           "restore": "Restaurar",
           "sync": "Sincronización activada"
-        }
+        },
+        "safari": "Safari"
       },
       "trust": {
         "label": "Aspectos destacados",
@@ -710,12 +711,16 @@
         "tabs": {
           "sessions": "Sesiones",
           "settings": "Ajustes",
-          "popup": "Ventana emergente"
+          "popup": "Ventana emergente",
+          "promo": "Vista general",
+          "privacy": "Privacidad y sincronización"
         },
         "captions": {
           "sessions": "Cada ventana guardada se convierte en una sesión que puedes restaurar más tarde.",
           "settings": "Elige qué se guarda, se cierra y se sincroniza.",
-          "popup": "Guarda todas las pestañas de la ventana actual con un clic."
+          "popup": "Guarda todas las pestañas de la ventana actual con un clic.",
+          "promo": "Guarda una ventana completa y restaura las mismas pestañas cuando las necesites.",
+          "privacy": "Privacidad por defecto. Sincronización cifrada solo si la activas."
         }
       },
       "guide": {
@@ -802,7 +807,7 @@
         "items": {
           "install": {
             "title": "Instalación",
-            "body": "Abre la página de Chrome Web Store, elige Añadir a Chrome y fija SaveTabs en la barra de herramientas. Firefox aún no está publicado."
+            "body": "Abre la tienda de extensiones de tu navegador, añade SaveTabs y fíjalo a la barra de herramientas. Disponible para Chrome y Firefox; el soporte para Safari está en desarrollo."
           },
           "uninstall": {
             "title": "Desinstalación",
@@ -816,7 +821,38 @@
       },
       "footer": {
         "privacy": "Privacidad",
-        "store": "Chrome Web Store"
+        "store": "Chrome Web Store",
+        "firefoxStore": "Complementos de Firefox"
+      },
+      "faq": {
+        "title": "Resolvemos tus dudas",
+        "subtitle": "Lo que conviene saber antes de guardar tu primera ventana.",
+        "items": {
+          "account": {
+            "q": "¿Necesito una cuenta?",
+            "a": "No. SaveTabs funciona de forma local y la sincronización con solo una clave no requiere cuenta. La cuenta es opcional y facilita la configuración en un dispositivo nuevo."
+          },
+          "storage": {
+            "q": "¿Dónde se guardan mis sesiones?",
+            "a": "Las sesiones se guardan en el almacenamiento de extensiones de tu navegador. Si activas la sincronización, se guardan copias cifradas en la nube."
+          },
+          "devices": {
+            "q": "¿Puedo restaurarlas en otro dispositivo o navegador?",
+            "a": "Sí. Activa la sincronización con la misma clave en otro dispositivo. Se admiten Chrome, Firefox y Safari, y el visor web permite consultar las sesiones sincronizadas."
+          },
+          "lostKey": {
+            "q": "¿Qué pasa si pierdo mi clave de sincronización?",
+            "a": "La clave es la única forma de descifrar las sesiones sincronizadas. Exporta las sesiones importantes como JSON antes de perderla; sin la clave, los datos de la nube no se pueden recuperar."
+          },
+          "tabs": {
+            "q": "¿Se cierran mis pestañas al guardar?",
+            "a": "Sí, por defecto, para despejar la ventana. Puedes desactivar el cierre tras guardar en Ajustes."
+          },
+          "free": {
+            "q": "¿SaveTabs es gratis?",
+            "a": "La extensión básica es gratuita: sin anuncios, sin rastreo y sin necesidad de cuenta. Incluye funciones opcionales de sincronización y cuentas."
+          }
+        }
       }
     },
     "sessions": {

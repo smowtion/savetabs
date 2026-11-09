@@ -2,7 +2,7 @@ import type { Translator } from "@savetabs/shared";
 import { Link } from "react-router-dom";
 
 import { TEXT_LINK_CLASS } from "./landing-styles";
-import { CHROME_STORE_URL, SUPPORT_EMAIL } from "./store-links";
+import { CHROME_STORE_URL, FIREFOX_STORE_URL, SUPPORT_EMAIL } from "./store-links";
 
 /**
  * Footer: support address, privacy policy and the store listing.
@@ -42,6 +42,14 @@ export function SiteFooter({ t }: Props) {
             className={TEXT_LINK_CLASS}
           >
             {t("web.landing.footer.store")}
+          </a>
+          <a
+            href={FIREFOX_STORE_URL}
+            target="_blank"
+            rel="noreferrer noopener"
+            className={TEXT_LINK_CLASS}
+          >
+            {t("web.landing.footer.firefoxStore")}
           </a>
         </div>
       </div>

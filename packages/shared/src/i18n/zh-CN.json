@@ -685,7 +685,7 @@
         "title": "保存每个标签页。以后随时找回。",
         "description": "SaveTabs 将整个浏览器窗口保存为一个会话，关闭这些标签页，并在你需要时重新打开。它在你的浏览器中运行，会话保留在你的设备上。",
         "chrome": "添加到 Chrome",
-        "firefox": "Firefox",
+        "firefox": "添加到 Firefox",
         "comingSoon": "即将推出",
         "noAccount": "无需账户。本地使用无需注册。",
         "mockup": {
@@ -695,7 +695,8 @@
           "sessionTwo": "阅读清单",
           "restore": "恢复",
           "sync": "同步已开启"
-        }
+        },
+        "safari": "Safari"
       },
       "trust": {
         "label": "产品亮点",
@@ -710,12 +711,16 @@
         "tabs": {
           "sessions": "会话",
           "settings": "设置",
-          "popup": "弹出窗口"
+          "popup": "弹出窗口",
+          "promo": "概览",
+          "privacy": "隐私与同步"
         },
         "captions": {
           "sessions": "每个保存的窗口都会成为一个可随时恢复的会话。",
           "settings": "选择要保存、关闭和同步的内容。",
-          "popup": "一键保存当前窗口中的所有标签页。"
+          "popup": "一键保存当前窗口中的所有标签页。",
+          "promo": "保存整个窗口，需要时原样恢复所有标签页。",
+          "privacy": "默认保护隐私。只有开启同步后，才会加密同步数据。"
         }
       },
       "guide": {
@@ -802,7 +807,7 @@
         "items": {
           "install": {
             "title": "安装",
-            "body": "打开 Chrome Web Store 页面，选择“添加到 Chrome”，并将 SaveTabs 固定到工具栏。Firefox 尚未发布。"
+            "body": "打开浏览器扩展商店，添加 SaveTabs 并将其固定到工具栏。目前支持 Chrome 和 Firefox，Safari 支持正在开发中。"
           },
           "uninstall": {
             "title": "卸载",
@@ -816,7 +821,38 @@
       },
       "footer": {
         "privacy": "隐私",
-        "store": "Chrome Web Store"
+        "store": "Chrome Web Store",
+        "firefoxStore": "Firefox 附加组件"
+      },
+      "faq": {
+        "title": "常见问题",
+        "subtitle": "首次保存窗口前，你可能想了解这些。",
+        "items": {
+          "account": {
+            "q": "需要账号吗？",
+            "a": "不需要。SaveTabs 可在本地使用，仅凭密钥即可同步，无需账号。账号为可选项，可让新设备的设置更轻松。"
+          },
+          "storage": {
+            "q": "我的会话存储在哪里？",
+            "a": "会话保存在浏览器的扩展存储空间中。开启同步后，加密副本会存储在云端。"
+          },
+          "devices": {
+            "q": "可以在其他设备或浏览器上恢复吗？",
+            "a": "可以。在其他设备上使用相同密钥开启同步即可。支持 Chrome、Firefox 和 Safari，也可通过网页查看器查看已同步的会话。"
+          },
+          "lostKey": {
+            "q": "同步密钥丢失了怎么办？",
+            "a": "密钥是解密已同步会话的唯一方式。请提前将重要会话导出为 JSON；没有密钥，云端数据将无法恢复。"
+          },
+          "tabs": {
+            "q": "保存时会关闭标签页吗？",
+            "a": "默认会关闭，以清空窗口。你可以在设置中关闭“保存后关闭标签页”。"
+          },
+          "free": {
+            "q": "SaveTabs 免费吗？",
+            "a": "核心扩展免费：无广告、不追踪、无需账号。内置可选的同步和账号功能。"
+          }
+        }
       }
     },
     "sessions": {

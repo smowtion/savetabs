@@ -685,7 +685,7 @@
         "title": "Save every tab. Get them back later.",
         "description": "SaveTabs stores a whole browser window as one session, closes the tabs, and reopens them when you need them. It runs in your browser and keeps your sessions on your device.",
         "chrome": "Add to Chrome",
-        "firefox": "Firefox",
+        "firefox": "Add to Firefox",
         "comingSoon": "Coming soon",
         "noAccount": "No account needed. Local use works without signing up.",
         "mockup": {
@@ -695,7 +695,8 @@
           "sessionTwo": "Reading list",
           "restore": "Restore",
           "sync": "Sync on"
-        }
+        },
+        "safari": "Safari"
       },
       "trust": {
         "label": "Product highlights",
@@ -710,12 +711,16 @@
         "tabs": {
           "sessions": "Sessions",
           "settings": "Settings",
-          "popup": "Popup"
+          "popup": "Popup",
+          "promo": "Overview",
+          "privacy": "Privacy & sync"
         },
         "captions": {
           "sessions": "Each saved window becomes one session you can restore later.",
           "settings": "Choose what gets saved, closed, and synced.",
-          "popup": "Save every tab in the current window in one click."
+          "popup": "Save every tab in the current window in one click.",
+          "promo": "Save a whole window, then restore the exact tabs when you need them.",
+          "privacy": "Private by default. Encrypted sync only when you turn it on."
         }
       },
       "guide": {
@@ -802,7 +807,7 @@
         "items": {
           "install": {
             "title": "Install",
-            "body": "Open the Chrome Web Store listing, choose Add to Chrome, and pin SaveTabs to the toolbar. Firefox is not published yet."
+            "body": "Open your browser add-on store, add SaveTabs, and pin it to the toolbar. Chrome and Firefox are available; Safari support is in progress."
           },
           "uninstall": {
             "title": "Uninstall",
@@ -816,7 +821,38 @@
       },
       "footer": {
         "privacy": "Privacy",
-        "store": "Chrome Web Store"
+        "store": "Chrome Web Store",
+        "firefoxStore": "Firefox Add-ons"
+      },
+      "faq": {
+        "title": "Questions, answered",
+        "subtitle": "The details people ask before saving their first window.",
+        "items": {
+          "account": {
+            "q": "Do I need an account?",
+            "a": "No. SaveTabs works locally and key-only sync needs no account. An account is optional and makes setup on a new device easier."
+          },
+          "storage": {
+            "q": "Where are my sessions stored?",
+            "a": "Sessions live in your browser extension storage. If you turn on sync, encrypted copies are stored in the cloud."
+          },
+          "devices": {
+            "q": "Can I restore on another device or browser?",
+            "a": "Yes. Enable sync with the same key on another device. Chrome, Firefox and Safari are supported, and the web viewer can read synced sessions."
+          },
+          "lostKey": {
+            "q": "What if I lose my sync key?",
+            "a": "The key is the only way to decrypt synced sessions. Export important sessions as JSON before losing it; without the key, cloud data cannot be recovered."
+          },
+          "tabs": {
+            "q": "Does saving close my tabs?",
+            "a": "By default yes, so the window clears. You can turn off closing after save in Settings."
+          },
+          "free": {
+            "q": "Is SaveTabs free?",
+            "a": "The core extension is free: no ads, no tracking, no account required. Optional sync and accounts are built in."
+          }
+        }
       }
     },
     "privacy": {

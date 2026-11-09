@@ -685,7 +685,7 @@
         "title": "Salve cada aba. Recupere-as depois.",
         "description": "O SaveTabs armazena uma janela inteira do navegador como uma sessão, fecha as abas e as reabre quando você precisa. Ele funciona no seu navegador e mantém suas sessões no seu dispositivo.",
         "chrome": "Adicionar ao Chrome",
-        "firefox": "Firefox",
+        "firefox": "Adicionar ao Firefox",
         "comingSoon": "Em breve",
         "noAccount": "Não precisa de conta. O uso local funciona sem cadastro.",
         "mockup": {
@@ -695,7 +695,8 @@
           "sessionTwo": "Lista de leitura",
           "restore": "Restaurar",
           "sync": "Sincronização ativada"
-        }
+        },
+        "safari": "Safari"
       },
       "trust": {
         "label": "Destaques do produto",
@@ -710,12 +711,16 @@
         "tabs": {
           "sessions": "Sessões",
           "settings": "Configurações",
-          "popup": "Pop-up"
+          "popup": "Pop-up",
+          "promo": "Visão geral",
+          "privacy": "Privacidade e sincronização"
         },
         "captions": {
           "sessions": "Cada janela guardada vira uma sessão que você pode restaurar depois.",
           "settings": "Escolha o que é guardado, fechado e sincronizado.",
-          "popup": "Guarde todas as abas da janela atual com um clique."
+          "popup": "Guarde todas as abas da janela atual com um clique.",
+          "promo": "Salve uma janela inteira e restaure as mesmas abas quando precisar.",
+          "privacy": "Privacidade por padrão. Sincronização criptografada só quando você ativar."
         }
       },
       "guide": {
@@ -802,7 +807,7 @@
         "items": {
           "install": {
             "title": "Instalar",
-            "body": "Abra a página do SaveTabs na Chrome Web Store, escolha Adicionar ao Chrome e fixe o SaveTabs na barra de ferramentas. O Firefox ainda não foi publicado."
+            "body": "Abra a loja de extensões do navegador, adicione o SaveTabs e fixe-o na barra de ferramentas. Disponível para Chrome e Firefox; o suporte ao Safari está em desenvolvimento."
           },
           "uninstall": {
             "title": "Desinstalar",
@@ -816,7 +821,38 @@
       },
       "footer": {
         "privacy": "Privacidade",
-        "store": "Chrome Web Store"
+        "store": "Chrome Web Store",
+        "firefoxStore": "Extensões do Firefox"
+      },
+      "faq": {
+        "title": "Suas dúvidas, respondidas",
+        "subtitle": "O que você precisa saber antes de salvar sua primeira janela.",
+        "items": {
+          "account": {
+            "q": "Preciso de uma conta?",
+            "a": "Não. O SaveTabs funciona localmente, e a sincronização apenas com chave não exige conta. A conta é opcional e facilita a configuração em um novo dispositivo."
+          },
+          "storage": {
+            "q": "Onde minhas sessões são armazenadas?",
+            "a": "As sessões ficam no armazenamento de extensões do navegador. Se você ativar a sincronização, cópias criptografadas serão armazenadas na nuvem."
+          },
+          "devices": {
+            "q": "Posso restaurar em outro dispositivo ou navegador?",
+            "a": "Sim. Ative a sincronização com a mesma chave em outro dispositivo. Chrome, Firefox e Safari são compatíveis, e o visualizador web permite consultar as sessões sincronizadas."
+          },
+          "lostKey": {
+            "q": "E se eu perder minha chave de sincronização?",
+            "a": "A chave é a única forma de descriptografar as sessões sincronizadas. Exporte as sessões importantes como JSON antes de perdê-la; sem a chave, não é possível recuperar os dados na nuvem."
+          },
+          "tabs": {
+            "q": "Salvar fecha minhas abas?",
+            "a": "Sim, por padrão, para deixar a janela livre. Você pode desativar o fechamento após salvar nas Configurações."
+          },
+          "free": {
+            "q": "O SaveTabs é gratuito?",
+            "a": "A extensão básica é gratuita: sem anúncios, sem rastreamento e sem exigir conta. Inclui recursos opcionais de sincronização e contas."
+          }
+        }
       }
     },
     "sessions": {

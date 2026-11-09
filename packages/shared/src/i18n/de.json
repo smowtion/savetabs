@@ -685,7 +685,7 @@
         "title": "Jeden Tab speichern. Später zurückholen.",
         "description": "SaveTabs speichert ein ganzes Browserfenster als eine Sitzung, schließt die Tabs und öffnet sie bei Bedarf wieder. Die Erweiterung läuft im Browser und behält die Sitzungen auf diesem Gerät.",
         "chrome": "Zu Chrome hinzufügen",
-        "firefox": "Firefox",
+        "firefox": "Zu Firefox hinzufügen",
         "comingSoon": "Demnächst verfügbar",
         "noAccount": "Kein Konto erforderlich. Die lokale Nutzung funktioniert ohne Registrierung.",
         "mockup": {
@@ -695,7 +695,8 @@
           "sessionTwo": "Leseliste",
           "restore": "Wiederherstellen",
           "sync": "Synchronisierung an"
-        }
+        },
+        "safari": "Safari"
       },
       "trust": {
         "label": "Produktmerkmale",
@@ -710,12 +711,16 @@
         "tabs": {
           "sessions": "Sitzungen",
           "settings": "Einstellungen",
-          "popup": "Popup"
+          "popup": "Popup",
+          "promo": "Übersicht",
+          "privacy": "Datenschutz & Synchronisierung"
         },
         "captions": {
           "sessions": "Jedes gespeicherte Fenster wird zu einer Sitzung, die du später wiederherstellen kannst.",
           "settings": "Lege fest, was gespeichert, geschlossen und synchronisiert wird.",
-          "popup": "Speichere alle Tabs des aktuellen Fensters mit einem Klick."
+          "popup": "Speichere alle Tabs des aktuellen Fensters mit einem Klick.",
+          "promo": "Speichere ein ganzes Fenster und stelle dieselben Tabs wieder her, wenn du sie brauchst.",
+          "privacy": "Standardmäßig privat. Verschlüsselte Synchronisierung nur, wenn du sie aktivierst."
         }
       },
       "guide": {
@@ -802,7 +807,7 @@
         "items": {
           "install": {
             "title": "Installieren",
-            "body": "Den Chrome Web Store öffnen, Zu Chrome hinzufügen wählen und SaveTabs an die Symbolleiste anheften. Firefox ist noch nicht veröffentlicht."
+            "body": "Öffne den Erweiterungs-Store deines Browsers, füge SaveTabs hinzu und hefte es an die Symbolleiste an. Für Chrome und Firefox verfügbar; die Safari-Unterstützung ist in Arbeit."
           },
           "uninstall": {
             "title": "Deinstallieren",
@@ -816,7 +821,38 @@
       },
       "footer": {
         "privacy": "Datenschutz",
-        "store": "Chrome Web Store"
+        "store": "Chrome Web Store",
+        "firefoxStore": "Firefox-Add-ons"
+      },
+      "faq": {
+        "title": "Deine Fragen, beantwortet",
+        "subtitle": "Was du vor dem Speichern deines ersten Fensters wissen möchtest.",
+        "items": {
+          "account": {
+            "q": "Brauche ich ein Konto?",
+            "a": "Nein. SaveTabs funktioniert lokal, und für die Synchronisierung nur per Schlüssel ist kein Konto nötig. Ein Konto ist optional und erleichtert die Einrichtung auf einem neuen Gerät."
+          },
+          "storage": {
+            "q": "Wo werden meine Sitzungen gespeichert?",
+            "a": "Sitzungen liegen im Erweiterungsspeicher deines Browsers. Wenn du die Synchronisierung aktivierst, werden verschlüsselte Kopien in der Cloud gespeichert."
+          },
+          "devices": {
+            "q": "Kann ich Sitzungen auf einem anderen Gerät oder in einem anderen Browser wiederherstellen?",
+            "a": "Ja. Aktiviere die Synchronisierung mit demselben Schlüssel auf einem anderen Gerät. Chrome, Firefox und Safari werden unterstützt. Im Web-Viewer kannst du synchronisierte Sitzungen ansehen."
+          },
+          "lostKey": {
+            "q": "Was passiert, wenn ich meinen Synchronisierungsschlüssel verliere?",
+            "a": "Nur mit dem Schlüssel lassen sich synchronisierte Sitzungen entschlüsseln. Exportiere wichtige Sitzungen vorsorglich als JSON. Ohne den Schlüssel können die Cloud-Daten nicht wiederhergestellt werden."
+          },
+          "tabs": {
+            "q": "Werden meine Tabs beim Speichern geschlossen?",
+            "a": "Standardmäßig ja, damit das Fenster leer ist. Du kannst das Schließen nach dem Speichern in den Einstellungen deaktivieren."
+          },
+          "free": {
+            "q": "Ist SaveTabs kostenlos?",
+            "a": "Die Grundfunktionen der Erweiterung sind kostenlos: keine Werbung, kein Tracking, kein Konto nötig. Optionale Synchronisierung und Konten sind integriert."
+          }
+        }
       }
     },
     "sessions": {

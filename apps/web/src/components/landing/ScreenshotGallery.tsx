@@ -9,7 +9,7 @@ import {
 } from "./landing-styles";
 
 /**
- * Screenshot gallery for the three extension surfaces.
+ * Screenshot gallery for the extension surfaces and the promotional art.
  *
  * The gallery is a standard ARIA tabset: the tabs move with the arrow, Home
  * and End keys, every tab points at its own panel, and only the selected
@@ -23,12 +23,14 @@ import {
 
 type Props = { t: Translator };
 
-type GalleryKey = "sessions" | "settings" | "popup";
+type GalleryKey = "promo" | "sessions" | "settings" | "popup" | "privacy";
 
 const ITEMS: ReadonlyArray<{ key: GalleryKey; src: string }> = [
+  { key: "promo", src: "/screenshots/overview-showcase.webp" },
   { key: "sessions", src: "/screenshots/sessions.png" },
   { key: "settings", src: "/screenshots/settings.png" },
   { key: "popup", src: "/screenshots/popup.png" },
+  { key: "privacy", src: "/screenshots/privacy-showcase.webp" },
 ];
 
 export function ScreenshotGallery({ t }: Props) {
