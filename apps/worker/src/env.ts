@@ -6,11 +6,6 @@ export interface Env {
   RELEASES: R2Bucket;
   /** Web app origin allowed to make cross-origin requests (used in Task 23). */
   WEB_ORIGIN: string;
-  /**
-   * Global daily request cap. Wrangler vars arrive as strings, so callers
-   * parse it before comparing (Task 23).
-   */
-  GLOBAL_DAILY_REQUESTS: string;
   /** Maximum number of sync keys the service accepts (Task 23). */
   GLOBAL_MAX_KEYS: string;
   /**

@@ -3,17 +3,25 @@ import type { Env } from "./env";
 
 export const CORS_ALLOW_METHODS = "GET, POST, PUT, DELETE, OPTIONS";
 export const CORS_ALLOW_HEADERS = "Authorization, Content-Type";
+/**
+ * Cache preflights for a day. Every authorized request carries a
+ * non-safelisted Authorization header, so an uncached preflight would double
+ * the Worker request count for each API call.
+ */
+export const CORS_MAX_AGE_SECONDS = 86_400;
 
 /**
  * Browser origins allowed to call the API:
  * - the web app origin from `WEB_ORIGIN`;
- * - Chrome and Firefox extension pages. Extension origins are opaque and
- *   per-install, so they cannot be listed in configuration; the API does not
- *   use cookies, so reflecting these origins is safe.
+ * - Chrome, Firefox and Safari extension pages. Extension origins are opaque
+ *   and per-install, so they cannot be listed in configuration; the API does
+ *   not use cookies, so reflecting these origins is safe.
  */
 export function isAllowedOrigin(origin: string, webOrigin: string): boolean {
   if (origin === webOrigin) return true;
-  return /^(chrome|moz)-extension:\/\/[A-Za-z0-9._-]+$/.test(origin);
+  return /^(chrome|moz|safari|safari-web)-extension:\/\/[A-Za-z0-9._-]+$/.test(
+    origin,
+  );
 }
 
 /**
@@ -40,6 +48,7 @@ export const corsMiddleware: MiddlewareHandler<{ Bindings: Env }> = async (
     if (allowOrigin !== undefined) {
       c.header("Access-Control-Allow-Methods", CORS_ALLOW_METHODS);
       c.header("Access-Control-Allow-Headers", CORS_ALLOW_HEADERS);
+      c.header("Access-Control-Max-Age", String(CORS_MAX_AGE_SECONDS));
     }
     return c.body(null, 204);
   }

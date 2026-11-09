@@ -165,6 +165,22 @@ class FakeClient implements SyncClientApi {
   }
 }
 
+class SnapshotClient extends FakeClient {
+  snapshotCalls = 0;
+  snapshotError: unknown = null;
+
+  async snapshot() {
+    this.snapshotCalls += 1;
+    if (this.snapshotError !== null) throw this.snapshotError;
+    return {
+      summaries: this.summaries,
+      deletions: this.deletions,
+      blobs: this.pages[0] ?? [],
+      ...(this.pages.length > 1 ? { nextPage: 1 } : {}),
+    };
+  }
+}
+
 type HarnessOptions = {
   enabled?: boolean;
   key?: string | undefined;
@@ -317,6 +333,59 @@ describe("enqueueUpload", () => {
 });
 
 describe("syncNow", () => {
+  it("reads the initial remote state with one snapshot request", async () => {
+    const client = new SnapshotClient();
+    const { derived, repo, service } = await createHarness({ client });
+    const remote = makeSession({ id: "remote", updatedAt: 50 });
+    client.pages = [[await encryptedBlob(remote, derived)]];
+
+    const result = await service.syncNow();
+
+    expect(result).toMatchObject({ downloaded: 1, errors: [] });
+    expect(client.snapshotCalls).toBe(1);
+    expect(client.blobPageRequests).toEqual([]);
+    expect(repo.sessions.get("remote")).toBeDefined();
+  });
+
+  it("pages /blobs only when the snapshot reports more blobs", async () => {
+    const client = new SnapshotClient();
+    const { derived, repo, service } = await createHarness({ client });
+    const first = makeSession({ id: "first", updatedAt: 50 });
+    const second = makeSession({ id: "second", updatedAt: 40 });
+    client.pages = [
+      [await encryptedBlob(first, derived)],
+      [await encryptedBlob(second, derived)],
+    ];
+
+    const result = await service.syncNow();
+
+    expect(result).toMatchObject({ downloaded: 2, errors: [] });
+    expect(client.snapshotCalls).toBe(1);
+    expect(client.blobPageRequests).toEqual([1]);
+    expect(repo.sessions.get("first")).toBeDefined();
+    expect(repo.sessions.get("second")).toBeDefined();
+  });
+
+  it("falls back to legacy reads when the server predates the snapshot route", async () => {
+    const client = new SnapshotClient();
+    client.snapshotError = new SyncHttpError(
+      404,
+      "not_found",
+      "Route not found.",
+    );
+    const { derived, repo, service } = await createHarness({ client });
+    const remote = makeSession({ id: "remote", updatedAt: 50 });
+    client.summaries = [{ id: "remote", updatedAt: 50, size: 10 }];
+    client.pages = [[await encryptedBlob(remote, derived)]];
+
+    const result = await service.syncNow();
+
+    expect(result).toMatchObject({ downloaded: 1, errors: [] });
+    expect(client.snapshotCalls).toBe(1);
+    expect(client.blobPageRequests).toEqual([0]);
+    expect(repo.sessions.get("remote")).toBeDefined();
+  });
+
   it("returns zeros without touching the network when sync is disabled", async () => {
     const { createClient, service } = await createHarness({ enabled: false });
 

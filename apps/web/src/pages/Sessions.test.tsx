@@ -542,6 +542,41 @@ describe("Sessions page", () => {
     );
   });
 
+  it("lists every saved tab URL in one read-only text area", async () => {
+    const session = sessionFixture({ title: "URLs" });
+    const blob = await encryptedBlob(session);
+    mockFetch(() => jsonResponse({ blobs: [blob] }));
+
+    renderSessions();
+
+    await screen.findByRole("heading", { name: "URLs" });
+    const field = screen.getByRole("textbox", { name: "All URLs" });
+
+    expect(field).toHaveValue(
+      "https://example.com/a\nhttps://docs.example.com/b",
+    );
+    expect(field).toHaveAttribute("readonly");
+  });
+
+  it("changes the tab view mode from the page header", async () => {
+    const user = userEvent.setup();
+    const session = sessionFixture({ title: "View me" });
+    const blob = await encryptedBlob(session);
+    mockFetch(() => jsonResponse({ blobs: [blob] }));
+
+    renderSessions();
+
+    await screen.findByRole("heading", { name: "View me" });
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "View" }),
+      "full-url",
+    );
+
+    expect(
+      await screen.findByRole("link", { name: "https://example.com/a" }),
+    ).toBeInTheDocument();
+  });
+
   it("opens every tab of a session in a new browser tab", async () => {
     const user = userEvent.setup();
     const session = sessionFixture({ title: "Restore me" });

@@ -88,6 +88,12 @@ jobs:
       - name: Check versions are in sync
         run: node scripts/update-versions.mjs --check
 
+      # Serve the update manifest as a static Pages asset. The extension checks
+      # it daily; routing that through the Worker would spend one request per
+      # installed user per day.
+      - name: Stage versions.json for the static update check
+        run: cp versions.json apps/web/public/versions.json
+
       - name: Typecheck
         run: pnpm typecheck
 
@@ -144,16 +150,13 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: pnpm --filter @savetabs/worker exec wrangler deploy
 
-      - name: Deploy web app to Cloudflare Pages
+      - name: Deploy web app Worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: >-
-          pnpm --filter @savetabs/worker exec wrangler pages deploy
-          "$GITHUB_WORKSPACE/apps/web/dist"
-          --project-name savetabs
-          --branch main
-          --commit-dirty=true
+          pnpm --filter @savetabs/worker exec wrangler deploy
+          --config "$GITHUB_WORKSPACE/apps/web/wrangler.toml"
 
       - name: Upload release artifacts
         uses: actions/upload-artifact@v4

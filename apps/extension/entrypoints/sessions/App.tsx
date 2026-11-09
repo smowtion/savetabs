@@ -43,6 +43,13 @@ import {
 type Status = { kind: "success" | "error"; message: string };
 type ErrorResponse = Extract<UiResponse, { ok: false }>;
 
+/** Values offered by the sessions-page view selector. */
+const DISPLAY_MODES: readonly UrlDisplayMode[] = [
+  "title",
+  "domain",
+  "full-url",
+];
+
 /** Normalize the stored `urlDisplay.mode` value. */
 function normalizeDisplayMode(value: unknown): UrlDisplayMode {
   return value === "domain" || value === "full-url" ? value : "title";
@@ -93,6 +100,13 @@ export function App() {
 
   const themePreference = normalizeThemePreference(settings?.["general.theme"]);
   useTheme(themePreference);
+  const displayMode = normalizeDisplayMode(settings?.["urlDisplay.mode"]);
+
+  function changeDisplayMode(next: string): void {
+    void updateSetting("urlDisplay.mode", next).catch((error) => {
+      console.error("[savetabs] failed to save the URL display mode", error);
+    });
+  }
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -289,6 +303,22 @@ export function App() {
           </h1>
 
           <div className="flex flex-1 flex-wrap items-center justify-end gap-2">
+            {settings !== null && (
+              <label className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-600 dark:text-neutral-400">
+                {t("sessions.viewMode")}
+                <select
+                  value={displayMode}
+                  onChange={(event) => changeDisplayMode(event.target.value)}
+                  className="rounded-md border border-neutral-300 bg-white px-2 py-1.5 text-xs text-neutral-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+                >
+                  {DISPLAY_MODES.map((mode) => (
+                    <option key={mode} value={mode}>
+                      {t(`settings.option.urlDisplay.mode.${mode}`)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
             <SearchBar
               value={query}
               onChange={setQuery}
@@ -354,9 +384,7 @@ export function App() {
                   onToggleExpanded={() =>
                     toggleExpanded(session.id, expandedByDefault)
                   }
-                  displayMode={normalizeDisplayMode(
-                    settings["urlDisplay.mode"],
-                  )}
+                  displayMode={displayMode}
                   showFavicons={readBoolean(
                     settings,
                     "urlDisplay.showFavicons",

@@ -42,6 +42,7 @@ import {
   type Session,
   type SessionSummary,
   type Settings,
+  type SyncSnapshot,
   type Tombstone,
 } from "@savetabs/shared";
 
@@ -75,6 +76,12 @@ export type SyncResult = {
 
 /** Subset of `SyncClient` the service needs; tests substitute a fake. */
 export type SyncClientApi = {
+  /**
+   * One-request read of summaries, tombstones and the first blob page.
+   * Optional so older test doubles and older servers can fall back to the
+   * three-request path.
+   */
+  snapshot?(): Promise<SyncSnapshot>;
   listSummaries(): Promise<SessionSummary[]>;
   listBlobs(
     page?: number,
@@ -172,6 +179,29 @@ async function readRemoteOrEmpty<T>(
   }
 }
 
+/**
+ * Try the one-request snapshot endpoint.
+ *
+ * Returns `null` when the client or the deployed server predates the route, so
+ * syncNow can use the legacy three-request path. A 404 naming the key itself
+ * is a real empty vault, not a missing route.
+ */
+async function readSnapshotOrFallback(
+  client: SyncClientApi,
+): Promise<SyncSnapshot | null> {
+  if (client.snapshot === undefined) return null;
+
+  try {
+    return await client.snapshot();
+  } catch (error) {
+    if (error instanceof SyncHttpError && error.status === 404) {
+      if (error.message.toLowerCase().includes("route not found")) return null;
+      return { summaries: [], deletions: [], blobs: [] };
+    }
+    throw error;
+  }
+}
+
 /** Build a service bound to the given dependencies (production by default). */
 export function createSyncService(
   overrides: Partial<SyncServiceDeps> = {},
@@ -222,25 +252,29 @@ export function createSyncService(
     client: SyncClientApi,
     derived: DerivedKeys,
     result: SyncResult,
+    initial?: { blobs: RemoteSessionBlob[]; nextPage?: number },
   ): Promise<Session[]> {
     const remote: Session[] = [];
     const seenPages = new Set<number>();
-    let page = 0;
+    let response: BlobPage;
 
-    for (;;) {
-      if (seenPages.has(page)) {
-        result.errors.push(
-          `download: the server repeated blob page ${page}; stopped paging.`,
-        );
-        break;
-      }
-      seenPages.add(page);
-
-      const response = await readRemoteOrEmpty<BlobPage>(
-        () => client.listBlobs(page, BLOB_PAGE_SIZE),
+    // A snapshot already carries page 0, so a normal account downloads in one
+    // request. Only accounts with more than one blob page call /blobs.
+    if (initial !== undefined) {
+      response =
+        initial.nextPage === undefined
+          ? { blobs: initial.blobs }
+          : { blobs: initial.blobs, nextPage: initial.nextPage };
+      seenPages.add(0);
+    } else {
+      seenPages.add(0);
+      response = await readRemoteOrEmpty<BlobPage>(
+        () => client.listBlobs(0, BLOB_PAGE_SIZE),
         { blobs: [] },
       );
+    }
 
+    for (;;) {
       for (const blob of response.blobs) {
         try {
           remote.push(
@@ -256,8 +290,19 @@ export function createSyncService(
         }
       }
 
-      if (response.nextPage === undefined) break;
-      page = response.nextPage;
+      const nextPage = response.nextPage;
+      if (nextPage === undefined) break;
+      if (seenPages.has(nextPage)) {
+        result.errors.push(
+          `download: the server repeated blob page ${nextPage}; stopped paging.`,
+        );
+        break;
+      }
+      seenPages.add(nextPage);
+      response = await readRemoteOrEmpty<BlobPage>(
+        () => client.listBlobs(nextPage, BLOB_PAGE_SIZE),
+        { blobs: [] },
+      );
     }
 
     return remote;
@@ -520,15 +565,25 @@ export function createSyncService(
     // partial result instead of throwing out of the UI handler.
     let summaries: SessionSummary[];
     let remoteDeletions: RemoteDeletion[];
+    let initialBlobs: RemoteSessionBlob[] | undefined;
+    let initialNextPage: number | undefined;
     try {
-      summaries = await readRemoteOrEmpty<SessionSummary[]>(
-        () => client.listSummaries(),
-        [],
-      );
-      remoteDeletions = await readRemoteOrEmpty<RemoteDeletion[]>(
-        () => client.listDeletions(),
-        [],
-      );
+      const snapshot = await readSnapshotOrFallback(client);
+      if (snapshot !== null) {
+        summaries = snapshot.summaries;
+        remoteDeletions = snapshot.deletions;
+        initialBlobs = snapshot.blobs;
+        initialNextPage = snapshot.nextPage;
+      } else {
+        summaries = await readRemoteOrEmpty<SessionSummary[]>(
+          () => client.listSummaries(),
+          [],
+        );
+        remoteDeletions = await readRemoteOrEmpty<RemoteDeletion[]>(
+          () => client.listDeletions(),
+          [],
+        );
+      }
     } catch (error) {
       if (error instanceof SyncAuthError) throw error;
       result.errors.push(errorMessage(error));
@@ -554,7 +609,19 @@ export function createSyncService(
 
     let remoteSessions: Session[];
     try {
-      remoteSessions = await downloadRemoteSessions(client, derived, result);
+      remoteSessions = await downloadRemoteSessions(
+        client,
+        derived,
+        result,
+        initialBlobs === undefined
+          ? undefined
+          : {
+              blobs: initialBlobs,
+              ...(initialNextPage === undefined
+                ? {}
+                : { nextPage: initialNextPage }),
+            },
+      );
     } catch (error) {
       if (error instanceof SyncAuthError) throw error;
       result.errors.push(errorMessage(error));

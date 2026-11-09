@@ -172,6 +172,31 @@ describe("sessions page", () => {
     ).toBeInTheDocument();
   });
 
+  it("changes the saved-tab view mode from the header", async () => {
+    await addSession(
+      makeSession({
+        title: "A session",
+        tabs: [
+          { url: "https://docs.example.com/guide", title: "Guide" },
+        ],
+      }),
+    );
+
+    render(<App />);
+
+    const picker = await screen.findByRole("combobox", { name: "View" });
+    await userEvent.selectOptions(picker, "domain");
+
+    expect(
+      await screen.findByRole("link", { name: "docs.example.com" }),
+    ).toBeInTheDocument();
+    await waitFor(async () => {
+      const stored = await fakeBrowser.storage.local.get("settings");
+      const settings = stored.settings as Record<string, unknown>;
+      expect(settings["urlDisplay.mode"]).toBe("domain");
+    });
+  });
+
   it("sends SAVE_TABS for the save window button and refreshes", async () => {
     const sendMessage = stubSendMessage({
       ok: true,

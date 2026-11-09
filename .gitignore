@@ -1,3 +1,5 @@
+# Release-generated static update manifest (copied from versions.json)
+apps/web/public/versions.json
 node_modules/
 dist/
 .DS_Store

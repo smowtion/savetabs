@@ -11,7 +11,7 @@ import type { VersionInfo } from "@savetabs/shared";
 import { fakeBrowser } from "wxt/testing/fake-browser";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { API_BASE } from "./config";
+import { API_BASE, VERSION_MANIFEST_URL } from "./config";
 import { STORE_LISTING_URLS } from "./store-urls";
 import {
   LATEST_VERSION_STORAGE_KEY,
@@ -74,7 +74,23 @@ describe("checkForUpdate", () => {
       current: "1.2.3",
       updateAvailable: false,
     });
-    expect(fetchMock.mock.calls[0]?.[0]).toBe(`${API_BASE}/v1/version`);
+    expect(fetchMock.mock.calls[0]?.[0]).toBe(VERSION_MANIFEST_URL);
+  });
+
+  it("falls back to the Worker endpoint when the static manifest fails", async () => {
+    stubVersion("1.2.3");
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response("missing", { status: 404 }))
+      .mockResolvedValueOnce(jsonResponse(versionInfo("1.2.3", "1.2.3")));
+
+    await expect(checkForUpdate(fetchMock)).resolves.toEqual({
+      latest: "1.2.3",
+      current: "1.2.3",
+      updateAvailable: false,
+    });
+    expect(fetchMock.mock.calls[0]?.[0]).toBe(VERSION_MANIFEST_URL);
+    expect(fetchMock.mock.calls[1]?.[0]).toBe(`${API_BASE}/v1/version`);
   });
 
   it("reports an update when the published version is newer", async () => {

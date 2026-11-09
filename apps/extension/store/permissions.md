@@ -40,13 +40,21 @@ Adds right-click menu entries for Save tabs, Open sessions, and Discard inactive
 tabs now. The menu items call the same internal actions as the toolbar and
 keyboard shortcuts.
 
-## Host permission: the sync API origin only
+## Host permissions: sync API and the public release manifest
 
-`host_permissions` contains exactly one origin, the configured sync API base
-(set at build time through `WXT_SAVETABS_API_BASE`; the production build uses
-`https://savetabs-api.azcom.dev/*`). It is used only for optional end-to-end
-encrypted sync requests. When sync is off, the extension makes no requests to
-that origin. There is no broad host access and no access to browsing content.
+`host_permissions` contains two origins:
+
+- the configured sync API base (set at build time through
+  `WXT_SAVETABS_API_BASE`; the production build uses
+  `https://savetabs-api.azcom.dev/*`), used only for optional end-to-end
+  encrypted sync requests. When sync is off, the extension makes no requests
+  to that origin;
+- the public release manifest origin (production
+  `https://savetabs.azcom.dev/*`), used only to fetch the static
+  `/versions.json` update notice. No session data or identifiers are sent
+  there.
+
+There is no broad host access and no access to browsing content.
 
 ## Accounts
 

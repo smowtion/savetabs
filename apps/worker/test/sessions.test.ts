@@ -521,31 +521,57 @@ describe("PUT quotas", () => {
   });
 });
 
-describe("global capacity counters", () => {
-  it("returns 429 capacity_exceeded when the daily request cap is reached", async () => {
-    await seedCounter({
-      requests: Number(env.GLOBAL_DAILY_REQUESTS),
-      keysCreated: 0,
-    });
+describe("sync snapshot", () => {
+  it("returns summaries, tombstones and the first blob page in one request", async () => {
+    const authId = "snapshot";
+    await seedSessions(authId, [
+      { id: "older", size: 3, updatedAt: 1_000 },
+      { id: "newer", size: 4, updatedAt: 2_000 },
+    ]);
+    await deleteSession(authId, "older");
 
-    try {
-      const response = await SELF.fetch(`${BASE_URL}/v1/health`);
-      expect(response.status).toBe(429);
-      expect(((await response.json()) as ErrorBody).error.code).toBe(
-        "capacity_exceeded",
-      );
+    const response = await getJson(`/v1/keys/${authId}/sync`);
 
-      const counter = await env.DB.prepare(
-        "SELECT requests FROM counters WHERE day = ?",
-      )
-        .bind(currentDay())
-        .first<{ requests: number }>();
-      expect(counter?.requests).toBe(Number(env.GLOBAL_DAILY_REQUESTS) + 1);
-    } finally {
-      await resetCounters();
-    }
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as {
+      summaries: SessionSummary[];
+      deletions: DeletionRow[];
+      blobs: BlobRow[];
+      nextPage?: number;
+    };
+    expect(body.summaries.map((row) => row.id)).toEqual(["newer"]);
+    expect(body.blobs.map((row) => row.id)).toEqual(["newer"]);
+    expect(body.deletions.map((row) => row.id)).toEqual(["older"]);
+    expect(body.nextPage).toBeUndefined();
   });
 
+  it("keeps the 50-blob page and reports nextPage for larger accounts", async () => {
+    const authId = "snapshot-large";
+    await seedSessions(
+      authId,
+      Array.from({ length: 51 }, (_, index) => ({
+        id: `session-${String(index).padStart(2, "0")}`,
+        size: 2,
+        updatedAt: 1_000 + index,
+      })),
+    );
+
+    const response = await getJson(`/v1/keys/${authId}/sync`);
+
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as {
+      summaries: SessionSummary[];
+      deletions: DeletionRow[];
+      blobs: BlobRow[];
+      nextPage?: number;
+    };
+    expect(body.summaries).toHaveLength(51);
+    expect(body.blobs).toHaveLength(50);
+    expect(body.nextPage).toBe(1);
+  });
+});
+
+describe("global capacity counters", () => {
   it("returns 429 capacity_exceeded when the daily key cap is reached", async () => {
     await seedCounter({ requests: 0, keysCreated: Number(env.GLOBAL_MAX_KEYS) });
 
@@ -583,6 +609,7 @@ describe("CORS", () => {
     expect(response.headers.get("access-control-allow-headers")).toBe(
       "Authorization, Content-Type",
     );
+    expect(response.headers.get("access-control-max-age")).toBe("86400");
     expect(response.headers.get("vary")).toContain("Origin");
   });
 
@@ -608,6 +635,17 @@ describe("CORS", () => {
       firefoxOrigin,
     );
 
+    const safariOrigin =
+      "safari-web-extension://12345678-1234-1234-1234-123456789abc";
+    const safari = await SELF.fetch(`${BASE_URL}/v1/health`, {
+      method: "OPTIONS",
+      headers: { Origin: safariOrigin },
+    });
+    expect(safari.status).toBe(204);
+    expect(safari.headers.get("access-control-allow-origin")).toBe(
+      safariOrigin,
+    );
+
     const website = await SELF.fetch(`${BASE_URL}/v1/health`, {
       headers: { Origin: env.WEB_ORIGIN },
     });
@@ -631,7 +669,6 @@ describe("rate limiting", () => {
       DB: env.DB,
       RELEASES: env.RELEASES,
       WEB_ORIGIN: env.WEB_ORIGIN,
-      GLOBAL_DAILY_REQUESTS: env.GLOBAL_DAILY_REQUESTS,
       GLOBAL_MAX_KEYS: env.GLOBAL_MAX_KEYS,
       RATE_LIMITER_IP: bindings.ip,
       RATE_LIMITER_AUTH: bindings.auth,

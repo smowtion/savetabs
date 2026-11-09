@@ -475,7 +475,15 @@
     "recentTitle": "最近のセッション",
     "empty": "保存されたセッションはまだありません。",
     "restoreSession": "{time} に復元",
-    "loadFailed": "ポップアップのデータを読み込めませんでした。"
+    "loadFailed": "ポップアップのデータを読み込めませんでした。",
+    "languageAuto": "自動",
+    "syncEnable": "同期を有効にする",
+    "syncOffHint": "どのデバイスでもセッションを復元できます。",
+    "syncPanelTitle": "エンドツーエンド暗号化同期を有効にする",
+    "syncKeyLabel": "同期キー",
+    "syncEnableConfirm": "有効にして今すぐ同期",
+    "syncErrors": "同期は {count} 件のエラーで終了しました: {message}",
+    "syncLast": "最終同期: {time}"
   },
   "update": {
     "title": "アップデートがあります",
@@ -521,7 +529,9 @@
       "minutesAgo": "{count} 分前",
       "hoursAgo": "{count} 時間前",
       "daysAgo": "{count} 日前"
-    }
+    },
+    "viewMode": "表示",
+    "allUrls": "すべてのURL"
   },
   "web": {
     "signup": {

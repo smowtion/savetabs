@@ -475,7 +475,15 @@
     "recentTitle": "Recent sessions",
     "empty": "No saved sessions yet.",
     "restoreSession": "Restore {time}",
-    "loadFailed": "Could not load the popup data."
+    "loadFailed": "Could not load the popup data.",
+    "languageAuto": "Automatic",
+    "syncEnable": "Enable sync",
+    "syncOffHint": "Restore your sessions on any device.",
+    "syncPanelTitle": "Turn on encrypted sync",
+    "syncKeyLabel": "Your sync key",
+    "syncEnableConfirm": "Enable & sync now",
+    "syncErrors": "Sync finished with {count} error(s): {message}",
+    "syncLast": "Last sync: {time}"
   },
   "update": {
     "title": "Update available",
@@ -521,7 +529,9 @@
       "minutesAgo": "{count} minutes ago",
       "hoursAgo": "{count} hours ago",
       "daysAgo": "{count} days ago"
-    }
+    },
+    "viewMode": "View",
+    "allUrls": "All URLs"
   },
   "web": {
     "signup": {

@@ -36,7 +36,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 
 import { ConfirmDialog } from "../components/ConfirmDialog";
-import { SessionCard } from "../components/SessionCard";
+import { SessionCard, type UrlDisplayMode } from "../components/SessionCard";
 import { UnlockGate } from "../components/UnlockGate";
 import { useI18n } from "../hooks/useI18n";
 import { loadAccountToken } from "../lib/account-session";
@@ -51,6 +51,31 @@ import {
 const PAGE_SIZE = 50;
 /** Hard stop for a server that keeps returning the same next page. */
 const MAX_PAGES = 10_000;
+/** Values offered by the page's saved-tab view selector. */
+const DISPLAY_MODES: readonly UrlDisplayMode[] = [
+  "title",
+  "domain",
+  "full-url",
+];
+/** Per-browser preference for the view selector; never synced. */
+const DISPLAY_MODE_STORAGE_KEY = "savetabs.urlDisplayMode";
+
+function loadDisplayMode(): UrlDisplayMode {
+  try {
+    const stored = localStorage.getItem(DISPLAY_MODE_STORAGE_KEY);
+    return stored === "domain" || stored === "full-url" ? stored : "title";
+  } catch {
+    return "title";
+  }
+}
+
+function saveDisplayMode(mode: UrlDisplayMode): void {
+  try {
+    localStorage.setItem(DISPLAY_MODE_STORAGE_KEY, mode);
+  } catch {
+    // Private windows can reject storage; the in-memory choice still works.
+  }
+}
 
 type Status = { kind: "success" | "error"; message: string };
 
@@ -129,6 +154,12 @@ export default function Sessions() {
   const [status, setStatus] = useState<Status | null>(null);
   const [forgetConfirmOpen, setForgetConfirmOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [displayMode, setDisplayMode] = useState<UrlDisplayMode>(loadDisplayMode);
+
+  function changeDisplayMode(next: UrlDisplayMode): void {
+    setDisplayMode(next);
+    saveDisplayMode(next);
+  }
   const clientRef = useRef<SyncClient | null>(null);
 
   useEffect(() => {
@@ -308,6 +339,22 @@ export default function Sessions() {
                 {t("web.sessions.forgetKey")}
               </button>
             </nav>
+            <label className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-600 dark:text-neutral-400">
+              {t("sessions.viewMode")}
+              <select
+                value={displayMode}
+                onChange={(event) =>
+                  changeDisplayMode(event.target.value as UrlDisplayMode)
+                }
+                className="rounded-md border border-neutral-300 bg-white px-2 py-1.5 text-xs text-neutral-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+              >
+                {DISPLAY_MODES.map((mode) => (
+                  <option key={mode} value={mode}>
+                    {t(`settings.option.urlDisplay.mode.${mode}`)}
+                  </option>
+                ))}
+              </select>
+            </label>
             <label htmlFor="sessions-search" className="sr-only">
               {t("web.sessions.searchLabel")}
             </label>
@@ -420,6 +467,7 @@ export default function Sessions() {
               <SessionCard
                 key={session.id}
                 session={session}
+                displayMode={displayMode}
                 lang={lang}
                 t={t}
                 onDelete={deleteSession}

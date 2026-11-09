@@ -10,6 +10,21 @@ testimonials are claimed here.
 
 SaveTabs
 
+## Taglines
+
+- Too many tabs? Save now. Restore anytime.
+- Your tabs. Your control. Private by default. Encrypted sync when you need it.
+
+## Screenshots
+
+- `screenshots/01-sessions.png`, `02-options.png`, `03-popup.png`: actual UI,
+  suitable for every store.
+- `screenshots/04-promo-save-restore.png` and `05-promo-privacy-sync.png`:
+  promotional artwork for the Chrome listing only. Do not use them on Firefox
+  or Safari listings because they carry Chrome branding.
+- `promo/promo-tile-440x280.png`: Chrome promotional tile; the originals in
+  `promo/` are 1536x1024 for website/social use.
+
 ## Short description (English, 123/132 characters)
 
 Save open tabs as sessions, restore them later, and keep end-to-end encrypted backups. No account needed; sync is optional.

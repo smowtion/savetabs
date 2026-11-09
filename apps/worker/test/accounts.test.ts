@@ -353,7 +353,6 @@ function resendEnv(overrides: Partial<Env> = {}): Env {
     DB: env.DB,
     RELEASES: env.RELEASES,
     WEB_ORIGIN: env.WEB_ORIGIN,
-    GLOBAL_DAILY_REQUESTS: env.GLOBAL_DAILY_REQUESTS,
     GLOBAL_MAX_KEYS: env.GLOBAL_MAX_KEYS,
     RESEND_API_KEY: "re_test",
     RESEND_FROM: "SaveTabs <noreply@azcom.dev>",

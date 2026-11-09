@@ -8,9 +8,11 @@
  * extension settings, and export writes the standard single-session envelope.
  * Delete is routed through the modal `ConfirmDialog`.
  *
- * The body renders every tab with its title and domain. Restorable URLs are
- * real links, keyboard navigable and opening in a new tab without an opener;
- * any other scheme is rendered as plain text so it can never be clicked.
+ * The body renders every tab with a label chosen by `displayMode` (title,
+ * domain or full URL), plus one read-only text area listing every URL on its
+ * own line. Restorable URLs are real links, keyboard navigable and opening in
+ * a new tab without an opener; any other scheme is rendered as plain text so
+ * it can never be clicked.
  */
 
 import {
@@ -24,8 +26,13 @@ import { useId, useState } from "react";
 
 import { ConfirmDialog } from "./ConfirmDialog";
 
+/** How a saved tab's link label is rendered. */
+export type UrlDisplayMode = "title" | "domain" | "full-url";
+
 export type SessionCardProps = {
   session: Session;
+  /** Label style for each saved tab. */
+  displayMode: UrlDisplayMode;
   lang: Lang;
   t: Translator;
   /** Delete through the sessions page after confirmation. */
@@ -58,9 +65,25 @@ function hostnameOf(url: string): string {
   }
 }
 
-/** Visible label for one saved tab. */
-function tabLabel(tab: SavedTab): string {
-  return tab.title.trim() !== "" ? tab.title : tab.url;
+/** Visible label for one saved tab under the chosen display mode. */
+function tabLabel(tab: SavedTab, mode: UrlDisplayMode): string {
+  switch (mode) {
+    case "domain":
+      return hostnameOf(tab.url);
+    case "full-url":
+      return tab.url;
+    case "title":
+      return tab.title.trim() !== "" ? tab.title : tab.url;
+  }
+}
+
+/** Write text with the async clipboard API, failing loudly when unavailable. */
+async function writeClipboard(text: string): Promise<void> {
+  const clipboard = navigator.clipboard;
+  if (clipboard === undefined || typeof clipboard.writeText !== "function") {
+    throw new Error("Clipboard is unavailable");
+  }
+  await clipboard.writeText(text);
 }
 
 /** Filename used when one session is exported as JSON. */
@@ -90,6 +113,7 @@ function downloadJson(filename: string, text: string): void {
 
 export function SessionCard({
   session,
+  displayMode,
   lang,
   t,
   onDelete,
@@ -110,13 +134,7 @@ export function SessionCard({
   async function copyTabs(): Promise<void> {
     setCopying(true);
     try {
-      const clipboard = navigator.clipboard;
-      if (clipboard === undefined || typeof clipboard.writeText !== "function") {
-        throw new Error("Clipboard is unavailable");
-      }
-      await clipboard.writeText(
-        session.tabs.map((tab) => tab.url).join("\n"),
-      );
+      await writeClipboard(session.tabs.map((tab) => tab.url).join("\n"));
       onNotify("success", t("web.sessions.copySuccess", {
         count: session.tabs.length,
       }));
@@ -236,14 +254,19 @@ export function SessionCard({
       </div>
 
       {hasTabs ? (
+        <>
         <ul className="mt-3 grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
           {session.tabs.map((tab, index) => {
             const label = (
               <>
-                <span className="truncate font-medium">{tabLabel(tab)}</span>
-                <span className="truncate text-xs text-neutral-500 dark:text-neutral-400">
-                  {hostnameOf(tab.url)}
+                <span className="truncate font-medium">
+                  {tabLabel(tab, displayMode)}
                 </span>
+                {displayMode === "title" ? (
+                  <span className="truncate text-xs text-neutral-500 dark:text-neutral-400">
+                    {hostnameOf(tab.url)}
+                  </span>
+                ) : null}
               </>
             );
 
@@ -271,6 +294,19 @@ export function SessionCard({
             );
           })}
         </ul>
+        <label className="mt-3 block text-xs font-medium text-neutral-600 dark:text-neutral-400">
+          {t("sessions.allUrls")}
+          <textarea
+            readOnly
+            dir="ltr"
+            rows={Math.min(Math.max(session.tabs.length, 2), 8)}
+            value={session.tabs.map((tab) => tab.url).join("\n")}
+            onFocus={(event) => event.currentTarget.select()}
+            onClick={(event) => event.currentTarget.select()}
+            className="mt-1 w-full resize-y rounded-md border border-neutral-200 bg-neutral-50 px-2 py-1.5 font-mono text-[11px] leading-5 text-neutral-600 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-400"
+          />
+        </label>
+        </>
       ) : (
         <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400">
           {t("web.sessions.noTabs")}

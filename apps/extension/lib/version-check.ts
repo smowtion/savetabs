@@ -15,7 +15,7 @@
 import type { VersionInfo } from "@savetabs/shared";
 import { browser } from "wxt/browser";
 
-import { API_BASE } from "./config";
+import { API_BASE, VERSION_MANIFEST_URL } from "./config";
 import { STORE_LISTING_URLS, type StoreBrowser } from "./store-urls";
 
 /** Alarm that runs the daily update check. */
@@ -127,28 +127,46 @@ async function checkForUpdateOutcome(
     };
   }
 
-  let response: Response;
-  try {
-    // Native fetch rejects non-global receivers with "Illegal invocation".
-    response = await fetchImpl.call(globalThis, `${API_BASE}/v1/version`, {
-      headers: { Accept: "application/json" },
-    });
-  } catch (error) {
-    return { result: null, error };
+  // Prefer the static Pages manifest, which does not spend Worker requests.
+  // The Worker route remains a fallback during the first deployment that
+  // introduces the static file.
+  const candidates = [
+    ...new Set([VERSION_MANIFEST_URL, `${API_BASE}/v1/version`]),
+  ];
+
+  let body: unknown = null;
+  let lastError: unknown = null;
+  for (const url of candidates) {
+    try {
+      // Native fetch rejects non-global receivers with "Illegal invocation".
+      const response = await fetchImpl.call(globalThis, url, {
+        headers: { Accept: "application/json" },
+      });
+      if (!response.ok) {
+        lastError = new Error(
+          `the version endpoint returned HTTP ${response.status}`,
+        );
+        continue;
+      }
+      const candidate: unknown = await response.json();
+      if (readPublishedVersion(candidate, currentBrowser()) === null) {
+        lastError = new Error(
+          "the version endpoint did not return a version for this browser",
+        );
+        continue;
+      }
+      body = candidate;
+      break;
+    } catch (error) {
+      lastError = error;
+    }
   }
 
-  if (!response.ok) {
+  if (body === null) {
     return {
       result: null,
-      error: new Error(`the version endpoint returned HTTP ${response.status}`),
+      error: lastError ?? new Error("the version endpoint is unavailable"),
     };
-  }
-
-  let body: unknown;
-  try {
-    body = await response.json();
-  } catch (error) {
-    return { result: null, error };
   }
 
   const latest = readPublishedVersion(body, currentBrowser());

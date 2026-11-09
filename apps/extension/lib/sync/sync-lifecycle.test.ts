@@ -23,6 +23,7 @@ import {
   SYNC_LAST_AT_STORAGE_KEY,
   SYNC_RETRY_ALARM_NAME,
   SYNC_RETRY_PERIOD_MINUTES,
+  SYNC_STARTUP_INTERVAL_MS,
   applySyncAlarm,
   deleteAllCloudData,
   readLastSyncAt,
@@ -167,6 +168,28 @@ describe("syncOnStartup", () => {
     await syncOnStartup();
 
     expect(syncNowMock).not.toHaveBeenCalled();
+  });
+
+  it("skips a startup merge when a recent full sync completed", async () => {
+    await seedSettings({ "sync.enabled": true, "sync.autoDownload": true });
+    await fakeBrowser.storage.local.set({
+      [SYNC_LAST_AT_STORAGE_KEY]: Date.now() - 60_000,
+    });
+
+    await syncOnStartup();
+
+    expect(syncNowMock).not.toHaveBeenCalled();
+  });
+
+  it("syncs again once the startup interval has passed", async () => {
+    await seedSettings({ "sync.enabled": true, "sync.autoDownload": true });
+    await fakeBrowser.storage.local.set({
+      [SYNC_LAST_AT_STORAGE_KEY]: Date.now() - SYNC_STARTUP_INTERVAL_MS - 1,
+    });
+
+    await syncOnStartup();
+
+    expect(syncNowMock).toHaveBeenCalledTimes(1);
   });
 
   it("contains sync failures instead of breaking the worker", async () => {
