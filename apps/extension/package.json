@@ -1,6 +1,6 @@
 {
   "name": "@savetabs/extension",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,6 +10,8 @@
     "icons": "node ../../scripts/generate-icons.mjs",
     "zip:chrome": "wxt zip -b chrome",
     "zip:firefox": "wxt zip -b firefox",
+    "build:safari": "wxt build -b safari",
+    "safari:convert": "xcrun safari-web-extension-converter .output/safari-mv3 --project-location .output/safari-project --app-name SaveTabs --bundle-identifier com.azcom.savetabs --force",
     "verify:build": "node ../../scripts/verify-build.mjs",
     "screenshots": "node scripts/store-screenshots.mjs",
     "typecheck": "tsc --noEmit",

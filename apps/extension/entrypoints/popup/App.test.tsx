@@ -1,5 +1,6 @@
 import {
   DEFAULT_SETTINGS,
+  SyncAuthError,
   generateKey,
   type SavedTab,
   type Session,
@@ -19,6 +20,7 @@ import { DISCARD_STATS_KEY } from "../../lib/discard";
 import { SESSIONS_DB_NAME, closeSessionsDb } from "../../lib/sessions-db";
 import { addSession } from "../../lib/sessions-repo";
 import { resetSettings } from "../../lib/settings";
+import { syncNow } from "../../lib/sync/sync-service";
 import {
   LATEST_VERSION_STORAGE_KEY,
   UPDATE_AVAILABLE_STORAGE_KEY,
@@ -26,6 +28,14 @@ import {
   storeListingUrl,
 } from "../../lib/version-check";
 import { App } from "./App";
+
+vi.mock("../../lib/sync/sync-service", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("../../lib/sync/sync-service")>();
+  return { ...actual, syncNow: vi.fn() };
+});
+
+const syncNowMock = vi.mocked(syncNow);
 
 const HOUR_MS = 60 * 60 * 1000;
 /** The fake browser focuses the first window created after a reset. */
@@ -142,6 +152,13 @@ beforeEach(async () => {
   await deleteDatabase();
   document.documentElement.removeAttribute("data-theme");
   stubMatchMedia();
+  syncNowMock.mockReset();
+  syncNowMock.mockResolvedValue({
+    uploaded: 0,
+    downloaded: 0,
+    deleted: 0,
+    errors: [],
+  });
   // `windows.getCurrent()` and all-window saves need a real normal window.
   await createNormalWindow({ focused: true });
 });
@@ -605,6 +622,110 @@ describe("popup", () => {
 
     await waitFor(() =>
       expect(screen.queryByText("Update available")).not.toBeInTheDocument(),
+    );
+  });
+
+  it("changes the language from the popup header and persists it", async () => {
+    await seedSettings();
+    await seedTab("https://a.example");
+
+    render(<App />);
+
+    const picker = await screen.findByRole("combobox", { name: "Language" });
+    await userEvent.selectOptions(picker, "vi");
+
+    expect(
+      await screen.findByRole("button", { name: "Lưu 1 tab" }),
+    ).toBeInTheDocument();
+    await waitFor(async () => {
+      const stored = await fakeBrowser.storage.local.get("settings");
+      const settings = stored.settings as Record<string, unknown>;
+      expect(settings["general.language"]).toBe("vi");
+    });
+  });
+
+  it("enables sync with one click and runs a full sync", async () => {
+    await seedSettings();
+    syncNowMock.mockResolvedValue({
+      uploaded: 2,
+      downloaded: 1,
+      deleted: 0,
+      errors: [],
+    });
+
+    render(<App />);
+
+    expect(await screen.findByText("Sync off")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Enable sync" }));
+
+    expect(
+      await screen.findByText("Turn on encrypted sync"),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/^ST-/)).toBeInTheDocument();
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Enable & sync now" }),
+    );
+
+    await waitFor(() => expect(syncNowMock).toHaveBeenCalledTimes(1));
+    expect(await screen.findByText("Sync on")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Uploaded 2, downloaded 1, deleted 0."),
+    ).toBeInTheDocument();
+    const stored = await fakeBrowser.storage.local.get("settings");
+    const settings = stored.settings as Record<string, unknown>;
+    expect(settings["sync.enabled"]).toBe(true);
+  });
+
+  it("uses a pasted key when enabling sync", async () => {
+    await seedSettings();
+    const existingKey = generateKey();
+
+    render(<App />);
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Enable sync" }),
+    );
+    const input = await screen.findByLabelText("Import key");
+    await userEvent.type(input, existingKey);
+    await userEvent.click(
+      screen.getByRole("button", { name: "Enable & sync now" }),
+    );
+
+    await waitFor(() => expect(syncNowMock).toHaveBeenCalledTimes(1));
+    const stored = await fakeBrowser.storage.local.get("syncKey");
+    expect(stored.syncKey).toBe(existingKey);
+  });
+
+  it("runs a sync from the popup when sync is already on", async () => {
+    await seedSettings({ "sync.enabled": true });
+    await fakeBrowser.storage.local.set({ syncKey: generateKey() });
+
+    render(<App />);
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Sync now" }),
+    );
+
+    await waitFor(() => expect(syncNowMock).toHaveBeenCalledTimes(1));
+    expect(
+      await screen.findByText("Uploaded 0, downloaded 0, deleted 0."),
+    ).toBeInTheDocument();
+  });
+
+  it("shows a rejected-key error instead of a successful sync", async () => {
+    await seedSettings({ "sync.enabled": true });
+    await fakeBrowser.storage.local.set({ syncKey: generateKey() });
+    syncNowMock.mockRejectedValue(new SyncAuthError());
+
+    render(<App />);
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Sync now" }),
+    );
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "The sync key was rejected or the cloud data cannot be decrypted. Re-import or rotate your key.",
     );
   });
 });

@@ -44,6 +44,15 @@ import {
 export const SYNC_RETRY_ALARM_NAME = "sync-retry";
 /** Retry cadence in minutes, matching the alarm period. */
 export const SYNC_RETRY_PERIOD_MINUTES = 5;
+/**
+ * Minimum gap between automatic startup full syncs.
+ *
+ * On-save uploads and the retry alarm keep local changes flowing; this merge
+ * mainly pulls other devices' changes. A browser start is not a reason to
+ * spend a full sync per user per day, which would dominate the request budget
+ * at scale. Manual sync remains available at any time.
+ */
+export const SYNC_STARTUP_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
 /** Storage key holding the epoch-ms timestamp of the last completed full sync. */
 export const SYNC_LAST_AT_STORAGE_KEY = "syncLastAt";
 
@@ -116,6 +125,17 @@ export async function syncOnStartup(): Promise<void> {
   if (!isSyncEnabled(settings) || settings["sync.autoDownload"] !== true) {
     return;
   }
+
+  // Startup happens far more often than another device can produce changes.
+  // Skip the merge when a recent full sync already covered it.
+  const lastSyncAt = await readLastSyncAt();
+  if (
+    lastSyncAt !== undefined &&
+    Date.now() - lastSyncAt < SYNC_STARTUP_INTERVAL_MS
+  ) {
+    return;
+  }
+
   await runFullSync(settings["sync.autoUpload"] === true);
 }
 

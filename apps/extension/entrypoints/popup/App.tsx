@@ -1,10 +1,12 @@
 /**
  * Compact toolbar popup (360x420).
  *
- * The popup is a thin, read-only overview of what a save would cover: it
- * shows how many tabs the save would store, the most recent sessions, the
- * auto-discard state and a sync indicator. Nothing here duplicates the options
- * page; every setting lives in Options and is only read here.
+ * The popup is a thin overview of what a save would cover: it shows how many
+ * tabs the save would store, the most recent sessions, the auto-discard state
+ * and a compact sync card. It also exposes the two controls that should not
+ * require opening Options: the display-language picker and the one-click
+ * enable/sync action. Every other setting lives in Options and is only read
+ * here.
  *
  * The save button asks the background service worker through the typed
  * message contract. When the background answers `confirmation_required`,
@@ -18,12 +20,20 @@
  * stored session) over it.
  */
 
-import { APP_NAME, type Session, type Settings } from "@savetabs/shared";
+import {
+  APP_NAME,
+  isLanguagePreference,
+  type LanguagePreference,
+  type Session,
+  type Settings,
+} from "@savetabs/shared";
 import { useEffect, useState } from "react";
 import { browser } from "wxt/browser";
 
 import { ConfirmDialog } from "../../components/ConfirmDialog";
 import { DiscardNowButton } from "../../components/DiscardNowButton";
+import { LanguageSelect } from "../../components/LanguageSelect";
+import { PopupSyncCard } from "../../components/PopupSyncCard";
 import { UpdateBanner } from "../../components/UpdateBanner";
 import { useI18n } from "../../hooks/useI18n";
 import { useSettings } from "../../hooks/useSettings";
@@ -39,7 +49,7 @@ import type { SaveTabsResult } from "../../lib/save-flow";
 import { queryTabsForSaveScope } from "../../lib/save-scope";
 import { formatSessionTime } from "../../lib/session-time";
 import { listSessions, onSessionsChanged } from "../../lib/sessions-repo";
-import { SYNC_KEY_STORAGE_KEY, getKey } from "../../lib/sync/key-store";
+import { saveSettingNow } from "../../lib/settings";
 import { collectTabsForSave } from "../../lib/tab-collector";
 import { normalizeThemePreference } from "../../lib/theme";
 import {
@@ -75,7 +85,6 @@ export function App() {
   const [status, setStatus] = useState<Status | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveConfirmCount, setSaveConfirmCount] = useState<number | null>(null);
-  const [syncKeyPresent, setSyncKeyPresent] = useState<boolean | null>(null);
   const [discardCount, setDiscardCount] = useState(0);
   const discardSupported = isDiscardSupported();
 
@@ -162,36 +171,6 @@ export function App() {
       browser.storage.onChanged.removeListener(handleStorageChange);
     };
   }, [discardSupported]);
-
-  // The sync indicator only combines two non-secret facts: a key exists and
-  // sync is enabled. The key value itself is never rendered.
-  useEffect(() => {
-    let active = true;
-
-    const refresh = async (): Promise<void> => {
-      try {
-        const key = await getKey();
-        if (active) setSyncKeyPresent(key !== undefined);
-      } catch {
-        if (active) setSyncKeyPresent(false);
-      }
-    };
-
-    void refresh();
-    const handleStorageChange: Parameters<
-      typeof browser.storage.onChanged.addListener
-    >[0] = (changes, areaName) => {
-      if (areaName !== "local") return;
-      if (!(SYNC_KEY_STORAGE_KEY in changes)) return;
-      void refresh();
-    };
-    browser.storage.onChanged.addListener(handleStorageChange);
-
-    return () => {
-      active = false;
-      browser.storage.onChanged.removeListener(handleStorageChange);
-    };
-  }, []);
 
   function responseError(response: ErrorResponse): string {
     if (response.code === "not_found") return t("sessions.sessionMissing");
@@ -305,14 +284,20 @@ export function App() {
     }
   }
 
-  const syncOn =
-    syncKeyPresent === true && settings?.["sync.enabled"] === true;
-  const syncLabel =
-    settings === null || syncKeyPresent === null
-      ? null
-      : syncOn
-        ? t("popup.syncOn")
-        : t("popup.syncOff");
+  /**
+   * Persist immediately: the popup can close right after the selection and a
+   * debounced write would be lost with the popup's context.
+   */
+  function changeLanguage(value: LanguagePreference): void {
+    void saveSettingNow("general.language", value).catch((error) => {
+      console.error("[savetabs] failed to save the language", error);
+    });
+  }
+
+  const storedLanguage = settings?.["general.language"];
+  const languagePreference = isLanguagePreference(storedLanguage)
+    ? storedLanguage
+    : "auto";
 
   const autoDiscardText =
     settings === null || !discardSupported
@@ -331,25 +316,25 @@ export function App() {
   return (
     <div className="flex h-full w-full flex-col bg-neutral-50 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
       <header className="flex items-center justify-between gap-2 border-b border-neutral-200 bg-white px-4 py-3 dark:border-neutral-800 dark:bg-neutral-950">
-        <h1 className="text-base font-semibold">{APP_NAME}</h1>
-        {syncLabel !== null && (
-          <span
-            className="inline-flex items-center gap-1.5 text-xs text-neutral-600 dark:text-neutral-400"
-            title={syncLabel}
-          >
-            <span
-              aria-hidden="true"
-              className={`h-2 w-2 rounded-full ${
-                syncOn ? "bg-green-500" : "bg-neutral-400"
-              }`}
-            />
-            {syncLabel}
-          </span>
-        )}
+        <div className="flex min-w-0 items-center gap-2">
+          <img
+            src={browser.runtime.getURL("/icon/icon-32.png")}
+            alt=""
+            className="h-6 w-6 shrink-0"
+          />
+          <h1 className="truncate text-base font-semibold">{APP_NAME}</h1>
+        </div>
+        <LanguageSelect
+          value={languagePreference}
+          onChange={changeLanguage}
+          t={t}
+        />
       </header>
 
       <main className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-3">
         <UpdateBanner t={t} />
+
+        <PopupSyncCard t={t} settings={settings} />
 
         <button
           type="button"

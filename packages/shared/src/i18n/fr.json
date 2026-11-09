@@ -475,7 +475,15 @@
     "recentTitle": "Sessions récentes",
     "empty": "Aucune session enregistrée pour le moment.",
     "restoreSession": "Restaurer {time}",
-    "loadFailed": "Impossible de charger les données du popup."
+    "loadFailed": "Impossible de charger les données du popup.",
+    "languageAuto": "Automatique",
+    "syncEnable": "Activer la synchronisation",
+    "syncOffHint": "Restaurez vos sessions sur n'importe quel appareil.",
+    "syncPanelTitle": "Activer la synchronisation chiffrée",
+    "syncKeyLabel": "Votre clé de synchronisation",
+    "syncEnableConfirm": "Activer et synchroniser maintenant",
+    "syncErrors": "La synchronisation s'est terminée avec {count} erreur(s) : {message}",
+    "syncLast": "Dernière synchronisation : {time}"
   },
   "update": {
     "title": "Mise à jour disponible",
@@ -521,7 +529,9 @@
       "minutesAgo": "Il y a {count} minutes",
       "hoursAgo": "Il y a {count} heures",
       "daysAgo": "Il y a {count} jours"
-    }
+    },
+    "viewMode": "Affichage",
+    "allUrls": "Toutes les URL"
   },
   "web": {
     "signup": {

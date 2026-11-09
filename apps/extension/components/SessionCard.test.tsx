@@ -271,7 +271,8 @@ describe("SessionCard", () => {
     expect(selectedValue).toBe(
       "https://example.com/article\nhttps://docs.example.org/guide",
     );
-    expect(document.querySelector("textarea")).toBeNull();
+    // The temporary fallback is removed; only the visible URL list remains.
+    expect(document.querySelectorAll("textarea")).toHaveLength(1);
   });
 
   it("reports a copy failure when both clipboard paths fail", async () => {
@@ -288,6 +289,17 @@ describe("SessionCard", () => {
       "error",
       "Could not copy the tabs.",
     );
+  });
+
+  it("lists every tab URL in one read-only text area", () => {
+    renderCard();
+
+    const field = screen.getByRole("textbox", { name: "All URLs" });
+
+    expect(field).toHaveValue(
+      "https://example.com/article\nhttps://docs.example.org/guide",
+    );
+    expect(field).toHaveAttribute("readonly");
   });
 
   it("asks for confirmation before deleting and cancels safely", async () => {

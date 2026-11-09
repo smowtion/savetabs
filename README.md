@@ -80,6 +80,8 @@ Run from the repository root.
 | `pnpm build:ext` | Build the extension only. |
 | `pnpm icons` | Regenerate the 16/32/48/128 px PNG icons from `apps/extension/assets/icon.svg`. Commit the regenerated files. |
 | `pnpm zip:chrome` / `pnpm zip:firefox` | Build and package the store ZIPs. |
+| `pnpm --filter @savetabs/extension build:safari` | Build the Safari MV3 folder for the Xcode converter (see `docs/safari-extension-guide.md`). |
+| `pnpm --filter @savetabs/extension safari:convert` | Convert the Safari build into an Xcode project (macOS + Xcode required). |
 | `pnpm zip:sources` | Write the AMO source archive (`savetabs-<version>-sources.zip`) from the tracked monorepo tree; run it after the WXT zip steps because WXT's own sources ZIP only contains `apps/extension`. |
 | `pnpm verify:build` | Verify both built manifests, icons, and ZIPs. Run after the `zip:*` commands. |
 | `node scripts/update-versions.mjs` | Regenerate `versions.json` from the package versions. |
@@ -105,11 +107,11 @@ shell. Vite and WXT can also load `.env` files from their own app directories
 | --- | --- | --- | --- |
 | `WXT_SAVETABS_API_BASE` | Extension build (WXT) | `https://api.savetabs.example` | Sync API origin. Also becomes the manifest `host_permissions` entry. |
 | `SAVETABS_API_BASE` | Extension build (WXT) | — | Legacy alias for `WXT_SAVETABS_API_BASE`; empty values count as unset. |
+| `WXT_SAVETABS_VERSION_URL` | Extension build (WXT) | `https://savetabs.azcom.dev/versions.json` | Static release manifest for the daily update check. Its origin is added to `host_permissions`; the Worker `/v1/version` route remains a fallback. |
 | `VITE_API_BASE` | Web build (Vite) | `https://api.savetabs.example` | Sync API origin used by the web app. Must share its origin with `WXT_SAVETABS_API_BASE`; the release guard also requires that origin in `apps/web/public/_headers` (`connect-src`). |
 | `SAVETABS_NOTES_URL` | `scripts/update-versions.mjs`, CI | Script fallback: `https://savetabs.pages.dev/releases/<version>`; CI and Release read the repository variable, currently `https://savetabs.azcom.dev` | Release-notes URL written into `versions.json`. |
 | `WEB_ORIGIN` | Worker runtime | `https://savetabs.azcom.dev` | CORS allowlist. Defined in `apps/worker/wrangler.toml` `[vars]`. |
-| `GLOBAL_DAILY_REQUESTS` | Worker runtime | `100000` | Daily request cap. Defined in `wrangler.toml`. |
-| `GLOBAL_MAX_KEYS` | Worker runtime | `10000` | Daily cap on newly registered sync keys. Defined in `wrangler.toml`. |
+| `GLOBAL_MAX_KEYS` | Worker runtime | `50000` | Daily cap on newly registered sync keys. Defined in `wrangler.toml`. |
 
 Cloudflare and store credentials are **secrets** and belong in GitHub
 repository secrets, never in the repository:
@@ -169,6 +171,10 @@ Expected flow:
 
 The workflow builds and verifies the artifacts, then:
 
+- Stages `versions.json` into `apps/web/public/` before the web build, so
+  the web Worker serves it as the static update manifest the extension
+  prefers. The Worker `/v1/version` route remains a fallback.
+
 - Verifies the built web CSP allows the configured API origin and that the
   extension and web builds agree on it (`scripts/verify-csp.mjs`).
 
@@ -176,8 +182,8 @@ The workflow builds and verifies the artifacts, then:
   to the `savetabs-releases` R2 bucket.
 - Uploads `versions.json` to the bucket root. `GET /v1/version` serves it with
   a five-minute cache.
-- Deploys the Worker (`wrangler deploy`) and the web app to the `savetabs`
-  Cloudflare Pages project.
+- Deploys the sync Worker (`wrangler deploy`) and the static-assets web
+  Worker (`savetabs-web`).
 - Uploads the ZIPs and `versions.json` as workflow artifacts.
 - Submits to the Chrome Web Store and Firefox Add-ons only when the matching
   `CHROME_*` / `FIREFOX_*` secrets exist; otherwise those steps skip.

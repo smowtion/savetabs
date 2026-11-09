@@ -21,6 +21,7 @@ import {
   recordSyncCompleted,
 } from "../lib/sync/sync-lifecycle";
 import { syncNow, type SyncResult } from "../lib/sync/sync-service";
+import { formatLastSync } from "../lib/sync/sync-time";
 import { ConfirmDialog } from "./ConfirmDialog";
 
 const BUTTON_CLASS =
@@ -30,12 +31,7 @@ const PRIMARY_BUTTON_CLASS =
 const DANGER_BUTTON_CLASS =
   "rounded-md border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-50 disabled:opacity-50 dark:border-red-900 dark:bg-neutral-900 dark:text-red-400 dark:hover:bg-red-950";
 
-const MINUTE_MS = 60 * 1000;
-const HOUR_MS = 60 * MINUTE_MS;
-const DAY_MS = 24 * HOUR_MS;
-
-type Feedback = {
-  kind: "success" | "error";
+type Feedback = {  kind: "success" | "error";
   message: string;
 };
 
@@ -47,27 +43,6 @@ export type SyncStatusProps = {
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
-}
-
-/** Relative label for `syncLastAt`, reusing the sessions-page time strings. */
-export function formatLastSync(
-  timestamp: number,
-  now: number,
-  t: Translator,
-): string {
-  const elapsed = Math.max(0, now - timestamp);
-  if (elapsed < MINUTE_MS) return t("sessions.time.justNow");
-  if (elapsed < HOUR_MS) {
-    return t("sessions.time.minutesAgo", {
-      count: Math.floor(elapsed / MINUTE_MS),
-    });
-  }
-  if (elapsed < DAY_MS) {
-    return t("sessions.time.hoursAgo", {
-      count: Math.floor(elapsed / HOUR_MS),
-    });
-  }
-  return t("sessions.time.daysAgo", { count: Math.floor(elapsed / DAY_MS) });
 }
 
 async function countPendingUploads(): Promise<number> {

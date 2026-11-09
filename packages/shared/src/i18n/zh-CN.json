@@ -475,7 +475,15 @@
     "recentTitle": "最近的会话",
     "empty": "尚无已保存的会话。",
     "restoreSession": "恢复 {time}",
-    "loadFailed": "无法加载弹出窗口数据。"
+    "loadFailed": "无法加载弹出窗口数据。",
+    "languageAuto": "自动",
+    "syncEnable": "启用同步",
+    "syncOffHint": "在任意设备上恢复会话。",
+    "syncPanelTitle": "开启端到端加密同步",
+    "syncKeyLabel": "你的同步密钥",
+    "syncEnableConfirm": "启用并立即同步",
+    "syncErrors": "同步完成，但有 {count} 个错误：{message}",
+    "syncLast": "上次同步：{time}"
   },
   "update": {
     "title": "有可用更新",
@@ -521,7 +529,9 @@
       "minutesAgo": "{count} 分钟前",
       "hoursAgo": "{count} 小时前",
       "daysAgo": "{count} 天前"
-    }
+    },
+    "viewMode": "显示",
+    "allUrls": "所有链接"
   },
   "web": {
     "signup": {

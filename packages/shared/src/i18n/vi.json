@@ -475,7 +475,15 @@
     "recentTitle": "Phiên gần đây",
     "empty": "Chưa có phiên nào được lưu.",
     "restoreSession": "Khôi phục {time}",
-    "loadFailed": "Không thể tải dữ liệu cửa sổ bật lên."
+    "loadFailed": "Không thể tải dữ liệu cửa sổ bật lên.",
+    "languageAuto": "Tự động",
+    "syncEnable": "Bật đồng bộ",
+    "syncOffHint": "Khôi phục phiên trên mọi thiết bị.",
+    "syncPanelTitle": "Bật đồng bộ mã hóa đầu cuối",
+    "syncKeyLabel": "Khóa đồng bộ của bạn",
+    "syncEnableConfirm": "Bật và đồng bộ ngay",
+    "syncErrors": "Đồng bộ xong với {count} lỗi: {message}",
+    "syncLast": "Đồng bộ lần cuối: {time}"
   },
   "update": {
     "title": "Có bản cập nhật",
@@ -521,7 +529,9 @@
       "minutesAgo": "{count} phút trước",
       "hoursAgo": "{count} giờ trước",
       "daysAgo": "{count} ngày trước"
-    }
+    },
+    "viewMode": "Xem",
+    "allUrls": "Tất cả URL"
   },
   "web": {
     "signup": {

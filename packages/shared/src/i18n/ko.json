@@ -475,7 +475,15 @@
     "recentTitle": "최근 세션",
     "empty": "저장된 세션이 없습니다.",
     "restoreSession": "{time} 복원",
-    "loadFailed": "팝업 데이터를 불러올 수 없습니다."
+    "loadFailed": "팝업 데이터를 불러올 수 없습니다.",
+    "languageAuto": "자동",
+    "syncEnable": "동기화 켜기",
+    "syncOffHint": "모든 기기에서 세션을 복원하세요.",
+    "syncPanelTitle": "종단 간 암호화 동기화 켜기",
+    "syncKeyLabel": "동기화 키",
+    "syncEnableConfirm": "켜고 지금 동기화",
+    "syncErrors": "동기화가 {count}개의 오류로 완료되었습니다: {message}",
+    "syncLast": "마지막 동기화: {time}"
   },
   "update": {
     "title": "업데이트 사용 가능",
@@ -521,7 +529,9 @@
       "minutesAgo": "{count}분 전",
       "hoursAgo": "{count}시간 전",
       "daysAgo": "{count}일 전"
-    }
+    },
+    "viewMode": "보기",
+    "allUrls": "모든 URL"
   },
   "web": {
     "signup": {

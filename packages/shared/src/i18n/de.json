@@ -475,7 +475,15 @@
     "recentTitle": "Letzte Sitzungen",
     "empty": "Noch keine gespeicherten Sitzungen.",
     "restoreSession": "{time} wiederherstellen",
-    "loadFailed": "Popup-Daten konnten nicht geladen werden."
+    "loadFailed": "Popup-Daten konnten nicht geladen werden.",
+    "languageAuto": "Automatisch",
+    "syncEnable": "Synchronisierung aktivieren",
+    "syncOffHint": "Stelle deine Sitzungen auf jedem Gerät wieder her.",
+    "syncPanelTitle": "Verschlüsselte Synchronisierung aktivieren",
+    "syncKeyLabel": "Dein Synchronisierungsschlüssel",
+    "syncEnableConfirm": "Aktivieren und jetzt synchronisieren",
+    "syncErrors": "Synchronisierung mit {count} Fehler(n) beendet: {message}",
+    "syncLast": "Letzte Synchronisierung: {time}"
   },
   "update": {
     "title": "Update verfügbar",
@@ -521,7 +529,9 @@
       "minutesAgo": "Vor {count} Minuten",
       "hoursAgo": "Vor {count} Stunden",
       "daysAgo": "Vor {count} Tagen"
-    }
+    },
+    "viewMode": "Ansicht",
+    "allUrls": "Alle URLs"
   },
   "web": {
     "signup": {

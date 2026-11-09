@@ -11,6 +11,31 @@ const apiBase = (
   "https://api.savetabs.example"
 ).replace(/\/+$/, "");
 
+// Static release manifest for the daily update check. Hosting it on Pages
+// keeps one request per installed user per day off the Worker budget.
+const versionManifestUrl = (
+  process.env.WXT_SAVETABS_VERSION_URL ||
+  "https://savetabs.azcom.dev/versions.json"
+).replace(/\/+$/, "");
+
+/** Origin of a build-time URL; falls back to the documented production one. */
+function originOf(url: string, fallback: string): string {
+  try {
+    return new URL(url).origin;
+  } catch {
+    return fallback;
+  }
+}
+
+const versionOrigin = originOf(
+  versionManifestUrl,
+  "https://savetabs.azcom.dev",
+);
+
+// Both origins are needed: the Worker for sync/accounts and the static
+// manifest site for update checks. A duplicate origin is harmless.
+const HOST_PERMISSIONS = [...new Set([`${apiBase}/*`, `${versionOrigin}/*`])];
+
 // One raster set shared by the extension listing and the toolbar button. The
 // files are generated from `assets/icon.svg` and committed under `public/`.
 const ICON_PATHS = {
@@ -34,6 +59,8 @@ export default defineConfig({
     plugins: [tailwindcss()],
     define: {
       "import.meta.env.WXT_SAVETABS_API_BASE": JSON.stringify(apiBase),
+      "import.meta.env.WXT_SAVETABS_VERSION_URL":
+        JSON.stringify(versionManifestUrl),
     },
   }),
   manifest: ({ browser }) => ({
@@ -47,7 +74,7 @@ export default defineConfig({
     action: {
       default_icon: ICON_PATHS,
     },
-    host_permissions: [`${apiBase}/*`],
+    host_permissions: HOST_PERMISSIONS,
     commands: {
       "save-tabs": {
         suggested_key: { default: "Alt+Shift+S" },

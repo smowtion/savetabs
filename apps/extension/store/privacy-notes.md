@@ -206,13 +206,15 @@ these commands reproduce the package.
 
 Runtime notes:
 - Manifest V3 with an event-page background script; no service worker.
-- No remote code. The daily update check fetches a JSON manifest from
-  https://savetabs-api.azcom.dev/v1/version and compares version numbers; no
+- No remote code. The daily update check fetches a static JSON manifest from
+  https://savetabs.azcom.dev/versions.json (falling back to
+  https://savetabs-api.azcom.dev/v1/version) and compares version numbers; no
   fetched content is evaluated.
 - Permissions: tabs (save/restore), storage (settings and local sessions),
   alarms (auto-discard schedule and update check), contextMenus (right-click
-  actions). Host permission is limited to https://savetabs-api.azcom.dev/*.
-  Accounts add no permissions and reuse the same single API host permission.
+  actions). Host permissions are limited to https://savetabs-api.azcom.dev/*
+  (optional sync API) and https://savetabs.azcom.dev/* (public version
+  manifest only). Accounts add no permissions and reuse the sync API host.
 - Sync is opt-in. A 128-bit sync key is generated locally; sessions are
   encrypted in the browser with AES-GCM-256 and only ciphertext is uploaded.
   The server stores a public authId, a SHA-256 hash of a derived bearer key,

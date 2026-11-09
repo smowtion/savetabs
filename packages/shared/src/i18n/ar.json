@@ -475,7 +475,15 @@
     "recentTitle": "الجلسات الأخيرة",
     "empty": "لا توجد جلسات محفوظة بعد.",
     "restoreSession": "استعادة {time}",
-    "loadFailed": "تعذّر تحميل بيانات النافذة المنبثقة."
+    "loadFailed": "تعذّر تحميل بيانات النافذة المنبثقة.",
+    "languageAuto": "تلقائي",
+    "syncEnable": "تفعيل المزامنة",
+    "syncOffHint": "استعد جلساتك على أي جهاز.",
+    "syncPanelTitle": "تفعيل المزامنة المشفرة من طرف إلى طرف",
+    "syncKeyLabel": "مفتاح المزامنة الخاص بك",
+    "syncEnableConfirm": "تفعيل ومزامنة الآن",
+    "syncErrors": "اكتملت المزامنة مع {count} أخطاء: {message}",
+    "syncLast": "آخر مزامنة: {time}"
   },
   "update": {
     "title": "يتوفر تحديث",
@@ -521,7 +529,9 @@
       "minutesAgo": "قبل {count} دقيقة",
       "hoursAgo": "قبل {count} ساعة",
       "daysAgo": "قبل {count} يوم"
-    }
+    },
+    "viewMode": "عرض",
+    "allUrls": "كل الروابط"
   },
   "web": {
     "signup": {

@@ -36,6 +36,17 @@ export type BlobPage = {
   nextPage?: number;
 };
 
+/**
+ * Everything a full sync reads, returned by one `GET /sync` request.
+ * `nextPage` refers to the existing paged `/blobs` endpoint.
+ */
+export type SyncSnapshot = {
+  summaries: SessionSummary[];
+  deletions: RemoteDeletion[];
+  blobs: RemoteSessionBlob[];
+  nextPage?: number;
+};
+
 /** Codes carried by sync API error envelopes, plus the worker catch-all. */
 export type SyncErrorCode = ApiErrorCode | "internal_error";
 
@@ -84,6 +95,22 @@ export class SyncClient {
   async listSummaries(): Promise<SessionSummary[]> {
     const body = await this.request<SummariesBody>("/sessions");
     return body.sessions ?? [];
+  }
+
+  /**
+   * Read summaries, tombstones and the first blob page in one request.
+   * Large accounts follow `nextPage` through the paged `/blobs` endpoint.
+   */
+  async snapshot(): Promise<SyncSnapshot> {
+    const body = await this.request<Partial<SyncSnapshot>>("/sync");
+    return {
+      summaries: body.summaries ?? [],
+      deletions: body.deletions ?? [],
+      blobs: body.blobs ?? [],
+      ...(typeof body.nextPage === "number"
+        ? { nextPage: body.nextPage }
+        : {}),
+    };
   }
 
   /** Download one encrypted session. Throws `SyncHttpError` when absent. */

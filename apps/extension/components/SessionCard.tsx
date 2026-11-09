@@ -8,9 +8,9 @@
  * `ConfirmDialog`.
  *
  * The body renders every tab as a real link. Links stay keyboard navigable,
- * the visible label follows `urlDisplay.mode`, and the full URL is always
- * exposed through the `title` tooltip so a truncated label can never hide the
- * real destination.
+ * the visible label follows `urlDisplay.mode`, and one read-only text area
+ * lists every URL on its own line, so a truncated label can never hide or
+ * lose the real destination.
  */
 
 import {
@@ -376,7 +376,8 @@ export function SessionCard({
               {t("sessions.noTabs")}
             </p>
           ) : (
-            <ul className="grid grid-cols-1 gap-x-4 gap-y-1 min-[900px]:grid-cols-2">
+            <>
+              <ul className="grid grid-cols-1 gap-x-4 gap-y-1 min-[900px]:grid-cols-2">
               {session.tabs.map((tab, index) => (
                 <li key={`${index}-${tab.url}`} className="min-w-0">
                   <a
@@ -403,6 +404,19 @@ export function SessionCard({
                 </li>
               ))}
             </ul>
+            <label className="mt-3 block text-xs font-medium text-neutral-600 dark:text-neutral-400">
+              {t("sessions.allUrls")}
+              <textarea
+                readOnly
+                dir="ltr"
+                rows={Math.min(Math.max(session.tabs.length, 2), 8)}
+                value={session.tabs.map((tab) => tab.url).join("\n")}
+                onFocus={(event) => event.currentTarget.select()}
+                onClick={(event) => event.currentTarget.select()}
+                className="mt-1 w-full resize-y rounded-md border border-neutral-200 bg-neutral-50 px-2 py-1.5 font-mono text-[11px] leading-5 text-neutral-600 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-400"
+              />
+            </label>
+            </>
           )}
         </div>
       )}

@@ -475,7 +475,15 @@
     "recentTitle": "Sesiones recientes",
     "empty": "Aún no hay sesiones guardadas.",
     "restoreSession": "Restaurar {time}",
-    "loadFailed": "No se pudieron cargar los datos de la ventana emergente."
+    "loadFailed": "No se pudieron cargar los datos de la ventana emergente.",
+    "languageAuto": "Automático",
+    "syncEnable": "Activar sincronización",
+    "syncOffHint": "Restaura tus sesiones en cualquier dispositivo.",
+    "syncPanelTitle": "Activar la sincronización cifrada",
+    "syncKeyLabel": "Tu clave de sincronización",
+    "syncEnableConfirm": "Activar y sincronizar ahora",
+    "syncErrors": "La sincronización terminó con {count} error(es): {message}",
+    "syncLast": "Última sincronización: {time}"
   },
   "update": {
     "title": "Actualización disponible",
@@ -521,7 +529,9 @@
       "minutesAgo": "Hace {count} minutos",
       "hoursAgo": "Hace {count} horas",
       "daysAgo": "Hace {count} días"
-    }
+    },
+    "viewMode": "Ver",
+    "allUrls": "Todas las URL"
   },
   "web": {
     "signup": {

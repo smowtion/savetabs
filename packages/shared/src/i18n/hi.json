@@ -475,7 +475,15 @@
     "recentTitle": "हाल के सेशन",
     "empty": "अभी कोई सहेजा सेशन नहीं है।",
     "restoreSession": "{time} पुनर्स्थापित करें",
-    "loadFailed": "पॉपअप डेटा लोड नहीं हो सका।"
+    "loadFailed": "पॉपअप डेटा लोड नहीं हो सका।",
+    "languageAuto": "स्वचालित",
+    "syncEnable": "सिंक चालू करें",
+    "syncOffHint": "किसी भी डिवाइस पर अपने सत्र बहाल करें।",
+    "syncPanelTitle": "एंड-टू-एंड एन्क्रिप्टेड सिंक चालू करें",
+    "syncKeyLabel": "आपकी सिंक कुंजी",
+    "syncEnableConfirm": "चालू करें और अभी सिंक करें",
+    "syncErrors": "सिंक {count} त्रुटि(यों) के साथ पूरा हुआ: {message}",
+    "syncLast": "अंतिम सिंक: {time}"
   },
   "update": {
     "title": "अपडेट उपलब्ध है",
@@ -521,7 +529,9 @@
       "minutesAgo": "{count} मिनट पहले",
       "hoursAgo": "{count} घंटे पहले",
       "daysAgo": "{count} दिन पहले"
-    }
+    },
+    "viewMode": "दृश्य",
+    "allUrls": "सभी URL"
   },
   "web": {
     "signup": {

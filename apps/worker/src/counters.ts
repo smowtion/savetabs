@@ -3,7 +3,6 @@ import type { Env, RateLimiterBinding } from "./env";
 import { apiError, type AppContext } from "./errors";
 
 /** Fallbacks used when a Wrangler var is missing or not a positive number. */
-export const DEFAULT_DAILY_REQUESTS = 100_000;
 export const DEFAULT_MAX_KEYS = 1_000;
 
 /** UTC calendar day (`YYYY-MM-DD`), the primary key of the counters table. */
@@ -22,33 +21,6 @@ export function parseLimit(
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
   return Math.floor(parsed);
-}
-
-/**
- * Increment today's request counter and report whether the cap is exceeded.
- *
- * Counter writes are best-effort: if D1 is unavailable the request is allowed
- * through (the cap is not "known exceeded"). The single upsert statement makes
- * the increment atomic under concurrent requests.
- */
-export async function recordRequest(
-  db: D1Database,
-  cap: number,
-  now: number = Date.now(),
-): Promise<boolean> {
-  try {
-    const row = await db
-      .prepare(
-        `INSERT INTO counters (day, requests, keys_created) VALUES (?, 1, 0)
-         ON CONFLICT (day) DO UPDATE SET requests = counters.requests + 1
-         RETURNING requests`,
-      )
-      .bind(currentDay(now))
-      .first<{ requests: number }>();
-    return row !== null && row.requests > cap;
-  } catch {
-    return false;
-  }
 }
 
 /** Number of keys registered today, or 0 when the counter cannot be read. */
@@ -84,25 +56,6 @@ export async function recordKeyCreated(
     // A failed counter write must not fail an otherwise accepted upload.
   }
 }
-
-/** Reject requests once today's global request budget is spent. */
-export const capacityMiddleware: MiddlewareHandler<{ Bindings: Env }> = async (
-  c,
-  next,
-) => {
-  const cap = parseLimit(c.env.GLOBAL_DAILY_REQUESTS, DEFAULT_DAILY_REQUESTS);
-
-  if (await recordRequest(c.env.DB, cap)) {
-    return apiError(
-      c,
-      429,
-      "capacity_exceeded",
-      "The daily request capacity has been reached.",
-    );
-  }
-
-  await next();
-};
 
 /** Client address used for the per-IP bucket. */
 export function clientIp(c: AppContext): string {

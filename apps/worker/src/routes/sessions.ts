@@ -22,6 +22,11 @@ interface SessionSummaryRow {
   size: number;
 }
 
+interface DeletionRow {
+  id: string;
+  deletedAt: number;
+}
+
 type StoredBlob = ArrayBuffer | ArrayBufferView | number[];
 
 interface SessionBlobRow {
@@ -69,6 +74,65 @@ sessionsRoutes.get("/keys/:authId/sessions", async (c) => {
     .all<SessionSummaryRow>();
 
   return c.json({ sessions: results });
+});
+
+/**
+ * One-request sync snapshot: summaries, tombstones and the first blob page.
+ *
+ * The sync client used to make three separate authorized requests per run,
+ * and every one of them could trigger a browser preflight. Collapsing the read
+ * side into one request is the main reason a free/entry Worker budget can
+ * support a large number of sync users.
+ */
+sessionsRoutes.get("/keys/:authId/sync", async (c) => {
+  const auth = await authenticateExistingKey(c, c.req.param("authId"));
+  if ("response" in auth) return auth.response;
+
+  const [summaries, deletions, blobs] = await Promise.all([
+    c.env.DB.prepare(
+      `SELECT session_id AS id, updated_at AS updatedAt, size
+         FROM sessions
+        WHERE auth_id = ?
+        ORDER BY updated_at DESC, session_id ASC`,
+    )
+      .bind(auth.authId)
+      .all<SessionSummaryRow>(),
+    c.env.DB.prepare(
+      `SELECT session_id AS id, deleted_at AS deletedAt
+         FROM deletions
+        WHERE auth_id = ?
+        ORDER BY deleted_at DESC, session_id ASC`,
+    )
+      .bind(auth.authId)
+      .all<DeletionRow>(),
+    c.env.DB.prepare(
+      `SELECT session_id AS id, ciphertext, updated_at AS updatedAt
+         FROM sessions
+        WHERE auth_id = ?
+        ORDER BY updated_at DESC, session_id ASC
+        LIMIT ?`,
+    )
+      .bind(auth.authId, DEFAULT_PAGE_SIZE + 1)
+      .all<SessionBlobRow>(),
+  ]);
+
+  // One extra row tells the client whether another blob page exists without a
+  // second query. Large accounts keep using the paged /blobs endpoint.
+  const hasMore = blobs.results.length > DEFAULT_PAGE_SIZE;
+  const page = hasMore
+    ? blobs.results.slice(0, DEFAULT_PAGE_SIZE)
+    : blobs.results;
+
+  return c.json({
+    summaries: summaries.results,
+    deletions: deletions.results,
+    blobs: page.map((row) => ({
+      id: row.id,
+      ciphertext: toBase64Url(toBytes(row.ciphertext)),
+      updatedAt: row.updatedAt,
+    })),
+    ...(hasMore ? { nextPage: 1 } : {}),
+  });
 });
 
 sessionsRoutes.get("/keys/:authId/sessions/:sessionId", async (c) => {

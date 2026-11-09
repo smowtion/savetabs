@@ -45,6 +45,40 @@ describe("SyncClient", () => {
     );
   });
 
+  it("reads summaries, tombstones and blobs in one snapshot request", async () => {
+    const snapshot = {
+      summaries: [{ id: "session-1", updatedAt: 9, size: 4 }],
+      deletions: [{ id: "gone", deletedAt: 8 }],
+      blobs: [{ id: "session-1", ciphertext: "AAAA", updatedAt: 9 }],
+      nextPage: 1,
+    };
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(jsonResponse(snapshot));
+    const client = createClient(fetchMock);
+
+    await expect(client.snapshot()).resolves.toEqual(snapshot);
+    expect(fetchMock.mock.calls[0]?.[0]).toBe(
+      `${ORIGIN}/v1/keys/${AUTH_ID}/sync`,
+    );
+    expect(
+      new Headers(requestInit(fetchMock, 0).headers).get("authorization"),
+    ).toBe(`Bearer ${AUTH_KEY}`);
+  });
+
+  it("defaults missing snapshot arrays and omits an absent nextPage", async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(jsonResponse({}));
+    const client = createClient(fetchMock);
+
+    await expect(client.snapshot()).resolves.toEqual({
+      summaries: [],
+      deletions: [],
+      blobs: [],
+    });
+  });
+
   it("reads one encrypted session by id", async () => {
     const blob = { id: "session-1", ciphertext: "AAAA", updatedAt: 9 };
     const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(jsonResponse(blob));
