@@ -8,6 +8,7 @@
  */
 
 import type { Translator } from "@savetabs/shared";
+import { ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 import { browser } from "wxt/browser";
 
@@ -91,8 +92,9 @@ export function UpdateBanner({
       <button
         type="button"
         onClick={() => void openStoreListing()}
-        className="mt-1.5 rounded-md bg-blue-600 px-2.5 py-1 font-medium text-white transition-colors hover:bg-blue-700"
+        className="mt-1.5 inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-2.5 py-1 font-medium text-white transition-colors hover:bg-blue-700"
       >
+        <ExternalLink aria-hidden="true" className="size-3.5" />
         {t("update.action")}
       </button>
     </section>

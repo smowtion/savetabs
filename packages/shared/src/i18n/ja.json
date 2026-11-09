@@ -458,7 +458,8 @@
       "light": "ライト",
       "dark": "ダーク",
       "toggle": "テーマ: {theme}"
-    }
+    },
+    "changelog": "変更履歴"
   },
   "contextMenu": {
     "saveTab": "このタブを保存",
@@ -822,7 +823,8 @@
       "footer": {
         "privacy": "プライバシー",
         "store": "Chrome Web Store",
-        "firefoxStore": "Firefox アドオン"
+        "firefoxStore": "Firefox アドオン",
+        "changelog": "変更履歴"
       },
       "faq": {
         "title": "よくある質問",
@@ -900,6 +902,12 @@
       "system": "システム",
       "light": "ライト",
       "dark": "ダーク"
+    },
+    "changelog": {
+      "title": "変更履歴",
+      "subtitle": "SaveTabs の各リリースでの変更点。",
+      "back": "SaveTabs に戻る",
+      "latest": "最新"
     }
   }
 }

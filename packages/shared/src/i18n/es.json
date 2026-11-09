@@ -458,7 +458,8 @@
       "light": "Claro",
       "dark": "Oscuro",
       "toggle": "Tema: {theme}"
-    }
+    },
+    "changelog": "Registro de cambios"
   },
   "contextMenu": {
     "saveTab": "Guardar esta pestaña",
@@ -822,7 +823,8 @@
       "footer": {
         "privacy": "Privacidad",
         "store": "Chrome Web Store",
-        "firefoxStore": "Complementos de Firefox"
+        "firefoxStore": "Complementos de Firefox",
+        "changelog": "Registro de cambios"
       },
       "faq": {
         "title": "Resolvemos tus dudas",
@@ -900,6 +902,12 @@
       "system": "Sistema",
       "light": "Claro",
       "dark": "Oscuro"
+    },
+    "changelog": {
+      "title": "Registro de cambios",
+      "subtitle": "Qué cambió en cada versión de SaveTabs.",
+      "back": "Volver a SaveTabs",
+      "latest": "Última"
     }
   }
 }
