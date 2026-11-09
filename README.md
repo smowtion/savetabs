@@ -117,11 +117,14 @@ Cloudflare and store credentials are **secrets** and belong in GitHub
 repository secrets, never in the repository:
 
 - `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
-- `CHROME_EXTENSION_ID`, `CHROME_CLIENT_ID`, `CHROME_CLIENT_SECRET`,
-  `CHROME_REFRESH_TOKEN` (all four are required together)
+- `CHROME_EXTENSION_ID`, `CHROME_PUBLISHER_ID`,
+  `CHROME_SERVICE_ACCOUNT_EMAIL`, `CHROME_SERVICE_ACCOUNT_PRIVATE_KEY`
+  (all four are required together; Chrome Web Store API v2 service account)
 - `FIREFOX_EXTENSION_ID` (must equal the gecko id in
   `apps/extension/wxt.config.ts`), `FIREFOX_JWT_ISSUER`, `FIREFOX_JWT_SECRET`
   (all three are required together)
+
+Step-by-step credential creation: `docs/store-publishing-setup.md`.
 
 `.env.example` lists every name with placeholder values. `.env*` files are
 gitignored except `.env.example`; never commit real credentials.
@@ -161,9 +164,10 @@ Expected flow:
    `connect-src`; `node scripts/verify-csp.mjs` fails the release otherwise.
    Optionally set `SAVETABS_NOTES_URL`.
 4. Configure the Cloudflare secrets and, if store submission is wanted, the
-   complete Chrome tuple (`CHROME_EXTENSION_ID`, `CHROME_CLIENT_ID`,
-   `CHROME_CLIENT_SECRET`, `CHROME_REFRESH_TOKEN`) and/or the complete Firefox
-   tuple (`FIREFOX_EXTENSION_ID`, `FIREFOX_JWT_ISSUER`, `FIREFOX_JWT_SECRET`).
+   complete Chrome tuple (`CHROME_EXTENSION_ID`, `CHROME_PUBLISHER_ID`,
+   `CHROME_SERVICE_ACCOUNT_EMAIL`, `CHROME_SERVICE_ACCOUNT_PRIVATE_KEY`) and/or
+   the complete Firefox tuple (`FIREFOX_EXTENSION_ID`, `FIREFOX_JWT_ISSUER`,
+   `FIREFOX_JWT_SECRET`).
    A partially configured store fails the release; a fully absent one is
    skipped.
 5. Tag the commit as `v<version>` and push the tag, or run the workflow
