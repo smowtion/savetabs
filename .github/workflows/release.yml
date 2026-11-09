@@ -177,25 +177,28 @@ jobs:
       - name: Submit to Chrome Web Store
         env:
           CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
-          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
-          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
-          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          CHROME_PUBLISHER_ID: ${{ secrets.CHROME_PUBLISHER_ID }}
+          CHROME_SERVICE_ACCOUNT_EMAIL: ${{ secrets.CHROME_SERVICE_ACCOUNT_EMAIL }}
+          CHROME_SERVICE_ACCOUNT_PRIVATE_KEY: ${{ secrets.CHROME_SERVICE_ACCOUNT_PRIVATE_KEY }}
         run: |
-          if [ -z "$CHROME_EXTENSION_ID$CHROME_CLIENT_ID$CHROME_CLIENT_SECRET$CHROME_REFRESH_TOKEN" ]; then
+          if [ -z "$CHROME_EXTENSION_ID$CHROME_PUBLISHER_ID$CHROME_SERVICE_ACCOUNT_EMAIL$CHROME_SERVICE_ACCOUNT_PRIVATE_KEY" ]; then
             echo "Chrome Web Store credentials are not configured; skipping submission."
             exit 0
           fi
           missing=""
-          for name in CHROME_EXTENSION_ID CHROME_CLIENT_ID CHROME_CLIENT_SECRET CHROME_REFRESH_TOKEN; do
+          for name in CHROME_EXTENSION_ID CHROME_PUBLISHER_ID CHROME_SERVICE_ACCOUNT_EMAIL CHROME_SERVICE_ACCOUNT_PRIVATE_KEY; do
             if [ -z "${!name}" ]; then missing="$missing $name"; fi
           done
           if [ -n "$missing" ]; then
-            echo "::error::Chrome Web Store submission requires all of CHROME_EXTENSION_ID, CHROME_CLIENT_ID, CHROME_CLIENT_SECRET and CHROME_REFRESH_TOKEN; missing:$missing"
+            echo "::error::Chrome Web Store submission requires all of CHROME_EXTENSION_ID, CHROME_PUBLISHER_ID, CHROME_SERVICE_ACCOUNT_EMAIL and CHROME_SERVICE_ACCOUNT_PRIVATE_KEY; missing:$missing"
             exit 1
           fi
           pnpm --filter @savetabs/extension exec wxt submit \
-            --chrome-api-version v1.1 \
+            --chrome-api-version v2 \
             --chrome-extension-id "$CHROME_EXTENSION_ID" \
+            --chrome-publisher-id "$CHROME_PUBLISHER_ID" \
+            --chrome-service-account-client-email "$CHROME_SERVICE_ACCOUNT_EMAIL" \
+            --chrome-service-account-private-key "$CHROME_SERVICE_ACCOUNT_PRIVATE_KEY" \
             --chrome-zip "$GITHUB_WORKSPACE/apps/extension/.output/savetabs-${SAVETABS_VERSION}-chrome.zip"
 
       - name: Submit to Firefox Add-ons
