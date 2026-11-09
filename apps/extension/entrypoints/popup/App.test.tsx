@@ -644,6 +644,23 @@ describe("popup", () => {
     });
   });
 
+  it("changes the toolbar click action from the popup", async () => {
+    await seedSettings();
+
+    render(<App />);
+
+    const picker = await screen.findByRole("combobox", {
+      name: "Toolbar button action",
+    });
+    await userEvent.selectOptions(picker, "save");
+
+    await waitFor(async () => {
+      const stored = await fakeBrowser.storage.local.get("settings");
+      const settings = stored.settings as Record<string, unknown>;
+      expect(settings["open.toolbarAction"]).toBe("save");
+    });
+  });
+
   it("enables sync with one click and runs a full sync", async () => {
     await seedSettings();
     syncNowMock.mockResolvedValue({
