@@ -685,7 +685,7 @@
         "title": "Enregistrez chaque onglet. Retrouvez-les plus tard.",
         "description": "SaveTabs enregistre une fenêtre entière du navigateur comme une seule session, ferme les onglets et les rouvre lorsque vous en avez besoin. Il fonctionne dans votre navigateur et conserve vos sessions sur votre appareil.",
         "chrome": "Ajouter à Chrome",
-        "firefox": "Firefox",
+        "firefox": "Ajouter à Firefox",
         "comingSoon": "Bientôt disponible",
         "noAccount": "Aucun compte requis. L'utilisation locale fonctionne sans inscription.",
         "mockup": {
@@ -695,7 +695,8 @@
           "sessionTwo": "Liste de lecture",
           "restore": "Restaurer",
           "sync": "Synchronisation activée"
-        }
+        },
+        "safari": "Safari"
       },
       "trust": {
         "label": "Points forts",
@@ -710,12 +711,16 @@
         "tabs": {
           "sessions": "Sessions",
           "settings": "Réglages",
-          "popup": "Fenêtre"
+          "popup": "Fenêtre",
+          "promo": "Vue d’ensemble",
+          "privacy": "Confidentialité et synchronisation"
         },
         "captions": {
           "sessions": "Chaque fenêtre enregistrée devient une session que vous pouvez restaurer plus tard.",
           "settings": "Choisissez ce qui est enregistré, fermé et synchronisé.",
-          "popup": "Enregistrez tous les onglets de la fenêtre actuelle en un clic."
+          "popup": "Enregistrez tous les onglets de la fenêtre actuelle en un clic.",
+          "promo": "Enregistrez une fenêtre entière, puis retrouvez les mêmes onglets quand vous en avez besoin.",
+          "privacy": "Confidentialité par défaut. Synchronisation chiffrée uniquement si vous l’activez."
         }
       },
       "guide": {
@@ -802,7 +807,7 @@
         "items": {
           "install": {
             "title": "Installer",
-            "body": "Ouvrez la fiche du Chrome Web Store, choisissez Ajouter à Chrome et épinglez SaveTabs à la barre d'outils. Firefox n'est pas encore publié."
+            "body": "Ouvrez la boutique d’extensions de votre navigateur, ajoutez SaveTabs et épinglez-le à la barre d’outils. Disponible sur Chrome et Firefox ; la prise en charge de Safari est en cours de développement."
           },
           "uninstall": {
             "title": "Désinstaller",
@@ -816,7 +821,38 @@
       },
       "footer": {
         "privacy": "Confidentialité",
-        "store": "Chrome Web Store"
+        "store": "Chrome Web Store",
+        "firefoxStore": "Modules pour Firefox"
+      },
+      "faq": {
+        "title": "Les réponses à vos questions",
+        "subtitle": "L’essentiel à savoir avant d’enregistrer votre première fenêtre.",
+        "items": {
+          "account": {
+            "q": "Ai-je besoin d’un compte ?",
+            "a": "Non. SaveTabs fonctionne en local et la synchronisation par clé seule ne nécessite aucun compte. Le compte est facultatif et facilite la configuration sur un nouvel appareil."
+          },
+          "storage": {
+            "q": "Où sont stockées mes sessions ?",
+            "a": "Les sessions sont conservées dans le stockage des extensions de votre navigateur. Si vous activez la synchronisation, des copies chiffrées sont stockées dans le cloud."
+          },
+          "devices": {
+            "q": "Puis-je les restaurer sur un autre appareil ou navigateur ?",
+            "a": "Oui. Activez la synchronisation avec la même clé sur un autre appareil. Chrome, Firefox et Safari sont pris en charge, et la visionneuse web permet de consulter les sessions synchronisées."
+          },
+          "lostKey": {
+            "q": "Que se passe-t-il si je perds ma clé de synchronisation ?",
+            "a": "La clé est le seul moyen de déchiffrer les sessions synchronisées. Exportez vos sessions importantes au format JSON avant de la perdre ; sans elle, les données du cloud ne peuvent pas être récupérées."
+          },
+          "tabs": {
+            "q": "L’enregistrement ferme-t-il mes onglets ?",
+            "a": "Oui, par défaut, pour vider la fenêtre. Vous pouvez désactiver la fermeture après enregistrement dans les paramètres."
+          },
+          "free": {
+            "q": "SaveTabs est-il gratuit ?",
+            "a": "Les fonctions de base de l’extension sont gratuites : sans publicité, sans suivi et sans compte obligatoire. La synchronisation et les comptes sont intégrés et facultatifs."
+          }
+        }
       }
     },
     "sessions": {

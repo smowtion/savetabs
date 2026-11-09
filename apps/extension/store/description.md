@@ -1,10 +1,10 @@
 # SaveTabs — store listing copy
 
 Listing copy for the Chrome Web Store and Firefox Add-ons. English is the
-primary locale; Vietnamese follows the English text. The website and privacy
-policy point at the live deployment; the support email and store listing URLs
-still need real values before submitting. No ratings, install counts, or user
-testimonials are claimed here.
+primary locale; Vietnamese follows the English text. The website, privacy
+policy and both store listings are live; the support email is
+`support@azcom.dev`. No ratings, install counts, or user testimonials are
+claimed here.
 
 ## Name
 
@@ -56,7 +56,7 @@ The sync server stores a public account id derived from your sync key, a SHA-256
 - Privacy policy: https://savetabs.azcom.dev/privacy
 - Support: support@azcom.dev
 - Chrome Web Store: https://chromewebstore.google.com/detail/ajejilnkhplcpgcjfkidkdepjipmocfi
-- Firefox Add-ons: (added after AMO submission)
+- Firefox Add-ons: https://addons.mozilla.org/firefox/addon/save_tabs/
 
 ## Short description (Vietnamese, 107/132 characters)
 
@@ -89,4 +89,4 @@ Máy chủ đồng bộ lưu id tài khoản công khai dẫn xuất từ khoá 
 - Chính sách riêng tư: https://savetabs.azcom.dev/privacy
 - Hỗ trợ: support@azcom.dev
 - Chrome Web Store: https://chromewebstore.google.com/detail/ajejilnkhplcpgcjfkidkdepjipmocfi
-- Firefox Add-ons: (thêm sau khi nộp AMO)
+- Firefox Add-ons: https://addons.mozilla.org/firefox/addon/save_tabs/

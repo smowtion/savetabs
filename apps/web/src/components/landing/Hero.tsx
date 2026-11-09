@@ -3,8 +3,9 @@ import type { Translator } from "@savetabs/shared";
 import {
   DISABLED_BUTTON_CLASS,
   PRIMARY_LINK_CLASS,
+  SECONDARY_LINK_CLASS,
 } from "./landing-styles";
-import { CHROME_STORE_URL } from "./store-links";
+import { CHROME_STORE_URL, FIREFOX_STORE_URL } from "./store-links";
 
 /**
  * Hero: the one `h1`, the product pitch, install actions and a CSS mockup of
@@ -12,7 +13,8 @@ import { CHROME_STORE_URL } from "./store-links";
  *
  * The mockup is a visual aid only: it is hidden from assistive technology and
  * contains no links or controls, so it never competes with the real actions.
- * Firefox stays a disabled button until the AMO listing is published.
+ * Chrome and Firefox are live; Safari stays disabled until its store listing
+ * exists.
  */
 
 type Props = { t: Translator };
@@ -47,10 +49,39 @@ export function Hero({ t }: Props) {
               rel="noreferrer noopener"
               className={PRIMARY_LINK_CLASS}
             >
+              <img
+                src="/icons/chrome.svg"
+                alt=""
+                width={18}
+                height={18}
+                className="size-4"
+              />
               {t("web.landing.hero.chrome")}
             </a>
+            <a
+              href={FIREFOX_STORE_URL}
+              target="_blank"
+              rel="noreferrer noopener"
+              className={SECONDARY_LINK_CLASS}
+            >
+              <img
+                src="/icons/firefox.svg"
+                alt=""
+                width={18}
+                height={18}
+                className="size-4"
+              />
+              {t("web.landing.hero.firefox")}
+            </a>
             <button type="button" disabled className={DISABLED_BUTTON_CLASS}>
-              <span>{t("web.landing.hero.firefox")}</span>
+              <img
+                src="/icons/safari.svg"
+                alt=""
+                width={18}
+                height={18}
+                className="size-4"
+              />
+              <span>{t("web.landing.hero.safari")}</span>
               <span className="rounded-md bg-neutral-200 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
                 {t("web.landing.hero.comingSoon")}
               </span>

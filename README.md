@@ -254,12 +254,14 @@ v0.1.0 is live on Cloudflare:
   check).
 - Web: `https://savetabs.azcom.dev` — static-assets Worker `savetabs-web` with
   SPA fallback, so `/privacy` and `/sessions` resolve on first load.
-- Extension packages: `apps/extension/.output/savetabs-0.1.0-{chrome,firefox}.zip`,
+- Extension packages: `apps/extension/.output/savetabs-0.2.2-{chrome,firefox}.zip`,
   built with `WXT_SAVETABS_API_BASE=https://savetabs-api.azcom.dev`.
 
-Chrome Web Store listing is submitted and pending review
+Chrome Web Store 0.2.2 is pending review
 (`https://chromewebstore.google.com/detail/ajejilnkhplcpgcjfkidkdepjipmocfi`);
-the Firefox Add-ons listing is not created yet. Store listing copy lives in
+Firefox Add-ons 0.2.2 is live
+(`https://addons.mozilla.org/firefox/addon/save_tabs/`). Safari is built but
+not distributed yet. Store listing copy lives in
 `apps/extension/store/description.md`, permission justifications in
 `apps/extension/store/permissions.md`, and the privacy answers in
 `apps/extension/store/privacy-notes.md`. Screenshots for the Chrome listing are
@@ -272,12 +274,10 @@ pnpm --filter @savetabs/extension screenshots
 
 ## Remaining placeholders
 
-- Firefox Add-ons listing URL in `apps/extension/lib/store-urls.ts` and the
-  Firefox link in `apps/extension/store/description.md` once AMO submission
-  exists. The add-on id is `savetabs@azcom.dev`; the AMO data-collection
-  declaration is `required: ["none"]`, optional `browsingActivity`,
-  `authenticationInfo`, `personallyIdentifyingInfo`, and
-  `technicalAndInteraction`.
+- Safari distribution: the MV3 build exists in
+  `apps/extension/.output/safari-mv3/`, but the Xcode project and Mac App Store
+  listing still need an Apple Developer account. See
+  `docs/safari-extension-guide.md`.
 - Build-time defaults (`https://api.savetabs.example` in
   `apps/extension/lib/config.ts` and `apps/web/src/lib/config.ts`) stay as
   guards for builds that forget to set the API origin.

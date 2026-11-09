@@ -15,9 +15,11 @@ import Landing from "./Landing";
 /** A syntactically valid key: ST- prefix plus 26 Crockford symbols. */
 const VALID_KEY = "ST-00000-00000-00000-00000-00000-0";
 
-/** The published Chrome Web Store listing. Firefox is not published yet. */
+/** The published store listings. Safari is not distributed yet. */
 const CHROME_STORE_URL =
   "https://chromewebstore.google.com/detail/ajejilnkhplcpgcjfkidkdepjipmocfi";
+const FIREFOX_STORE_URL =
+  "https://addons.mozilla.org/firefox/addon/save_tabs/";
 
 const WEB_TRANSLATION_KEYS = [
   "web.landing.title",
@@ -35,6 +37,7 @@ const WEB_TRANSLATION_KEYS = [
   "web.landing.hero.description",
   "web.landing.hero.chrome",
   "web.landing.hero.firefox",
+  "web.landing.hero.safari",
   "web.landing.hero.comingSoon",
   "web.landing.hero.noAccount",
   "web.landing.hero.mockup.save",
@@ -53,9 +56,13 @@ const WEB_TRANSLATION_KEYS = [
   "web.landing.gallery.tabs.sessions",
   "web.landing.gallery.tabs.settings",
   "web.landing.gallery.tabs.popup",
+  "web.landing.gallery.tabs.promo",
+  "web.landing.gallery.tabs.privacy",
   "web.landing.gallery.captions.sessions",
   "web.landing.gallery.captions.settings",
   "web.landing.gallery.captions.popup",
+  "web.landing.gallery.captions.promo",
+  "web.landing.gallery.captions.privacy",
   "web.landing.guide.saveAlt",
   "web.landing.guide.restoreAlt",
   "web.landing.howItWorks.title",
@@ -102,6 +109,21 @@ const WEB_TRANSLATION_KEYS = [
   "web.landing.install.items.troubleshooting.body",
   "web.landing.footer.privacy",
   "web.landing.footer.store",
+  "web.landing.footer.firefoxStore",
+  "web.landing.faq.title",
+  "web.landing.faq.subtitle",
+  "web.landing.faq.items.account.q",
+  "web.landing.faq.items.account.a",
+  "web.landing.faq.items.storage.q",
+  "web.landing.faq.items.storage.a",
+  "web.landing.faq.items.devices.q",
+  "web.landing.faq.items.devices.a",
+  "web.landing.faq.items.lostKey.q",
+  "web.landing.faq.items.lostKey.a",
+  "web.landing.faq.items.tabs.q",
+  "web.landing.faq.items.tabs.a",
+  "web.landing.faq.items.free.q",
+  "web.landing.faq.items.free.a",
   "web.language.toggle",
   "web.theme.toggle",
   "web.theme.system",
@@ -148,7 +170,7 @@ describe("Landing", () => {
     );
     expect(screen.getByRole("button", { name: "Continue" })).toBeInTheDocument();
     expect(
-      screen.getByText(/cannot be recovered/i),
+      screen.getByText(/If you lose it, your saved data cannot be recovered/i),
     ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Privacy policy" })).toHaveAttribute(
       "href",
@@ -217,9 +239,21 @@ describe("Landing", () => {
     }
   });
 
-  it("switches the screenshot gallery between its three tabs", async () => {
+  it("switches the screenshot gallery between its five tabs", async () => {
     const user = userEvent.setup();
     renderLanding();
+
+    expect(screen.getByRole("tab", { name: "Overview" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    expect(
+      screen.getByRole("img", {
+        name: "Save a whole window, then restore the exact tabs when you need them.",
+      }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("tab", { name: "Sessions" }));
 
     expect(screen.getByRole("tab", { name: "Sessions" })).toHaveAttribute(
       "aria-selected",
@@ -229,31 +263,39 @@ describe("Landing", () => {
       screen.getByRole("img", {
         name: "Each saved window becomes one session you can restore later.",
       }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
+    expect(
+      screen.queryByRole("img", {
+        name: "Save a whole window, then restore the exact tabs when you need them.",
+      }),
+    ).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("tab", { name: "Settings" }));
-
-    expect(screen.getByRole("tab", { name: "Settings" })).toHaveAttribute(
-      "aria-selected",
-      "true",
-    );
     expect(
       screen.getByRole("img", {
         name: "Choose what gets saved, closed, and synced.",
       }),
     ).toBeVisible();
+
+    await user.click(screen.getByRole("tab", { name: "Privacy & sync" }));
     expect(
-      screen.queryByRole("img", {
-        name: "Each saved window becomes one session you can restore later.",
+      screen.getByRole("img", {
+        name: "Private by default. Encrypted sync only when you turn it on.",
       }),
-    ).not.toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it("moves the gallery selection with the arrow keys", async () => {
     const user = userEvent.setup();
     renderLanding();
 
-    screen.getByRole("tab", { name: "Sessions" }).focus();
+    screen.getByRole("tab", { name: "Overview" }).focus();
+
+    await user.keyboard("{ArrowRight}");
+    expect(screen.getByRole("tab", { name: "Sessions" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
 
     await user.keyboard("{ArrowRight}");
     expect(screen.getByRole("tab", { name: "Settings" })).toHaveAttribute(
@@ -268,37 +310,55 @@ describe("Landing", () => {
     );
 
     await user.keyboard("{ArrowRight}");
-    expect(screen.getByRole("tab", { name: "Sessions" })).toHaveAttribute(
+    expect(screen.getByRole("tab", { name: "Privacy & sync" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+
+    await user.keyboard("{ArrowRight}");
+    expect(screen.getByRole("tab", { name: "Overview" })).toHaveAttribute(
       "aria-selected",
       "true",
     );
   });
 
-  it("shows a labelled visual in the save and restore guide steps", () => {
-    renderLanding();
+  it("shows the generated visuals in the save, close and restore guide", () => {
+    const { container } = renderLanding();
 
-    expect(
-      screen.getByRole("img", {
-        name: "The SaveTabs popup with the save action",
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("img", {
-        name: "The sessions page with saved windows ready to restore",
-      }),
-    ).toBeInTheDocument();
+    for (const src of [
+      "/images/guide-save.webp",
+      "/images/guide-close.webp",
+      "/images/guide-restore.webp",
+    ]) {
+      expect(container.querySelector(`img[src="${src}"]`)).toBeInTheDocument();
+    }
   });
 
-  it("offers the Chrome install and a disabled Firefox button", () => {
+  it("links the Chrome and Firefox install buttons and disables Safari", () => {
     renderLanding();
 
-    expect(
-      screen.getByRole("link", { name: /add to chrome/i }),
-    ).toHaveAttribute("href", CHROME_STORE_URL);
+    const chromeLinks = screen.getAllByRole("link", {
+      name: /add to chrome/i,
+    });
+    expect(chromeLinks.length).toBeGreaterThanOrEqual(1);
+    for (const link of chromeLinks) {
+      expect(link).toHaveAttribute("href", CHROME_STORE_URL);
+    }
 
-    const firefox = screen.getByRole("button", { name: /firefox/i });
-    expect(firefox).toBeDisabled();
-    expect(firefox).toHaveTextContent(/coming soon/i);
+    const firefoxLinks = screen.getAllByRole("link", {
+      name: /add to firefox/i,
+    });
+    expect(firefoxLinks.length).toBeGreaterThanOrEqual(1);
+    for (const link of firefoxLinks) {
+      expect(link).toHaveAttribute("href", FIREFOX_STORE_URL);
+    }
+
+    const safariButtons = screen.getAllByRole("button", { name: /safari/i });
+    expect(safariButtons.length).toBeGreaterThanOrEqual(1);
+    for (const button of safariButtons) {
+      expect(button).toBeDisabled();
+      expect(button).toHaveTextContent(/coming soon/i);
+    }
   });
 
   it("links the account actions and the sync-key path", () => {
@@ -353,7 +413,7 @@ describe("Landing", () => {
     }
   });
 
-  it("shows the support address and the store listing in the footer", () => {
+  it("shows the support address and both store listings in the footer", () => {
     renderLanding();
 
     expect(
@@ -362,6 +422,23 @@ describe("Landing", () => {
     expect(
       screen.getByRole("link", { name: "Chrome Web Store" }),
     ).toHaveAttribute("href", CHROME_STORE_URL);
+    expect(
+      screen.getByRole("link", { name: "Firefox Add-ons" }),
+    ).toHaveAttribute("href", FIREFOX_STORE_URL);
+  });
+
+  it("answers the first FAQ entry on demand", async () => {
+    const user = userEvent.setup();
+    renderLanding();
+
+    const question = screen.getByText("Do I need an account?");
+    expect(question).toBeInTheDocument();
+
+    await user.click(question);
+
+    expect(
+      screen.getByText(/SaveTabs works locally and key-only sync needs no account/i),
+    ).toBeVisible();
   });
 
   it("avoids percentage claims in the copy", () => {

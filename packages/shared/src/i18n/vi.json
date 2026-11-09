@@ -685,7 +685,7 @@
         "title": "Lưu mọi tab. Mở lại khi cần.",
         "description": "SaveTabs lưu toàn bộ cửa sổ trình duyệt thành một phiên, đóng các tab rồi mở lại khi bạn cần. Tiện ích chạy trong trình duyệt và giữ các phiên trên thiết bị của bạn.",
         "chrome": "Thêm vào Chrome",
-        "firefox": "Firefox",
+        "firefox": "Thêm vào Firefox",
         "comingSoon": "Sắp ra mắt",
         "noAccount": "Không cần tài khoản. Bạn có thể dùng cục bộ mà không cần đăng ký.",
         "mockup": {
@@ -695,7 +695,8 @@
           "sessionTwo": "Danh sách đọc",
           "restore": "Khôi phục",
           "sync": "Đang đồng bộ"
-        }
+        },
+        "safari": "Safari"
       },
       "trust": {
         "label": "Điểm nổi bật",
@@ -710,12 +711,16 @@
         "tabs": {
           "sessions": "Phiên",
           "settings": "Cài đặt",
-          "popup": "Cửa sổ tiện ích"
+          "popup": "Cửa sổ tiện ích",
+          "promo": "Tổng quan",
+          "privacy": "Riêng tư & đồng bộ"
         },
         "captions": {
           "sessions": "Mỗi cửa sổ đã lưu trở thành một phiên để bạn khôi phục sau.",
           "settings": "Chọn nội dung được lưu, đóng và đồng bộ.",
-          "popup": "Lưu mọi tab trong cửa sổ hiện tại chỉ với một cú nhấp."
+          "popup": "Lưu mọi tab trong cửa sổ hiện tại chỉ với một cú nhấp.",
+          "promo": "Lưu cả cửa sổ, rồi khôi phục đúng các tab khi cần.",
+          "privacy": "Riêng tư mặc định. Chỉ đồng bộ mã hoá khi bạn bật."
         }
       },
       "guide": {
@@ -802,7 +807,7 @@
         "items": {
           "install": {
             "title": "Cài đặt",
-            "body": "Mở trang Chrome Web Store, chọn Thêm vào Chrome rồi ghim SaveTabs lên thanh công cụ. Firefox chưa được phát hành."
+            "body": "Mở cửa hàng tiện ích của trình duyệt, thêm SaveTabs và ghim lên thanh công cụ. Đã có Chrome và Firefox; Safari đang được phát triển."
           },
           "uninstall": {
             "title": "Gỡ cài đặt",
@@ -816,7 +821,38 @@
       },
       "footer": {
         "privacy": "Quyền riêng tư",
-        "store": "Chrome Web Store"
+        "store": "Chrome Web Store",
+        "firefoxStore": "Tiện ích Firefox"
+      },
+      "faq": {
+        "title": "Câu hỏi thường gặp",
+        "subtitle": "Những điều người dùng hỏi trước khi lưu cửa sổ đầu tiên.",
+        "items": {
+          "account": {
+            "q": "Tôi có cần tài khoản không?",
+            "a": "Không. SaveTabs chạy cục bộ và đồng bộ chỉ bằng khoá, không cần tài khoản. Tài khoản là tuỳ chọn, giúp thiết lập trên máy mới dễ hơn."
+          },
+          "storage": {
+            "q": "Phiên của tôi được lưu ở đâu?",
+            "a": "Phiên nằm trong bộ nhớ của extension trên trình duyệt. Nếu bật đồng bộ, bản mã hoá được lưu trên đám mây."
+          },
+          "devices": {
+            "q": "Có thể khôi phục trên thiết bị hoặc trình duyệt khác không?",
+            "a": "Có. Bật đồng bộ bằng cùng một khoá trên thiết bị khác. Hỗ trợ Chrome, Firefox và Safari; trình xem web cũng đọc được phiên đã đồng bộ."
+          },
+          "lostKey": {
+            "q": "Nếu mất khoá đồng bộ thì sao?",
+            "a": "Khoá là cách duy nhất để giải mã phiên đã đồng bộ. Hãy xuất các phiên quan trọng ra JSON trước khi mất khoá; nếu không có khoá, dữ liệu đám mây không thể khôi phục."
+          },
+          "tabs": {
+            "q": "Lưu có đóng tab của tôi không?",
+            "a": "Mặc định có, để cửa sổ trống. Bạn có thể tắt tự đóng sau khi lưu trong Cài đặt."
+          },
+          "free": {
+            "q": "SaveTabs có miễn phí không?",
+            "a": "Phần lõi miễn phí: không quảng cáo, không theo dõi, không cần tài khoản. Đồng bộ và tài khoản là tuỳ chọn tích hợp sẵn."
+          }
+        }
       }
     },
     "privacy": {

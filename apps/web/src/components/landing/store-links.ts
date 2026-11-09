@@ -1,12 +1,14 @@
 /**
  * Public links shown on the landing page.
  *
- * The Chrome Web Store listing is live; Firefox is not published on AMO yet,
- * so the landing page renders a disabled "coming soon" button instead of a
- * link. Keeping the URLs here lets the hero and footer stay in sync.
+ * Chrome and Firefox listings are live. Safari is built but not distributed
+ * yet, so it stays a disabled action until the Mac App Store listing exists.
  */
 
 export const CHROME_STORE_URL =
   "https://chromewebstore.google.com/detail/ajejilnkhplcpgcjfkidkdepjipmocfi";
+
+export const FIREFOX_STORE_URL =
+  "https://addons.mozilla.org/firefox/addon/save_tabs/";
 
 export const SUPPORT_EMAIL = "support@azcom.dev";

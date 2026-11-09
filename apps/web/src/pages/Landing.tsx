@@ -3,6 +3,7 @@ import { Monitor, Moon, Sun } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { AccountCta } from "../components/landing/AccountCta";
+import { FaqSection } from "../components/landing/FaqSection";
 import { FeatureGrid } from "../components/landing/FeatureGrid";
 import { Hero } from "../components/landing/Hero";
 import { HowItWorks } from "../components/landing/HowItWorks";
@@ -105,6 +106,7 @@ export default function Landing() {
         <HowItWorks t={t} />
         <PrivacySection t={t} />
         <FeatureGrid t={t} />
+        <FaqSection t={t} />
         <AccountCta t={t} />
         <SyncKeyPanel t={t} />
         <InstallHelp t={t} />
