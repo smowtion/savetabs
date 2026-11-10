@@ -825,7 +825,9 @@
         "privacy": "개인정보",
         "store": "Chrome Web Store",
         "firefoxStore": "Firefox 부가 기능",
-        "changelog": "변경 내역"
+        "changelog": "변경 내역",
+        "product": "제품",
+        "resources": "리소스"
       },
       "faq": {
         "title": "자주 묻는 질문",

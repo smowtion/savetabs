@@ -825,7 +825,9 @@
         "privacy": "Quyền riêng tư",
         "store": "Chrome Web Store",
         "firefoxStore": "Tiện ích Firefox",
-        "changelog": "Nhật ký thay đổi"
+        "changelog": "Nhật ký thay đổi",
+        "product": "Sản phẩm",
+        "resources": "Tài nguyên"
       },
       "faq": {
         "title": "Câu hỏi thường gặp",

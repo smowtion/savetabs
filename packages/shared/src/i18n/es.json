@@ -825,7 +825,9 @@
         "privacy": "Privacidad",
         "store": "Chrome Web Store",
         "firefoxStore": "Complementos de Firefox",
-        "changelog": "Registro de cambios"
+        "changelog": "Registro de cambios",
+        "product": "Producto",
+        "resources": "Recursos"
       },
       "faq": {
         "title": "Resolvemos tus dudas",

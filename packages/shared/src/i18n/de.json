@@ -825,7 +825,9 @@
         "privacy": "Datenschutz",
         "store": "Chrome Web Store",
         "firefoxStore": "Firefox-Add-ons",
-        "changelog": "Änderungsprotokoll"
+        "changelog": "Änderungsprotokoll",
+        "product": "Produkt",
+        "resources": "Ressourcen"
       },
       "faq": {
         "title": "Deine Fragen, beantwortet",

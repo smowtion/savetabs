@@ -825,7 +825,9 @@
         "privacy": "गोपनीयता",
         "store": "Chrome Web Store",
         "firefoxStore": "Firefox ऐड-ऑन",
-        "changelog": "परिवर्तन लॉग"
+        "changelog": "परिवर्तन लॉग",
+        "product": "उत्पाद",
+        "resources": "संसाधन"
       },
       "faq": {
         "title": "आपके सवालों के जवाब",

@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { AccountCta } from "../components/landing/AccountCta";
 import { FaqSection } from "../components/landing/FaqSection";
 import { FeatureGrid } from "../components/landing/FeatureGrid";
+import { GitHubIcon } from "../components/landing/GitHubIcon";
 import { Hero } from "../components/landing/Hero";
 import { HowItWorks } from "../components/landing/HowItWorks";
 import { InstallHelp } from "../components/landing/InstallHelp";
@@ -13,6 +14,7 @@ import { HEADER_CONTROL_CLASS } from "../components/landing/landing-styles";
 import { PrivacySection } from "../components/landing/PrivacySection";
 import { ScreenshotGallery } from "../components/landing/ScreenshotGallery";
 import { SiteFooter } from "../components/landing/SiteFooter";
+import { GITHUB_URL } from "../components/landing/store-links";
 import { SyncKeyPanel } from "../components/landing/SyncKeyPanel";
 import { TrustStrip } from "../components/landing/TrustStrip";
 import { useI18n } from "../hooks/useI18n";
@@ -93,12 +95,25 @@ export default function Landing() {
             >
               <ThemeIcon aria-hidden="true" size={16} />
             </button>
-            <a
-              href="#use-sync-key"
-              className={`${HEADER_CONTROL_CLASS} hidden whitespace-nowrap md:inline-flex`}
-            >
-              {t("web.landing.title")}
-            </a>
+            <span className="hidden sm:block">
+              <a
+                href={GITHUB_URL}
+                target="_blank"
+                rel="noreferrer noopener"
+                className={HEADER_CONTROL_CLASS}
+              >
+                <GitHubIcon className="size-4" />
+                GitHub
+              </a>
+            </span>
+            <span className="hidden md:block">
+              <a
+                href="#use-sync-key"
+                className={`${HEADER_CONTROL_CLASS} whitespace-nowrap`}
+              >
+                {t("web.landing.title")}
+              </a>
+            </span>
             <Link to={accountPath} className={HEADER_CONTROL_CLASS}>
               {t("web.landing.header.account")}
             </Link>
@@ -120,7 +135,7 @@ export default function Landing() {
         <InstallHelp t={t} />
       </main>
 
-      <SiteFooter t={t} />
+      <SiteFooter t={t} accountPath={accountPath} />
     </div>
   );
 }

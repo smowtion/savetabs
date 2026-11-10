@@ -825,7 +825,9 @@
         "privacy": "Confidentialité",
         "store": "Chrome Web Store",
         "firefoxStore": "Modules pour Firefox",
-        "changelog": "Journal des modifications"
+        "changelog": "Journal des modifications",
+        "product": "Produit",
+        "resources": "Ressources"
       },
       "faq": {
         "title": "Les réponses à vos questions",
