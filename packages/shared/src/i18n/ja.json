@@ -825,7 +825,9 @@
         "privacy": "プライバシー",
         "store": "Chrome Web Store",
         "firefoxStore": "Firefox アドオン",
-        "changelog": "変更履歴"
+        "changelog": "変更履歴",
+        "product": "製品",
+        "resources": "リソース"
       },
       "faq": {
         "title": "よくある質問",

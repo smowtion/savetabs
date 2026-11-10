@@ -20,6 +20,7 @@ const CHROME_STORE_URL =
   "https://chromewebstore.google.com/detail/ajejilnkhplcpgcjfkidkdepjipmocfi";
 const FIREFOX_STORE_URL =
   "https://addons.mozilla.org/firefox/addon/save_tabs/";
+const GITHUB_URL = "https://github.com/smowtion/savetabs";
 
 const WEB_TRANSLATION_KEYS = [
   "web.landing.title",
@@ -121,6 +122,8 @@ const WEB_TRANSLATION_KEYS = [
   "web.landing.footer.store",
   "web.landing.footer.firefoxStore",
   "web.landing.footer.changelog",
+  "web.landing.footer.product",
+  "web.landing.footer.resources",
   "web.landing.faq.title",
   "web.landing.faq.subtitle",
   "web.landing.faq.items.account.q",
@@ -234,6 +237,15 @@ describe("Landing", () => {
     expect(footerLogo).toHaveAttribute("src", "/icon.svg");
     expect(footerLogo).toHaveAttribute("alt", "");
     expect(footerLogo).toHaveAttribute("width", "28");
+  });
+
+  it("links GitHub from the header with its mark", () => {
+    renderLanding();
+
+    const header = screen.getByRole("banner");
+    const link = within(header).getByRole("link", { name: "GitHub" });
+    expect(link).toHaveAttribute("href", GITHUB_URL);
+    expect(link.querySelector("svg")).not.toBeNull();
   });
 
   it("estimates memory savings from the tab count", () => {
@@ -383,10 +395,9 @@ describe("Landing", () => {
   it("links the account actions and the sync-key path", () => {
     renderLanding();
 
-    expect(screen.getByRole("link", { name: "Account" })).toHaveAttribute(
-      "href",
-      "/login",
-    );
+    expect(
+      within(screen.getByRole("banner")).getByRole("link", { name: "Account" }),
+    ).toHaveAttribute("href", "/login");
     expect(
       screen.getByRole("link", { name: "Create account" }),
     ).toHaveAttribute("href", "/signup");
@@ -420,12 +431,13 @@ describe("Landing", () => {
     expect(sections[1]).toBe(form);
 
     const links = screen.getAllByRole("link", { name: "Open your saved tabs" });
-    expect(links).toHaveLength(2);
+    expect(links).toHaveLength(3);
     for (const link of links) {
       expect(link).toHaveAttribute("href", "#use-sync-key");
     }
     expect(links[0].closest("header")).not.toBeNull();
     expect(links[1].closest("section")).not.toBeNull();
+    expect(links[2].closest("footer")).not.toBeNull();
   });
 
   it("points the header account link at the account page when signed in", () => {
@@ -433,10 +445,9 @@ describe("Landing", () => {
 
     renderLanding();
 
-    expect(screen.getByRole("link", { name: "Account" })).toHaveAttribute(
-      "href",
-      "/account",
-    );
+    expect(
+      within(screen.getByRole("banner")).getByRole("link", { name: "Account" }),
+    ).toHaveAttribute("href", "/account");
   });
 
   it("keeps the key path available", () => {
@@ -458,23 +469,33 @@ describe("Landing", () => {
   it("shows the support address and both store listings in the footer", () => {
     renderLanding();
 
+    const footer = screen.getByRole("contentinfo");
     expect(
-      screen.getByRole("link", { name: "support@azcom.dev" }),
+      within(footer).getByRole("heading", { name: "Product" }),
+    ).toBeInTheDocument();
+    expect(
+      within(footer).getByRole("heading", { name: "Resources" }),
+    ).toBeInTheDocument();
+    expect(
+      within(footer).getByRole("link", { name: "support@azcom.dev" }),
     ).toHaveAttribute("href", "mailto:support@azcom.dev");
     expect(
-      screen.getByRole("link", { name: "Chrome Web Store" }),
+      within(footer).getByRole("link", { name: "Chrome Web Store" }),
     ).toHaveAttribute("href", CHROME_STORE_URL);
     expect(
-      screen.getByRole("link", { name: "Firefox Add-ons" }),
+      within(footer).getByRole("link", { name: "Firefox Add-ons" }),
     ).toHaveAttribute("href", FIREFOX_STORE_URL);
-    expect(screen.getByRole("link", { name: "Changelog" })).toHaveAttribute(
-      "href",
-      "/changelog",
-    );
-    expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute(
-      "href",
-      "https://github.com/smowtion/savetabs",
-    );
+    expect(
+      within(footer).getByRole("link", { name: "Changelog" }),
+    ).toHaveAttribute("href", "/changelog");
+    expect(
+      within(footer).getByRole("link", { name: "GitHub" }),
+    ).toHaveAttribute("href", GITHUB_URL);
+
+    // Every footer link carries an icon so the groups stay scannable.
+    for (const link of within(footer).getAllByRole("link")) {
+      expect(link.querySelector("svg, img")).not.toBeNull();
+    }
   });
 
   it("answers the first FAQ entry on demand", async () => {

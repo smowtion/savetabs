@@ -825,7 +825,9 @@
         "privacy": "الخصوصية",
         "store": "Chrome Web Store",
         "firefoxStore": "إضافات Firefox",
-        "changelog": "سجل التغييرات"
+        "changelog": "سجل التغييرات",
+        "product": "المنتج",
+        "resources": "الموارد"
       },
       "faq": {
         "title": "أسئلتك وإجاباتها",

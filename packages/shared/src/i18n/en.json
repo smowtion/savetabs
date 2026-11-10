@@ -825,7 +825,9 @@
         "privacy": "Privacy",
         "store": "Chrome Web Store",
         "firefoxStore": "Firefox Add-ons",
-        "changelog": "Changelog"
+        "changelog": "Changelog",
+        "product": "Product",
+        "resources": "Resources"
       },
       "faq": {
         "title": "Questions, answered",

@@ -825,7 +825,9 @@
         "privacy": "Конфиденциальность",
         "store": "Chrome Web Store",
         "firefoxStore": "Дополнения Firefox",
-        "changelog": "Журнал изменений"
+        "changelog": "Журнал изменений",
+        "product": "Продукт",
+        "resources": "Ресурсы"
       },
       "faq": {
         "title": "Ответы на вопросы",

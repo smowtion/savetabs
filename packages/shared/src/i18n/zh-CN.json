@@ -825,7 +825,9 @@
         "privacy": "隐私",
         "store": "Chrome Web Store",
         "firefoxStore": "Firefox 附加组件",
-        "changelog": "更新日志"
+        "changelog": "更新日志",
+        "product": "产品",
+        "resources": "资源"
       },
       "faq": {
         "title": "常见问题",
